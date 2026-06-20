@@ -1,0 +1,3883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Linux on Windows (WSL) & AOSP Mastery Portal</title>
+  <meta name="description" content="Master Linux, Windows Subsystem for Linux (WSL), Git, Repo, and Android Open Source Project (AOSP) system development.">
+  
+  <!-- Premium Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================
+       1. DESIGN SYSTEM & UTILITIES
+       ========================================== */
+    :root {
+      /* Theme color tokens - Default Dark Mode */
+      --hue: 250;
+      --bg-main: hsl(var(--hue), 47%, 4%);
+      --bg-sidebar: hsl(var(--hue), 45%, 6%);
+      --bg-card: hsl(var(--hue), 40%, 8%);
+      --bg-card-hover: hsl(var(--hue), 35%, 11%);
+      --border-card: hsla(var(--hue), 40%, 20%, 0.4);
+      --border-focus: hsl(var(--hue), 85%, 65%);
+      --text-main: hsl(210, 40%, 98%);
+      --text-muted: hsl(215, 20%, 65%);
+      --primary: hsl(var(--hue), 89%, 65%);
+      --primary-hover: hsl(var(--hue), 95%, 70%);
+      --primary-glow: hsla(var(--hue), 89%, 65%, 0.15);
+      --secondary: hsl(190, 90%, 50%);
+      --accent: hsl(320, 90%, 55%);
+      
+      --success: hsl(142, 70%, 45%);
+      --warning: hsl(38, 92%, 50%);
+      --danger: hsl(350, 80%, 50%);
+      
+      --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: 'JetBrains Mono', SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
+      
+      --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.5);
+      --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+      --shadow-lg: 0 16px 40px -8px rgba(0, 0, 0, 0.8);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Light Theme Color Overrides */
+    [data-theme="light"] {
+      --bg-main: hsl(210, 40%, 98%);
+      --bg-sidebar: hsl(210, 30%, 95%);
+      --bg-card: hsl(0, 0%, 100%);
+      --bg-card-hover: hsl(210, 20%, 98%);
+      --border-card: hsla(var(--hue), 30%, 80%, 0.5);
+      --border-focus: hsl(var(--hue), 85%, 55%);
+      --text-main: hsl(222, 47%, 12%);
+      --text-muted: hsl(215, 16%, 47%);
+      --primary: hsl(var(--hue), 89%, 55%);
+      --primary-hover: hsl(var(--hue), 95%, 60%);
+      --primary-glow: hsla(var(--hue), 89%, 55%, 0.08);
+      --secondary: hsl(190, 90%, 40%);
+      --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 16px 40px -8px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-main);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-card);
+      border-radius: var(--radius-sm);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--primary);
+    }
+
+    /* Typography */
+    h1, h2, h3, h4, h5 {
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      color: var(--text-main);
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 1.5rem; }
+    h2 { font-size: 1.85rem; margin-bottom: 1rem; border-bottom: 2px solid var(--border-card); padding-bottom: 0.5rem; }
+    h3 { font-size: 1.4rem; margin-bottom: 0.75rem; }
+    p { line-height: 1.6; margin-bottom: 1.25rem; color: var(--text-muted); font-size: 1.05rem; }
+
+    /* Layout structure */
+    .sidebar {
+      width: 300px;
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-card);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 100;
+      transition: transform 0.3s var(--transition);
+    }
+
+    .main-layout {
+      margin-left: 300px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    .top-bar {
+      height: 70px;
+      border-bottom: 1px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      background-color: rgba(var(--bg-main), 0.7);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .content-area {
+      padding: 2.5rem;
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    /* ==========================================
+       2. COMPONENTS
+       ========================================== */
+
+    /* Glassmorphism Card Style */
+    .glass-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: var(--transition);
+      backdrop-filter: blur(12px);
+    }
+    .glass-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-sans);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      border: 1px solid transparent;
+      outline: none;
+    }
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background-color: transparent;
+      border-color: var(--border-card);
+      color: var(--text-main);
+    }
+    .btn-secondary:hover {
+      background-color: var(--bg-card-hover);
+      border-color: var(--text-muted);
+    }
+
+    /* Sidebar Logo */
+    .logo-container {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-card);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: white;
+      font-size: 1.25rem;
+      box-shadow: 0 0 15px var(--primary-glow);
+    }
+    .logo-text h2 {
+      font-size: 1.2rem;
+      margin: 0;
+      border: none;
+      padding: 0;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .logo-text span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Sidebar User Profile */
+    .sidebar-profile {
+      padding: 1.25rem;
+      border-bottom: 1px solid var(--border-card);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .profile-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .avatar {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      background: var(--bg-card-hover);
+      border: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    .user-name-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+    .user-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+    .user-title {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .profile-xp {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+    .xp-bar-container {
+      width: 100%;
+      height: 6px;
+      background: var(--bg-main);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .xp-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      transition: width 0.5s ease-out;
+    }
+
+    /* Sidebar Navigation Links */
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem 0.75rem;
+    }
+    .nav-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      padding: 0.5rem 0.75rem;
+      margin-top: 0.75rem;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 0.75rem;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      user-select: none;
+      margin-bottom: 0.2rem;
+    }
+    .nav-item:hover, .nav-item.active {
+      color: var(--text-main);
+      background-color: var(--bg-card-hover);
+    }
+    .nav-item.active {
+      border-left: 3px solid var(--primary);
+    }
+    .nav-item-left {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .nav-item svg {
+      width: 18px;
+      height: 18px;
+    }
+    .nav-badge {
+      font-size: 0.7rem;
+      background: var(--border-card);
+      color: var(--text-muted);
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+    }
+    .nav-badge.completed {
+      background: var(--success);
+      color: white;
+    }
+
+    /* Streak & Status Indicators */
+    .status-indicators {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .streak-display {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(255, 120, 0, 0.1);
+      border: 1px solid rgba(255, 120, 0, 0.2);
+      color: rgb(255, 120, 0);
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .streak-display svg {
+      fill: rgb(255, 120, 0);
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Search Bar */
+    .search-box {
+      position: relative;
+      width: 300px;
+    }
+    .search-box input {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      color: var(--text-main);
+      padding: 0.5rem 1rem 0.5rem 2.25rem;
+      border-radius: 30px;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      outline: none;
+      transition: var(--transition);
+    }
+    .search-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 10px var(--primary-glow);
+    }
+    .search-box svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+    }
+
+    /* Collapsible Pages */
+    .page {
+      display: block;
+    }
+    .page.hidden {
+      display: none;
+    }
+
+    /* Global XP Notification Overlay */
+    .xp-float {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      padding: 0.75rem 1.25rem;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100px);
+      opacity: 0;
+      z-index: 200;
+      transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .xp-float.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* ==========================================
+       3. DASHBOARD PAGE
+       ========================================== */
+    .dashboard-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stat-val {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin: 0.25rem 0;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .stat-icon {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border-card);
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+    }
+    .stat-icon svg { width: 24px; height: 24px; }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .dash-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Modules List styling */
+    .module-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      border-radius: var(--radius-md);
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      transition: var(--transition);
+      cursor: pointer;
+    }
+    .module-card:hover {
+      border-color: var(--primary);
+      transform: translateX(4px);
+    }
+    .module-card-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .module-number {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      background: var(--primary-glow);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .module-details h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+    }
+    .module-details p {
+      font-size: 0.8rem;
+      margin: 0;
+      color: var(--text-muted);
+    }
+    .module-card-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Badge Grid */
+    .badge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .badge-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 0.5rem;
+      opacity: 0.3;
+      filter: grayscale(1);
+      transition: var(--transition);
+    }
+    .badge-item.unlocked {
+      opacity: 1;
+      filter: grayscale(0);
+    }
+    .badge-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .badge-item.unlocked .badge-icon {
+      box-shadow: 0 0 12px var(--primary-glow);
+      animation: pulse-glow 2s infinite alternate;
+    }
+    .badge-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    @keyframes pulse-glow {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05); }
+    }
+
+    /* ==========================================
+       4. MODULE DOCUMENTATION DISPLAY
+       ========================================== */
+    .module-header-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-card);
+      padding-bottom: 1rem;
+    }
+    .module-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .module-content-body {
+      max-width: 850px;
+      margin-bottom: 3rem;
+    }
+    .module-content-body ul, .module-content-body ol {
+      margin-left: 2rem;
+      margin-bottom: 1.5rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .module-content-body li {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Code Blocks */
+    .code-container {
+      position: relative;
+      margin: 1.5rem 0;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid var(--border-card);
+    }
+    .code-header {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 0.5rem 1rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-card);
+    }
+    .copy-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.7rem;
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    .copy-btn:hover {
+      color: var(--text-main);
+    }
+    pre {
+      background: rgba(0, 0, 0, 0.2);
+      padding: 1rem;
+      margin: 0;
+      overflow-x: auto;
+    }
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: #38bdf8; /* high visibility */
+      line-height: 1.5;
+    }
+
+    /* Info callouts */
+    .info-callout {
+      border-left: 4px solid var(--primary);
+      background: var(--primary-glow);
+      padding: 1rem 1.25rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin: 1.5rem 0;
+    }
+    .info-callout h5 {
+      margin-bottom: 0.5rem;
+      color: var(--text-main);
+    }
+
+    /* Diagrams */
+    .visual-diagram {
+      margin: 2rem 0;
+      padding: 1.5rem;
+      background: rgba(0, 0, 0, 0.15);
+      border: 1px dashed var(--border-card);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .diagram-caption {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.75rem;
+      font-style: italic;
+    }
+
+    /* Command detail list item */
+    .cmd-item {
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.75rem;
+      overflow: hidden;
+    }
+    .cmd-header {
+      background: var(--bg-card);
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .cmd-header h4 {
+      font-family: var(--font-mono);
+      color: var(--primary);
+      margin: 0;
+    }
+    .cmd-header-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-left: 1rem;
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cmd-details {
+      display: none;
+      padding: 1rem;
+      border-top: 1px solid var(--border-card);
+      background: rgba(0,0,0,0.1);
+    }
+    .cmd-item.expanded .cmd-details {
+      display: block;
+    }
+    .cmd-section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Boot Sequence Interactive Box */
+    .boot-flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      width: 100%;
+      margin: 2rem 0;
+    }
+    .boot-steps-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
+    }
+    .boot-step-box {
+      flex: 1;
+      min-width: 110px;
+      padding: 1rem 0.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .boot-step-box.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary-hover);
+      box-shadow: 0 0 15px var(--primary-glow);
+      transform: scale(1.05);
+    }
+    .boot-step-box.completed {
+      background: var(--success);
+      color: white;
+      border-color: var(--success);
+    }
+    .boot-desc-box {
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      min-height: 120px;
+    }
+    .boot-desc-box h4 {
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+    .boot-desc-box p {
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    .boot-terminal-log {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      background: black;
+      color: #38bdf8;
+      padding: 0.75rem;
+      border-radius: var(--radius-sm);
+      height: 80px;
+      overflow-y: auto;
+      margin-top: 1rem;
+      border: 1px solid var(--border-card);
+    }
+
+    /* ==========================================
+       5. INTERACTIVE SIMULATOR ARENA
+       ========================================== */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 768px) {
+      .lab-layout { grid-template-columns: 1fr; }
+    }
+    .lab-tabs {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .lab-tab {
+      padding: 0.75rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      text-align: left;
+    }
+    .lab-tab:hover, .lab-tab.active {
+      border-color: var(--primary);
+      color: var(--text-main);
+    }
+    .lab-tab.active {
+      background: var(--primary-glow);
+    }
+
+    .lab-main {
+      min-height: 480px;
+      background: #020617;
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .terminal-header {
+      background: #0f172a;
+      padding: 0.6rem 1rem;
+      border-bottom: 1px solid var(--border-card);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+    }
+    .terminal-dots {
+      display: flex;
+      gap: 0.4rem;
+    }
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #eab308; }
+    .dot-green { background: #22c55e; }
+
+    .terminal-body {
+      flex: 1;
+      padding: 1rem;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 400px;
+    }
+    .terminal-line {
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+    .terminal-line.input { color: #f8fafc; }
+    .terminal-line.output { color: #38bdf8; }
+    .terminal-line.error { color: #ef4444; }
+    .terminal-line.success { color: #22c55e; }
+    .terminal-input-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .terminal-prompt {
+      color: #38bdf8;
+      white-space: nowrap;
+      font-weight: bold;
+    }
+    .terminal-input-field {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+    }
+
+    /* Simulator UI Overrides */
+    .git-viz-box {
+      height: 120px;
+      background: #0b0f19;
+      border-bottom: 1px solid var(--border-card);
+      overflow-x: auto;
+      padding: 0.5rem;
+    }
+
+    /* ==========================================
+       6. INTERVIEW PREP PAGE (MODULE 14)
+       ========================================== */
+    .interview-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .filter-pill {
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    .filter-pill:hover, .filter-pill.active {
+      border-color: var(--primary);
+      color: var(--text-main);
+    }
+    .filter-pill.active {
+      background: var(--primary-glow);
+    }
+
+    .qna-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .qna-header {
+      padding: 1.25rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .qna-header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+    }
+    .qna-q {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .qna-check {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-card);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: transparent;
+    }
+    .qna-check.mastered {
+      background: var(--success);
+      border-color: var(--success);
+    }
+    .qna-check svg {
+      width: 14px;
+      height: 14px;
+      stroke: white;
+      fill: none;
+      display: none;
+    }
+    .qna-check.mastered svg {
+      display: block;
+    }
+
+    .qna-body {
+      display: none;
+      padding: 1.25rem;
+      border-top: 1px solid var(--border-card);
+      background: rgba(0,0,0,0.15);
+    }
+    .qna-item.expanded .qna-body {
+      display: block;
+    }
+
+    .qna-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-card);
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+    .qna-tab {
+      padding: 0.5rem 0.25rem;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+    }
+    .qna-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .qna-tab-content {
+      display: none;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+    .qna-tab-content.active {
+      display: block;
+    }
+
+    /* ==========================================
+       7. QUIZ ENGINE
+       ========================================== */
+    .quiz-section {
+      margin-top: 3rem;
+      border-top: 2px dashed var(--border-card);
+      padding-top: 2rem;
+    }
+    .quiz-title {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .quiz-question-container {
+      margin-bottom: 1.5rem;
+    }
+    .quiz-question-text {
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--text-main);
+    }
+    .quiz-options {
+      display: grid;
+      gap: 0.5rem;
+    }
+    .quiz-option {
+      padding: 0.75rem 1rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      font-size: 0.95rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .quiz-option:hover {
+      border-color: var(--primary);
+      background: var(--bg-card-hover);
+    }
+    .quiz-option.correct {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: var(--success);
+      color: var(--success);
+    }
+    .quiz-option.incorrect {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+    .quiz-feedback {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--text-muted);
+      display: none;
+    }
+
+    /* ==========================================
+       8. CERTIFICATE CENTER & PRINT STYLING
+       ========================================== */
+    .certificate-preview-box {
+      max-width: 800px;
+      margin: 2rem 0;
+      border: 2px dashed var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--bg-card);
+      position: relative;
+    }
+    .cert-lock-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: white;
+      z-index: 10;
+    }
+    .cert-name-input {
+      background: var(--bg-main);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      padding: 0.75rem 1.25rem;
+      width: 100%;
+      max-width: 400px;
+      font-family: var(--font-sans);
+      font-size: 1rem;
+      outline: none;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .cert-name-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* SVG Certificate Layout (Modern premium vector design) */
+    .certificate-svg {
+      width: 100%;
+      max-width: 700px;
+      height: auto;
+      border-radius: 4px;
+      background: white;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* Bookmark button styling */
+    .bookmark-btn {
+      color: var(--text-muted);
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: var(--transition);
+    }
+    .bookmark-btn:hover {
+      background: var(--bg-card-hover);
+      color: var(--warning);
+    }
+    .bookmark-btn.bookmarked {
+      color: var(--warning);
+      fill: var(--warning);
+    }
+
+    /* ==========================================
+       9. RESPONSIVE / MOBILE OVERRIDES
+       ========================================== */
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 992px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .main-layout {
+        margin-left: 0;
+      }
+      .menu-toggle {
+        display: block;
+      }
+    }
+
+    /* Bookmark View Items */
+    .bookmark-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-sm);
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    /* Print Overrides for Certificate */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-certificate-container, #print-certificate-container * {
+        visibility: visible;
+      }
+      #print-certificate-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 70vw; /* Keep proper aspect ratio */
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+       10. APPLICATION LAYOUT
+       ========================================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="logo-container">
+      <div class="logo-icon">C</div>
+      <div class="logo-text">
+        <h2>AOSP & WSL</h2>
+        <span>Mastery Portal</span>
+      </div>
+    </div>
+    
+    <div class="sidebar-profile">
+      <div class="profile-info">
+        <div class="avatar" id="user-avatar">D</div>
+        <div class="user-name-wrapper">
+          <span class="user-name" id="user-display-name">Developer</span>
+          <span class="user-title" id="user-display-title">Novice System Eng</span>
+        </div>
+      </div>
+      <div class="profile-xp">
+        <div style="display: flex; justify-content: space-between;">
+          <span id="xp-text">0 / 500 XP</span>
+          <span id="level-text">Lvl 1</span>
+        </div>
+        <div class="xp-bar-container">
+          <div class="xp-bar" id="xp-bar-fill"></div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="switchPage('dashboard')">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </div>
+      </div>
+
+      <div class="nav-label">Modules</div>
+      <div id="module-nav-list">
+        <!-- Rendered Dynamically in JS to ensure complete listings and sync counters -->
+      </div>
+
+      <div class="nav-label">Playgrounds</div>
+      <div class="nav-item" onclick="switchPage('labs')">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V5A2.5 2.5 0 0 1 6.5 2.5H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"/></svg>
+          <span>Interactive Labs</span>
+        </div>
+      </div>
+
+      <div class="nav-label">Assessment & Cert</div>
+      <div class="nav-item" onclick="switchPage('interview')">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span>Interview Prep (50 Qs)</span>
+        </div>
+      </div>
+      <div class="nav-item" onclick="switchPage('certificate')">
+        <div class="nav-item-left">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+          <span>Certificate</span>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <div class="main-layout">
+    <header class="top-bar">
+      <button class="menu-toggle" onclick="toggleSidebar()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="global-search" placeholder="Search lessons, commands, questions..." oninput="handleSearch(this.value)">
+      </div>
+
+      <div class="status-indicators">
+        <div class="streak-display" title="Daily Active Streak!">
+          <svg viewBox="0 0 24 24"><path d="M12 2c0 0-4 4.5-4 7.5c0 2.2 1.8 4 4 4s4-1.8 4-4C16 6.5 12 2 12 2zm0 18.5c-4.4 0-8-3.6-8-8c0-1.8.6-3.4 1.6-4.7l1.4 1.4c-.6.9-1 2.1-1 3.3c0 3.3 2.7 6 6 6s6-2.7 6-6c0-1.2-.4-2.4-1-3.3l1.4-1.4c1 1.3 1.6 2.9 1.6 4.7c0 4.4-3.6 8-8 8z"/></svg>
+          <span id="streak-counter">0 Days</span>
+        </div>
+
+        <button class="btn btn-secondary" onclick="toggleTheme()" style="padding: 0.5rem; border-radius: 50%;">
+          <svg id="theme-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="content-area">
+      <!-- ==========================================
+           11. DASHBOARD PAGE VIEW
+           ========================================== -->
+      <section id="page-dashboard" class="page">
+        <h1>Welcome Back, System Architect</h1>
+        <p>Track your stats, review your badges, and progress through Modules to unlock certification.</p>
+
+        <div class="dashboard-stats">
+          <div class="glass-card stat-card">
+            <div>
+              <div class="stat-label">System Progress</div>
+              <div class="stat-val" id="stats-progress">0%</div>
+            </div>
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+          </div>
+          <div class="glass-card stat-card">
+            <div>
+              <div class="stat-label">Total Gained XP</div>
+              <div class="stat-val" id="stats-xp">0 XP</div>
+            </div>
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+          </div>
+          <div class="glass-card stat-card">
+            <div>
+              <div class="stat-label">Mastered Qs</div>
+              <div class="stat-val" id="stats-qna">0 / 50</div>
+            </div>
+            <div class="stat-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-grid">
+          <div>
+            <h3>Learning Modules Progress</h3>
+            <div id="dashboard-modules-list" style="margin-top: 1rem;">
+              <!-- Rendered Dynamically in JS -->
+            </div>
+          </div>
+          <div>
+            <div class="glass-card">
+              <h3>Earned Badges</h3>
+              <div class="badge-grid" id="dashboard-badges">
+                <!-- Badges dynamically rendered here -->
+              </div>
+            </div>
+            <div class="glass-card">
+              <h3>Your Bookmarked Topics</h3>
+              <div id="dashboard-bookmarks" style="margin-top: 1rem;">
+                <p style="font-size: 0.85rem;">No bookmarked items yet. Click bookmark icons inside lessons.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           12. MODULE CONTENT VIEWPORT
+           ========================================== -->
+      <section id="page-module" class="page hidden">
+        <div class="module-header-nav">
+          <div>
+            <button class="btn btn-secondary" onclick="switchPage('dashboard')">&larr; Dashboard</button>
+          </div>
+          <div class="module-actions">
+            <button class="bookmark-btn" id="module-bookmark-action" onclick="toggleCurrentBookmark()">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+            </button>
+            <span class="nav-badge" id="module-completion-status">Incomplete</span>
+          </div>
+        </div>
+
+        <div class="module-content-body" id="module-content-placeholder">
+          <!-- Populated Dynamically in JS -->
+        </div>
+
+        <!-- Quiz Container -->
+        <div class="glass-card quiz-section" id="module-quiz-container">
+          <div class="quiz-title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Module Knowledge Check</span>
+          </div>
+          <div id="quiz-questions-list">
+            <!-- Questions rendered here -->
+          </div>
+          <button class="btn btn-primary" style="margin-top: 1rem;" onclick="checkModuleQuiz()">Submit Answers</button>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           13. PLAYGROUND LABS VIEW
+           ========================================== -->
+      <section id="page-labs" class="page hidden">
+        <h1>Interactive Simulator Labs</h1>
+        <p>Practice Linux, WSL setup, Git revision graphs, Android compilation scripts, and ADB diagnostics directly in your browser.</p>
+
+        <div class="lab-layout">
+          <div class="lab-tabs">
+            <div class="lab-tab active" onclick="switchLabTab('terminal')">1. Linux Terminal</div>
+            <div class="lab-tab" onclick="switchLabTab('wsl')">2. WSL Installer</div>
+            <div class="lab-tab" onclick="switchLabTab('git')">3. Git Graph</div>
+            <div class="lab-tab" onclick="switchLabTab('repo')">4. Repo Sync</div>
+            <div class="lab-tab" onclick="switchLabTab('build')">5. AOSP Build</div>
+            <div class="lab-tab" onclick="switchLabTab('adb')">6. ADB Simulator</div>
+          </div>
+
+          <div class="lab-main">
+            <!-- 1. Linux Terminal -->
+            <div id="lab-sec-terminal" class="lab-section-content">
+              <div class="terminal-header">
+                <div class="terminal-dots">
+                  <div class="dot dot-red"></div>
+                  <div class="dot dot-yellow"></div>
+                  <div class="dot dot-green"></div>
+                </div>
+                <span>bash - developer@aosp-mastery:~</span>
+              </div>
+              <div class="terminal-body" id="term-output-linux" onclick="focusTerm('term-input-linux')">
+                <div class="terminal-line">Welcome to Linux Command Terminal! Type <span style="color:var(--accent);">help</span> to view available operations.</div>
+                <div class="terminal-line">Start by listing directories or checking your current location.</div>
+              </div>
+              <div class="terminal-header" style="border-top: 1px solid var(--border-card); border-bottom: none;">
+                <div class="terminal-input-row" style="width:100%;">
+                  <span class="terminal-prompt" id="term-prompt-linux">developer@aosp-mastery:~$</span>
+                  <input type="text" class="terminal-input-field" id="term-input-linux" onkeydown="handleTermInput(event, 'linux')">
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. WSL Simulator -->
+            <div id="lab-sec-wsl" class="lab-section-content" style="display:none;">
+              <div class="terminal-header">
+                <div class="terminal-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+                <span>PowerShell - Windows WSL Manager</span>
+              </div>
+              <div class="terminal-body" id="term-output-wsl" onclick="focusTerm('term-input-wsl')">
+                <div class="terminal-line">PS C:\Users\Administrator> Windows Subsystem for Linux (WSL) setup wizard.</div>
+                <div class="terminal-line">Please type <span style="color:var(--accent);">wsl --install</span> to begin setting up WSL2.</div>
+              </div>
+              <div class="terminal-header" style="border-top: 1px solid var(--border-card); border-bottom: none;">
+                <div class="terminal-input-row" style="width:100%;">
+                  <span class="terminal-prompt" style="color:#22c55e">PS C:\Users\Administrator></span>
+                  <input type="text" class="terminal-input-field" id="term-input-wsl" onkeydown="handleTermInput(event, 'wsl')">
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Git Graph Visualizer -->
+            <div id="lab-sec-git" class="lab-section-content" style="display:none;">
+              <div class="git-viz-box" id="git-graph-viewport">
+                <!-- Dynamic SVG Commits will render here -->
+                <svg id="git-graph-svg" width="100%" height="110" style="background:#0f172a; border-radius: 4px;"></svg>
+              </div>
+              <div class="terminal-header">
+                <div class="terminal-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+                <span>git - visual-commit-logger</span>
+              </div>
+              <div class="terminal-body" id="term-output-git" onclick="focusTerm('term-input-git')">
+                <div class="terminal-line">Git Branching Interactive Lab. Run:</div>
+                <div class="terminal-line">  <span style="color:var(--accent);">git init</span> -> initialize graph</div>
+                <div class="terminal-line">  <span style="color:var(--accent);">git commit -m "Commit Message"</span> -> append nodes</div>
+                <div class="terminal-line">  <span style="color:var(--accent);">git checkout -b branch-name</span> -> spawn branches</div>
+                <div class="terminal-line">  <span style="color:var(--accent);">git merge branch-name</span> -> merge branches</div>
+              </div>
+              <div class="terminal-header" style="border-top: 1px solid var(--border-card); border-bottom: none;">
+                <div class="terminal-input-row" style="width:100%;">
+                  <span class="terminal-prompt" style="color:#a855f7">git:(main) $</span>
+                  <input type="text" class="terminal-input-field" id="term-input-git" onkeydown="handleTermInput(event, 'git')">
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Repo Sync Simulator -->
+            <div id="lab-sec-repo" class="lab-section-content" style="display:none;">
+              <div class="terminal-header">
+                <div class="terminal-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+                <span>repo-manifest-sync</span>
+              </div>
+              <div class="terminal-body" id="term-output-repo" onclick="focusTerm('term-input-repo')">
+                <div class="terminal-line">AOSP Code synchronization terminal.</div>
+                <div class="terminal-line">Type <span style="color:var(--accent);">repo init -u https://android.googlesource.com/platform/manifest</span> to link details.</div>
+              </div>
+              <div class="terminal-header" style="border-top: 1px solid var(--border-card); border-bottom: none;">
+                <div class="terminal-input-row" style="width:100%;">
+                  <span class="terminal-prompt">developer@aosp-build:~/android$</span>
+                  <input type="text" class="terminal-input-field" id="term-input-repo" onkeydown="handleTermInput(event, 'repo')">
+                </div>
+              </div>
+            </div>
+
+            <!-- 5. AOSP Build System Simulator -->
+            <div id="lab-sec-build" class="lab-section-content" style="display:none;">
+              <div class="terminal-header">
+                <div class="terminal-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+                <span>aosp-compiler-console</span>
+              </div>
+              <div class="terminal-body" id="term-output-build" onclick="focusTerm('term-input-build')">
+                <div class="terminal-line">Android platform compiler engine. Step 1: Set up compile scripts by running:</div>
+                <div class="terminal-line">  <span style="color:var(--accent);">source build/envsetup.sh</span></div>
+              </div>
+              <div class="terminal-header" style="border-top: 1px solid var(--border-card); border-bottom: none;">
+                <div class="terminal-input-row" style="width:100%;">
+                  <span class="terminal-prompt">developer@aosp-compiling:~/android$</span>
+                  <input type="text" class="terminal-input-field" id="term-input-build" onkeydown="handleTermInput(event, 'build')">
+                </div>
+              </div>
+            </div>
+
+            <!-- 6. ADB & Fastboot Command Simulator -->
+            <div id="lab-sec-adb" class="lab-section-content" style="display:none;">
+              <div class="terminal-header">
+                <div class="terminal-dots"><div class="dot dot-red"></div><div class="dot dot-yellow"></div><div class="dot dot-green"></div></div>
+                <span>adb-bridge-client</span>
+              </div>
+              <div class="terminal-body" id="term-output-adb" onclick="focusTerm('term-input-adb')">
+                <div class="terminal-line">Android Debug Bridge. Connect and run tests. Available commands include:</div>
+                <div class="terminal-line">  <span style="color:var(--accent);">adb devices</span>, <span style="color:var(--accent);">adb shell</span>, <span style="color:var(--accent);">adb shell logcat</span>, <span style="color:var(--accent);">adb push</span>.</div>
+              </div>
+              <div class="terminal-header" style="border-top: 1px solid var(--border-card); border-bottom: none;">
+                <div class="terminal-input-row" style="width:100%;">
+                  <span class="terminal-prompt">C:\Android\sdk\platform-tools&gt;</span>
+                  <input type="text" class="terminal-input-field" id="term-input-adb" onkeydown="handleTermInput(event, 'adb')">
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ==========================================
+           14. INTERVIEW PREPARATION (MODULE 14)
+           ========================================== -->
+      <section id="page-interview" class="page hidden">
+        <h1>AOSP & Linux System Interview Preparation</h1>
+        <p>Study the 50 most frequently asked questions during engineering interviews. Toggle question states and review explanations.</p>
+
+        <div class="interview-filters">
+          <div class="filter-pill active" onclick="filterInterview('all')">All Questions</div>
+          <div class="filter-pill" onclick="filterInterview('linux')">Linux & commands</div>
+          <div class="filter-pill" onclick="filterInterview('wsl')">WSL integration</div>
+          <div class="filter-pill" onclick="filterInterview('git')">Git & Repo</div>
+          <div class="filter-pill" onclick="filterInterview('android')">Android Arch & Boot</div>
+          <div class="filter-pill" onclick="filterInterview('aosp')">AOSP compiling</div>
+          <div class="filter-pill" onclick="filterInterview('adb')">ADB & Debugging</div>
+        </div>
+
+        <div id="interview-questions-container">
+          <!-- Loaded Dynamically in JS to prevent code repetition -->
+        </div>
+      </section>
+
+      <!-- ==========================================
+           15. CERTIFICATION HUB
+           ========================================== -->
+      <section id="page-certificate" class="page hidden">
+        <h1>Mastery Certification Portal</h1>
+        <p>Complete all learning tracks, interactive simulators, and interview study plans to claim your verification.</p>
+
+        <div class="certificate-preview-box">
+          <div class="cert-lock-overlay" id="cert-lock-overlay">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--accent);"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <h2>Certificate Locked</h2>
+            <p id="cert-lock-reason">You must complete all 13 modules, run all simulators, and answer quizzes to unlock.</p>
+          </div>
+
+          <div style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <label style="font-weight: 600; margin-bottom: 0.5rem;">Enter Certificate Holder Full Name:</label>
+            <input type="text" class="cert-name-input" id="cert-name-input" placeholder="Your Name" oninput="updateCertPreviewName(this.value)">
+
+            <!-- Dynamic Print Container -->
+            <div id="print-certificate-container" style="background:#fff; border: 1px solid #ccc; padding: 5px;">
+              <svg id="certificate-svg-node" class="certificate-svg" viewBox="0 0 842 595">
+                <!-- Vector Certificate Frame -->
+                <rect x="15" y="15" width="812" height="565" fill="#f8fafc" stroke="#0f172a" stroke-width="6"/>
+                <rect x="25" y="25" width="792" height="545" fill="none" stroke="#6366f1" stroke-width="2" stroke-dasharray="10, 5"/>
+                
+                <!-- Stylized Corners -->
+                <polygon points="15,15 45,15 15,45" fill="#6366f1"/>
+                <polygon points="827,15 797,15 827,45" fill="#6366f1"/>
+                <polygon points="15,580 45,580 15,550" fill="#6366f1"/>
+                <polygon points="827,580 797,580 827,550" fill="#6366f1"/>
+
+                <!-- Header Title -->
+                <text x="421" y="90" font-family="'Outfit', sans-serif" font-size="28" font-weight="800" text-anchor="middle" fill="#0f172a">CERTIFICATE OF MASTERY</text>
+                <text x="421" y="120" font-family="'Outfit', sans-serif" font-size="12" letter-spacing="4" font-weight="600" text-anchor="middle" fill="#64748b">LINUX ON WINDOWS & AOSP SYSTEM DEVELOPMENT</text>
+                
+                <!-- Divider -->
+                <line x1="300" y1="140" x2="542" y2="140" stroke="#cbd5e1" stroke-width="2"/>
+
+                <!-- Core text -->
+                <text x="421" y="190" font-family="'Outfit', sans-serif" font-size="16" font-style="italic" text-anchor="middle" fill="#475569">This is proudly presented to</text>
+                
+                <!-- Recipient Name -->
+                <text x="421" y="260" font-family="'Outfit', sans-serif" font-size="38" font-weight="800" text-anchor="middle" fill="#4f46e5" id="cert-svg-name">DEVELOPER NAME</text>
+                <line x1="200" y1="280" x2="642" y2="280" stroke="#6366f1" stroke-width="1"/>
+
+                <!-- Body text -->
+                <text x="421" y="330" font-family="'Outfit', sans-serif" font-size="15" text-anchor="middle" fill="#334155">for having successfully completed all curriculum components, theoretical quizzes,</text>
+                <text x="421" y="355" font-family="'Outfit', sans-serif" font-size="15" text-anchor="middle" fill="#334155">and developer-level interactive simulator playgrounds covering WSL2 environments,</text>
+                <text x="421" y="380" font-family="'Outfit', sans-serif" font-size="15" text-anchor="middle" fill="#334155">Git/Repo tools, and Android Open Source Project compilation.</text>
+
+                <!-- Certification details -->
+                <text x="421" y="440" font-family="'Outfit', sans-serif" font-size="14" font-weight="600" text-anchor="middle" fill="#64748b" id="cert-svg-date">Date: 2026-06-20</text>
+                
+                <!-- Logo element / Seal -->
+                <circle cx="421" cy="510" r="30" fill="#6366f1" opacity="0.1"/>
+                <path d="M421 495 L430 515 L410 515 Z" fill="#6366f1"/>
+                <text x="421" y="525" font-family="'Outfit', sans-serif" font-size="8" font-weight="700" text-anchor="middle" fill="#6366f1">VERIFIED</text>
+              </svg>
+            </div>
+
+            <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="triggerPrintCertificate()">Print Certificate (PDF)</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="xp-float" id="xp-float-notification">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="color:var(--success);"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="xp-float-text">+100 XP Earned</span>
+  </div>
+
+  <!-- ==========================================
+       16. PORTAL ENGINE (DATA & LOGIC)
+       ========================================== -->
+  <script>
+    /* ==========================================
+       A. DATA STORE (14 STUDY MODULES)
+       ========================================== */
+    const MODULES_DATA = [
+      {
+        id: "module-1",
+        title: "Linux Fundamentals",
+        desc: "Linux architecture, directory layouts, environment variables, permissions, and basic commands.",
+        readingTime: "12 min",
+        content: `
+          <h2>Module 1: Linux Fundamentals</h2>
+          <p>Welcome to Module 1. Linux is the open-source Unix-like operating system kernel that serves as the foundation for Android and many cloud platforms. To configure WSL or compile AOSP, an engineer must possess a deep operational understanding of how the Linux environment functions.</p>
+          
+          <h3>1. Linux Architecture</h3>
+          <p>The Linux operating system is fundamentally partitioned into two privilege domains:</p>
+          <ul>
+            <li><strong>Kernel Space:</strong> The core virtual engine that manages hardware devices, memory allocation, process scheduling, and network sockets. It communicates directly with physical components.</li>
+            <li><strong>User Space:</strong> The execution layer for application binaries, shells, GUI, and user libraries. System calls act as the boundary crossing interface (using trap signals) for user applications requesting kernel services.</li>
+          </ul>
+          
+          <div class="visual-diagram">
+            <pre style="background:transparent; padding:0; line-height:1.2; color:var(--primary);">
++---------------------------------------------+
+|                User Space                   |
+|  [Applications]   [Command Shell]  [GUI]    |
++---------------------------------------------+
+|            System Call Interface            |
+|       (open, read, fork, socket, exec)      |
++---------------------------------------------+
+|                Kernel Space                 |
+|  [Process Scheduler]   [Virtual Filesystem] |
+|  [Memory Manager]      [Network Stack]      |
++---------------------------------------------+
+|                  Hardware                   |
+|     [CPU]    [RAM]    [Storage]   [NIC]     |
++---------------------------------------------+</pre>
+            <div class="diagram-caption">Figure 1.1: Multi-tier privilege layering of the Linux Kernel Architecture.</div>
+          </div>
+
+          <h3>2. Common Distributions</h3>
+          <p>Linux distributions (distros) bundle the Linux kernel with package managers, installer engines, and system services:</p>
+          <ul>
+            <li><strong>Debian Family (Ubuntu, Debian):</strong> Relies on the <code>apt</code> package manager. Ubuntu is the official supported operating system environment for building AOSP.</li>
+            <li><strong>RedHat Family (Fedora, CentOS, RHEL):</strong> Relies on <code>dnf</code> or <code>yum</code> package managers. Predominant in enterprise environments.</li>
+          </ul>
+
+          <h3>3. The Linux File System Hierarchy</h3>
+          <p>Linux organizes files under a unified logical tree structured according to the Filesystem Hierarchy Standard (FHS):</p>
+          <ul>
+            <li><code>/</code> : The root directory. Everything originates here.</li>
+            <li><code>/home</code> : User directories (e.g., <code>/home/developer</code>).</li>
+            <li><code>/etc</code> : System-wide configuration files.</li>
+            <li><code>/bin</code> and <code>/sbin</code> : Executables required for booting and troubleshooting.</li>
+            <li><code>/var</code> : Variable data including log streams (<code>/var/log</code>) and temporary files.</li>
+            <li><code>/proc</code> and <code>/sys</code> : Virtual filesystems tracking active process trees and kernel configurations.</li>
+          </ul>
+
+          <h3>4. Linux Permissions & Security Model</h3>
+          <p>Every file and directory is assigned access permission flags mapped to three user layers: <strong>Owner (User)</strong>, <strong>Group</strong>, and <strong>Others</strong>. Permissions are defined by three states:</p>
+          <ul>
+            <li><code>Read (r)</code> - Octal value 4. Allows reading contents.</li>
+            <li><code>Write (w)</code> - Octal value 2. Allows editing/deleting contents.</li>
+            <li><code>Execute (x)</code> - Octal value 1. Allows running a file or searching a directory.</li>
+          </ul>
+          <p>For example, a file with permissions <code>755</code> gives full access (rwx) to the Owner, and read/execute access (r-x) to the Group and others.</p>
+        `,
+        quiz: [
+          {
+            q: "Which AOSP supported package manager is native to the Debian and Ubuntu Linux families?",
+            a: ["yum", "apt", "pacman", "dnf"],
+            correct: 1,
+            feedback: "Apt (Advanced Package Tool) is the package manager for Debian/Ubuntu systems, which are the official build hosts for AOSP."
+          },
+          {
+            q: "What does the permission value octal '755' signify for a file?",
+            a: [
+              "Full owner permissions, read/execute for group & others",
+              "Full owner permissions, write only for group",
+              "Read and write permissions for all users",
+              "No execute permissions for others"
+            ],
+            correct: 0,
+            feedback: "7 (r+w+x = 4+2+1) for owner, 5 (r+x = 4+1) for group, and 5 (r+x = 4+1) for others."
+          }
+        ]
+      },
+      {
+        id: "module-2",
+        title: "Linux Commands",
+        desc: "Interactive catalog of essential Linux commands with syntax, examples, mistakes, and interview tips.",
+        readingTime: "15 min",
+        content: `
+          <h2>Module 2: Essential Linux Commands</h2>
+          <p>To operate effectively in WSL and AOSP build scripts, you must master the fundamental Linux commands. Click on any command below to explore its syntax, examples, pitfalls, and interview details.</p>
+          
+          <div id="commands-list-container">
+            <!-- Programmatically populated in JS for complete coverage -->
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Which command would you run to find the absolute path of your current location in the shell?",
+            a: ["ls", "cd", "pwd", "whereami"],
+            correct: 2,
+            feedback: "pwd stands for Print Working Directory."
+          },
+          {
+            q: "What is the primary difference between nano and vim?",
+            a: [
+              "nano is GUI based, vim is CLI based",
+              "nano is modeless and simpler, vim is modal and heavily extensible",
+              "nano does not support editing txt files",
+              "vim only runs on Windows systems"
+            ],
+            correct: 1,
+            feedback: "Vim has separate modes (Normal, Insert, Visual) which make it fast once mastered, whereas nano works like a traditional editor."
+          }
+        ]
+      },
+      {
+        id: "module-3",
+        title: "Windows Subsystem for Linux (WSL)",
+        desc: "Comparing WSL1 vs WSL2, core installations, tuning configs, memory allocation, and docker integrations.",
+        readingTime: "10 min",
+        content: `
+          <h2>Module 3: WSL (Windows Subsystem for Linux)</h2>
+          <p>Windows Subsystem for Linux allows software developers to run a complete GNU/Linux environment natively on Windows without the overhead of standard hypervisors or dual-boot setups.</p>
+          
+          <h3>1. WSL1 vs WSL2 Comparison</h3>
+          <p>WSL was redesigned from the ground up to improve performance and compatibility:</p>
+          <ul>
+            <li><strong>WSL1:</strong> Translates Linux system calls to Windows NT APIs. It struggles with slow disk I/O when compiling large code bases (like AOSP) and lacks a real Linux kernel.</li>
+            <li><strong>WSL2:</strong> Uses a lightweight utility VM to run a real Linux kernel. It features deep container virtualization support and 100% system-call compatibility. <strong>WSL2 is mandatory for AOSP development</strong>.</li>
+          </ul>
+
+          <h3>2. Performance Tuning for Large Compilations</h3>
+          <p>AOSP builds can exhaust system RAM and disk capacity on Windows. You must tune WSL using the global configuration file located at <code>C:\\Users\\&lt;User&gt;\\.wslconfig</code>:</p>
+          
+          <div class="code-container">
+            <div class="code-header"><span>.wslconfig</span></div>
+            <pre><code>[wsl2]
+memory=32GB            # Allocation limit (AOSP requires 16GB min, 32GB recommended)
+processors=16          # Map CPU cores
+localhostForwarding=true
+guiApplications=true</code></pre>
+          </div>
+
+          <h3>3. Troubleshooting File System Access</h3>
+          <p>Never access Windows filesystem paths (e.g. <code>/mnt/c/</code>) from within WSL to compile code, because this translation layer introduces major performance penalties. Always keep your code within the native ext4 volume (e.g. under <code>/home/developer/</code>) and access it from Windows if needed via the virtual network share path: <code>\\\\wsl$\\Ubuntu\\home\\developer\\</code>.</p>
+        `,
+        quiz: [
+          {
+            q: "Why is WSL2 preferred over WSL1 for compiling huge codebases like AOSP?",
+            a: [
+              "WSL2 runs on a real Linux kernel providing faster file system actions inside the native Linux volume",
+              "WSL1 cannot execute simple git commands",
+              "WSL2 uses translation tables directly on the NTFS filesystem",
+              "WSL1 is restricted to 32-bit hardware architectures"
+            ],
+            correct: 0,
+            feedback: "WSL2 runs a true Linux kernel in a VM, allowing direct filesystem speeds on ext4 virtual disks, which is critical for compiling millions of C/C++ files in AOSP."
+          }
+        ]
+      },
+      {
+        id: "module-4",
+        title: "Git & Repo Tool",
+        desc: "Advanced Git branching workflows, manifests, sync steps, and using Google's AOSP Repo launcher.",
+        readingTime: "11 min",
+        content: `
+          <h2>Module 4: Git & AOSP Repo Tool</h2>
+          <p>AOSP consists of hundreds of distinct git repositories. To handle this complexity, Google created a script launcher called the <strong>Repo Tool</strong> that acts as a wrapper over Git.</p>
+
+          <h3>1. Advanced Git Workflows</h3>
+          <p>Familiarize yourself with essential git developer utilities:</p>
+          <ul>
+            <li><code>git cherry-pick &lt;commit-hash&gt;</code>: Copies a single commit's changes from another branch into your active branch.</li>
+            <li><code>git rebase -i HEAD~n</code>: Interactively clean up, squash, or rewrite the local history of commit logs.</li>
+            <li><code>git stash</code>: Safely stores your uncommitted modifications to clear the working directory for emergency hotfixes.</li>
+          </ul>
+
+          <h3>2. AOSP Repo Manifests</h3>
+          <p>The Repo tool resolves all system dependencies using a manifest XML file located in the manifest repository. It lists every git repository, target branches, and destination paths:</p>
+          
+          <div class="code-container">
+            <div class="code-header"><span>manifest.xml</span></div>
+            <pre><code>&lt;manifest&gt;
+  &lt;remote name="aosp" fetch="https://android.googlesource.com/" /&gt;
+  &lt;default revision="refs/tags/android-13.0.0_r1" remote="aosp" sync-j="4" /&gt;
+  &lt;project path="frameworks/base" name="platform/frameworks/base" /&gt;
+  &lt;project path="system/core" name="platform/system/core" /&gt;
+&lt;/manifest&gt;</code></pre>
+          </div>
+
+          <h3>3. Core Repo Commands</h3>
+          <p>When starting AOSP work, use the following sequence:</p>
+          <ul>
+            <li><code>repo init -u &lt;manifest-url&gt; -b &lt;branch&gt;</code>: Pull down the config repository and prepare local repo directories.</li>
+            <li><code>repo sync</code>: Sync all local directories with Google servers. This will pull down 150GB+ of codebase repository data.</li>
+            <li><code>repo start &lt;branch-name&gt; --all</code>: Create an identical working git branch across all independent repositories.</li>
+          </ul>
+        `,
+        quiz: [
+          {
+            q: "What is the primary role of the Google Repo tool?",
+            a: [
+              "To compile C++ and Java code files",
+              "To coordinate operations across hundreds of separate git repositories referenced in an XML manifest",
+              "To deploy Android system builds to a target physical phone",
+              "To debug system errors inside Android Runtime"
+            ],
+            correct: 1,
+            feedback: "Repo coordinates git actions across AOSP's complex modular structures."
+          }
+        ]
+      },
+      {
+        id: "module-5",
+        title: "Android Fundamentals",
+        desc: "Detailed structural view of the Android Platform Stack, HAL implementations, and Binder IPC mechanisms.",
+        readingTime: "12 min",
+        content: `
+          <h2>Module 5: Android System Architecture</h2>
+          <p>Android is not a standard desktop Linux system. Understanding the architecture layers is essential for modifying system behaviors.</p>
+
+          <h3>1. System Layering</h3>
+          <p>Android is divided into five distinct operational tiers:</p>
+          <div class="visual-diagram">
+            <pre style="background:transparent; padding:0; line-height:1.2; color:var(--secondary);">
++------------------------------------------------+
+|  1. System Apps (Settings, Phone, Launcher)    |
++------------------------------------------------+
+|  2. Java API Framework (ActivityManager, WMS)  |
++------------------------------------------------+
+|  3. Android Runtime (ART & Core Libraries)     |
++------------------------------------------------+
+|  4. Native C/C++ Libraries (libc, OpenGL, SSL) |
++------------------------------------------------+
+|  5. Hardware Abstraction Layer (HAL)           |
++------------------------------------------------+
+|  6. Linux Kernel (Binder Driver, Power Mgr)    |
++------------------------------------------------+</pre>
+            <div class="diagram-caption">Figure 5.1: Block diagram representing the Android Architecture stack.</div>
+          </div>
+
+          <h3>2. Binder IPC</h3>
+          <p>Android system services run in isolated processes. Communication across processes is enabled by <strong>Binder</strong>, a custom, high-performance inter-process communication (IPC) driver implemented in kernel space. Developers define Binder interfaces using AIDL (Android Interface Definition Language).</p>
+
+          <h3>3. System Server</h3>
+          <p>The <code>System Server</code> is the core of the Java framework. It hosts key background services, including the Activity Manager Service (AMS), Window Manager Service (WMS), and Package Manager Service (PMS), which manage app lifecycles, UI rendering, and permissions.</p>
+        `,
+        quiz: [
+          {
+            q: "Which component manages the interfaces between System Services and low-level kernel drivers without exposing raw hardware specifics?",
+            a: ["Zygote", "Hardware Abstraction Layer (HAL)", "Android Runtime (ART)", "Soong Build System"],
+            correct: 1,
+            feedback: "The Hardware Abstraction Layer (HAL) decouples device-specific hardware features from the core system APIs."
+          }
+        ]
+      },
+      {
+        id: "module-6",
+        title: "AOSP Fundamentals",
+        desc: "AOSP codebase folders, transition to Soong and Ninja, and configuring build target variants.",
+        readingTime: "10 min",
+        content: `
+          <h2>Module 6: AOSP Fundamentals</h2>
+          <p>This module introduces the Android Open Source Project (AOSP) source tree and its modern build infrastructure.</p>
+
+          <h3>1. Source Tree Layout</h3>
+          <ul>
+            <li><code>/frameworks</code>: Code for the Java APIs and System Services.</li>
+            <li><code>/device</code>: Target-specific board configurations for physical systems.</li>
+            <li><code>/vendor</code>: Proprietory blobs and driver libraries.</li>
+            <li><code>/hardware</code>: Hardware abstraction source interfaces.</li>
+          </ul>
+
+          <h3>2. Transition from Make to Soong</h3>
+          <p>Legacy Android versions used GNU Make (<code>Android.mk</code>). Modern Android versions (Android 8.0+) rely on the <strong>Soong build system</strong> (using JSON-like <code>Android.bp</code> files), which generates <strong>Ninja</strong> compilation manifests for fast parallel builds:</p>
+          
+          <div class="code-container">
+            <div class="code-header"><span>Android.bp Example</span></div>
+            <pre><code>cc_binary {
+    name: "custom_daemon",
+    srcs: ["main.cpp"],
+    shared_libs: ["liblog", "libutils"],
+    vendor: true,
+}</code></pre>
+          </div>
+
+          <h3>3. Target Build Variants</h3>
+          <p>When selecting compilation variables via the <code>lunch</code> target, you choose from three primary options:</p>
+          <ul>
+            <li><strong>user:</strong> Production builds with strict security, debugging disabled, and ADB root access blocked.</li>
+            <li><strong>userdebug:</strong> Developer-friendly builds with performance metrics enabled, system debug logs, and root access.</li>
+            <li><strong>eng:</strong> Unlocked development builds with fast compile settings, debug utilities, and all security checks disabled.</li>
+          </ul>
+        `,
+        quiz: [
+          {
+            q: "Which build variant is configured with system debug logs enabled while retaining typical user-level safety layouts?",
+            a: ["user", "eng", "userdebug", "release"],
+            correct: 2,
+            feedback: "userdebug balances performance logging with system functionality, making it ideal for daily development testing."
+          }
+        ]
+      },
+      {
+        id: "module-7",
+        title: "AOSP Build Environment",
+        desc: "Hardware pre-requisites, storage needs, setting up WSL packages, Java SDK, and source downloads.",
+        readingTime: "10 min",
+        content: `
+          <h2>Module 7: AOSP Build Environment Setup</h2>
+          <p>Compiling AOSP requires significant system resources. A single compilation can take hours and use massive amounts of storage.</p>
+
+          <h3>1. Hardware & System Requirements</h3>
+          <ul>
+            <li><strong>Memory (RAM):</strong> 16 GB minimum, 32 GB+ highly recommended (otherwise compile steps may fail due to Out-Of-Memory errors).</li>
+            <li><strong>Storage (SSD):</strong> 300 GB minimum (500 GB+ recommended for keeping build history logs).</li>
+            <li><strong>CPU:</strong> 8 Cores / 16 threads minimum.</li>
+          </ul>
+
+          <h3>2. Package Installations</h3>
+          <p>Update your Ubuntu instance packages and set up dependencies for compiling the AOSP codebase:</p>
+          
+          <div class="code-container">
+            <div class="code-header"><span>Setup Commands</span></div>
+            <pre><code>sudo apt-get update
+sudo apt-get install -y git-core gnupg flex bison build-essential zip curl zlib1g-dev \\
+  gcc-multilib g++-multilib libc6-dev-i386 libncurses5 lib32ncurses5-dev x11proto-core-dev \\
+  libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils xsltproc unzip fontconfig python3</code></pre>
+          </div>
+
+          <h3>3. Java Development Kit</h3>
+          <p>AOSP includes its own prebuilt OpenJDK compiler versions (typically mapped under <code>prebuilts/jdk/</code>). Make sure the default system paths don't conflict with these settings when calling build targets.</p>
+        `,
+        quiz: [
+          {
+            q: "What is the recommended storage requirement to check out and build AOSP successfully?",
+            a: ["50 GB", "100 GB", "300 GB to 500 GB on an SSD", "2 TB HDD"],
+            correct: 2,
+            feedback: "The source code tree and output build directories easily exceed 250GB-300GB, requiring fast SSD speeds for compilation."
+          }
+        ]
+      },
+      {
+        id: "module-8",
+        title: "Android Build Process",
+        desc: "Understanding the command sequence: envsetup.sh, lunch selections, and make compiling parameters.",
+        readingTime: "9 min",
+        content: `
+          <h2>Module 8: Android Build Process</h2>
+          <p>This module details the step-by-step compilation flow for building Android.</p>
+
+          <h3>1. Build Sequence</h3>
+          <p>To compile the system, run these commands in order:</p>
+          
+          <div class="code-container">
+            <div class="code-header"><span>Build Commands</span></div>
+            <pre><code>source build/envsetup.sh   # 1. Load shell functions
+lunch aosp_arm64-userdebug # 2. Choose target device and variant
+m -j$(nproc)               # 3. Compile all packages using all CPU cores</code></pre>
+          </div>
+
+          <h3>2. Incremental Build Utilities</h3>
+          <p>Instead of rebuilding the entire system, you can compile specific modules using these shortcuts:</p>
+          <ul>
+            <li><code>mm</code>: Compiles all modules in the current working directory.</li>
+            <li><code>mmm &lt;dir&gt;</code>: Compiles all modules in the specified directory.</li>
+            <li><code>mka &lt;module&gt;</code>: Compiles the specified module and its dependencies using parallel thread optimization.</li>
+          </ul>
+
+          <h3>3. Output Artifacts</h3>
+          <p>Once compiled, build targets generate image files under <code>out/target/product/&lt;device-name&gt;/</code>:</p>
+          <ul>
+            <li><code>system.img</code>: The core Android system, hosting the framework APIs and standard apps.</li>
+            <li><code>boot.img</code>: Contains the Linux Kernel and init ramdisk.</li>
+            <li><code>vendor.img</code>: Contains hardware drivers and device-specific configurations.</li>
+          </ul>
+        `,
+        quiz: [
+          {
+            q: "Which build utility command targets all compilations in your current directory?",
+            a: ["mka", "brunch", "mm", "lunch"],
+            correct: 2,
+            feedback: "The command 'mm' builds the target directory modules from your current location."
+          }
+        ]
+      },
+      {
+        id: "module-9",
+        title: "Android Boot Sequence",
+        desc: "Detailed boot path tracing: Boot ROM, Bootloader, Init, Zygote, System Server, and Launcher.",
+        readingTime: "11 min",
+        content: `
+          <h2>Module 9: Android Boot Sequence</h2>
+          <p>Understanding how an Android device boots up is essential for debugging bootloops and system crashes.</p>
+
+          <h3>1. Boot Sequence Phases</h3>
+          <ol>
+            <li><strong>Power On / Boot ROM:</strong> CPU exits reset state and loads a hard-coded boot ROM to initialize basic components and look for the Bootloader.</li>
+            <li><strong>Bootloader:</strong> The primary bootloader (e.g., U-Boot, LK, ABL) initializes external RAM, setups partition tables, and loads the Linux kernel.</li>
+            <li><strong>Linux Kernel:</strong> Mounts virtual filesystems, setups system drivers, and launches the first user-space process: <code>/init</code>.</li>
+            <li><strong>Init:</strong> Reads configurations from <code>init.rc</code> scripts, configures SELinux rules, mounts system partitions, and spawns the <strong>Zygote</strong> daemon.</li>
+            <li><strong>Zygote:</strong> Pre-loads core Java libraries and resources. It speeds up app launches by cloning (forking) its own pre-warmed process instead of spawning new JVM instances from scratch.</li>
+            <li><strong>System Server:</strong> Spawned by Zygote. It starts all core system services (AMS, PMS, WMS).</li>
+            <li><strong>Launcher:</strong> Once system services are running, the Activity Manager sends an intent to start the default launcher app, displaying the Android home screen.</li>
+          </ol>
+
+          <h3>Interactive Boot Sequence Visualizer</h3>
+          <p>Click on the steps below to trace the boot sequence and view the corresponding logcat logs:</p>
+          <div class="boot-flow-container">
+            <div class="boot-steps-row">
+              <div class="boot-step-box" onclick="triggerBootStep(1)">1. Boot ROM</div>
+              <div class="boot-step-box" onclick="triggerBootStep(2)">2. Bootloader</div>
+              <div class="boot-step-box" onclick="triggerBootStep(3)">3. Kernel</div>
+              <div class="boot-step-box" onclick="triggerBootStep(4)">4. Init</div>
+              <div class="boot-step-box" onclick="triggerBootStep(5)">5. Zygote</div>
+              <div class="boot-step-box" onclick="triggerBootStep(6)">6. System Server</div>
+              <div class="boot-step-box" onclick="triggerBootStep(7)">7. Launcher</div>
+            </div>
+            <div class="boot-desc-box" id="boot-desc-output">
+              <h4>Select a boot step to begin...</h4>
+              <p>Click step buttons above to view how the system processes startup elements and starts Android services.</p>
+            </div>
+            <div class="boot-terminal-log" id="boot-log-console">
+              [SYSTEM SHUTDOWN - READY TO INITIALIZE BOOT SEQUENCE]
+            </div>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "Why does the Zygote process fork new app processes instead of starting new VM instances?",
+            a: [
+              "Because it is written in C++ and cannot run Java code",
+              "To improve app launch speeds and save memory by sharing pre-loaded system libraries",
+              "To bypass SELinux security checks",
+              "To restrict applications from calling the Binder IPC driver"
+            ],
+            correct: 1,
+            feedback: "Zygote pre-loads common classes and libraries. Forking clones this memory space, reducing overhead and speeding up app launch times."
+          }
+        ]
+      },
+      {
+        id: "module-10",
+        title: "ADB & Fastboot",
+        desc: "Deep dive into Android Debug Bridge architecture, shell tools, fastboot flashing, and getvar configurations.",
+        readingTime: "12 min",
+        content: `
+          <h2>Module 10: ADB & Fastboot Tools</h2>
+          <p>The Android Debug Bridge (ADB) and Fastboot are the primary command-line tools for communicating with Android devices during development.</p>
+
+          <h3>1. ADB Architecture</h3>
+          <p>ADB uses a client-server model consisting of three components:</p>
+          <ul>
+            <li><strong>Client:</strong> The development host machine running commands (e.g. your WSL instance).</li>
+            <li><strong>Server:</strong> A background process running on your host machine that coordinates communication between the client and the device daemon.</li>
+            <li><strong>Daemon (adbd):</strong> A background service running on the Android device that executes the commands sent from the host.</li>
+          </ul>
+
+          <h3>2. Common ADB Commands</h3>
+          <ul>
+            <li><code>adb devices</code>: Lists all connected devices and emulators.</li>
+            <li><code>adb shell</code>: Drops the host user into an interactive shell session on the device.</li>
+            <li><code>adb push &lt;local&gt; &lt;remote&gt;</code>: Copies files from the host machine to the device.</li>
+            <li><code>adb pull &lt;remote&gt; &lt;local&gt;</code>: Copies files from the device to the host machine.</li>
+            <li><code>adb logcat</code>: Streams system logs in real-time.</li>
+          </ul>
+
+          <h3>3. Fastboot Mode</h3>
+          <p>Fastboot runs when the device is in the bootloader state, before the operating system boots. It allows you to modify flash partitions and update system images directly:</p>
+          
+          <div class="code-container">
+            <div class="code-header"><span>Fastboot Command sequence</span></div>
+            <pre><code>fastboot devices              # Detect bootloader states
+fastboot flash boot boot.img  # Flash a custom kernel image
+fastboot flash system system.img # Flash system changes
+fastboot reboot               # Reboot the device</code></pre>
+          </div>
+        `,
+        quiz: [
+          {
+            q: "What component of ADB runs as a background process on the Android device itself?",
+            a: ["ADB Client", "ADB Server", "adbd Daemon", "Fastboot shell"],
+            correct: 2,
+            feedback: "The 'adbd' (adb daemon) runs on the device, executing commands sent from the host."
+          }
+        ]
+      },
+      {
+        id: "module-11",
+        title: "Android Logs & Debugging",
+        desc: "Parsing logcat outputs, reading tombstones and ANR logs, using Perfetto and dumpsys for diagnostics.",
+        readingTime: "12 min",
+        content: `
+          <h2>Module 11: Logs & Debugging</h2>
+          <p>This module covers troubleshooting system bugs, crashes, and performance issues in Android.</p>
+
+          <h3>1. Logcat Log Levels</h3>
+          <p>Android logs are categorized by priority level:</p>
+          <ul>
+            <li><code>V</code>: Verbose (Lowest priority)</li>
+            <li><code>D</code>: Debug</li>
+            <li><code>I</code>: Info</li>
+            <li><code>W</code>: Warning</li>
+            <li><code>E</code>: Error</li>
+            <li><code>F</code>: Fatal (Causes system crash)</li>
+          </ul>
+
+          <h3>2. Analyzing System Failures</h3>
+          <ul>
+            <li><strong>ANRs (Application Not Responding):</strong> Occurs when the app's main thread is blocked for more than 5 seconds. Diagnostic traces are written to <code>/data/anr/traces.txt</code>.</li>
+            <li><strong>Tombstones:</strong> Generated when a native C/C++ process crashes. Contains details on register states and memory stack traces, saved under <code>/data/tombstones/</code>.</li>
+          </ul>
+
+          <h3>3. Performance Tracing with Perfetto</h3>
+          <p><strong>Perfetto</strong> is the modern platform instrumentation tool for recording performance traces on Android. It allows you to analyze CPU usage, memory leaks, and render latency using visual timelines.</p>
+        `,
+        quiz: [
+          {
+            q: "Where does the Android system write native C/C++ crash logs containing CPU register states?",
+            a: ["/data/anr/traces.txt", "/data/tombstones/", "/var/log/syslog", "/proc/kmsg"],
+            correct: 1,
+            feedback: "Tombstones store detailed debugging logs for native code crashes (such as segmentation faults)."
+          }
+        ]
+      },
+      {
+        id: "module-12",
+        title: "Android System Development",
+        desc: "Framework level modifications, custom HAL APIs, AIDL designs, and configuring vendor partitions.",
+        readingTime: "13 min",
+        content: `
+          <h2>Module 12: Android System Development</h2>
+          <p>Customizing Android devices often requires modifying the system framework and writing custom services.</p>
+
+          <h3>1. Adding Custom System Services</h3>
+          <p>To expose a new system feature to applications, you must extend the Android framework:</p>
+          <ol>
+            <li><strong>Define the AIDL Interface:</strong> Create an interface file (e.g. <code>ICustomService.aidl</code>) to define the Binder communication methods.</li>
+            <li><strong>Implement the Service:</strong> Create a Java class that implements the interface.</li>
+            <li><strong>Register the Service:</strong> Register your service in the System Server initialization sequence:
+              <pre><code>ServiceManager.addService("custom_service", new CustomService(context));</code></pre>
+            </li>
+          </ol>
+
+          <h3>2. Multi-Partition Architecture</h3>
+          <p>To support Treble architecture and make updates easier, AOSP splits the system into distinct disk partitions:</p>
+          <ul>
+            <li><code>/system</code>: Contains generic, open-source framework components.</li>
+            <li><code>/vendor</code>: Contains device-specific binary drivers and configs provided by silicon manufacturers (e.g. Qualcomm).</li>
+            <li><code>/product</code>: Contains system customizations and preinstalled applications specific to the device brand.</li>
+          </ul>
+        `,
+        quiz: [
+          {
+            q: "Which file format is used to define Binder interfaces for Android System Services?",
+            a: [".bp", ".xml", ".aidl", ".mk"],
+            correct: 2,
+            feedback: "AIDL (Android Interface Definition Language) defines the interfaces that processes use to communicate with each other via Binder."
+          }
+        ]
+      },
+      {
+        id: "module-13",
+        title: "Android Security",
+        desc: "SELinux policies, AVB 2.0 signatures, secure boot validations, and app sandbox layers.",
+        readingTime: "10 min",
+        content: `
+          <h2>Module 13: Android Security Model</h2>
+          <p>Android is built on security features designed to isolate applications, protect user data, and verify system integrity.</p>
+
+          <h3>1. SELinux (Security-Enhanced Linux)</h3>
+          <p>Android uses SELinux to enforce Mandatory Access Control (MAC) policies, preventing unauthorized processes from accessing system resources even with root privileges. SELinux runs in one of two modes:</p>
+          <ul>
+            <li><strong>Permissive:</strong> Policies are not enforced, but violations are logged (used for debugging).</li>
+            <li><strong>Enforcing:</strong> Policies are strictly enforced, and unauthorized actions are blocked.</li>
+          </ul>
+
+          <h3>2. Verified Boot (AVB 2.0)</h3>
+          <p>Android Verified Boot (AVB) establishes a cryptographic <strong>Root of Trust</strong>. The bootloader verifies the cryptographic signature of the boot, system, and vendor partition images before mounting them, preventing tampered software from booting.</p>
+
+          <h3>3. Application Sandboxing</h3>
+          <p>Every Android app is assigned a unique Linux User ID (UID) on installation. Each app runs in its own isolated process sandbox with restricted file access, isolating it from other apps and the system.</p>
+        `,
+        quiz: [
+          {
+            q: "What security mechanism assigns a unique Linux UID to every application to isolate their execution?",
+            a: ["Android Verified Boot", "SELinux", "Application Sandboxing", "Keystore Provider"],
+            correct: 2,
+            feedback: "Application Sandboxing uses standard Linux user privilege structures to isolate application processes."
+          }
+        ]
+      }
+    ];
+
+    /* ==========================================
+       B. DATA STORE (50 COMMANDS FOR MODULE 2)
+       ========================================== */
+    const COMMANDS_DATA = [
+      { name: "pwd", syntax: "pwd", desc: "Print Working Directory. Outputs the absolute path of your current folder.", ex: "pwd\n# Output: /home/developer", err: "Confusing it with Windows backslash paths. In Linux, paths always use forward slashes.", q: "How is pwd implemented? It tracks the $PWD environment variable or traverses the directory tree upwards using parent inodes (..) until it matches the root." },
+      { name: "ls", syntax: "ls [options] [path]", desc: "List directory contents.", ex: "ls -la /etc\n# Lists all files including hidden files, permissions, size, and modified date.", err: "Running just 'ls' when looking for hidden files like .git or .wslconfig (requires -a).", q: "What does 'ls -la' display? It lists all directory contents including hidden files, sizes, owners, and permissions." },
+      { name: "cd", syntax: "cd [path]", desc: "Change the current working directory.", ex: "cd /home/developer/android\ncd ..\ncd ~", err: "Typing 'cd' without a space, or using backslashes.", q: "What does 'cd ~' do? It changes the current directory to the user's home folder." },
+      { name: "mkdir", syntax: "mkdir [options] directory_name", desc: "Create a new directory.", ex: "mkdir -p frameworks/base/services\n# -p creates parent directories if they don't exist.", err: "Trying to create nested directories without the '-p' flag.", q: "What does the -p flag do? It creates nested parent directories automatically without throwing errors." },
+      { name: "rmdir", syntax: "rmdir directory_name", desc: "Remove empty directories.", ex: "rmdir old_reports", err: "Trying to use rmdir to delete a directory containing files (use 'rm -rf' instead).", q: "When does rmdir fail? When the target directory is not empty." },
+      { name: "touch", syntax: "touch file_name", desc: "Create an empty file or update the access/modification timestamps of an existing file.", ex: "touch Android.bp", err: "Using touch to create nested files in folders that do not exist yet.", q: "How do you create an empty file in Linux? Use the 'touch' command." },
+      { name: "cat", syntax: "cat [options] file_name", desc: "Concatenate and display file content.", ex: "cat build/envsetup.sh", err: "Using cat on large binaries, which can corrupt the terminal output.", q: "What is the risk of calling cat on huge logs? It dumps the entire file at once, which can slow down or crash your terminal session." },
+      { name: "more", syntax: "more file_name", desc: "Display file content page-by-page (forward only).", ex: "more system/core/init/init.cpp", err: "Trying to scroll backward using arrow keys (not supported by more).", q: "Why use less instead of more? 'less' allows scrolling both backward and forward." },
+      { name: "less", syntax: "less file_name", desc: "Display file content page-by-page, allowing forward and backward navigation.", ex: "less frameworks/base/core/java/android/app/Activity.java", err: "Forgetting to press 'q' to exit the less viewport.", q: "How do you exit 'less' mode? Press 'q'." },
+      { name: "head", syntax: "head [-n lines] file_name", desc: "Output the first lines of a file.", ex: "head -n 20 manifest.xml\n# Shows first 20 lines.", err: "Forgetting the '-n' flag will default to displaying 10 lines.", q: "What is the default line count for head? 10 lines." },
+      { name: "tail", syntax: "tail [-n lines] [-f] file_name", desc: "Output the last lines of a file. Use '-f' to stream additions in real-time.", ex: "tail -f out/build.log\n# Streams build output.", err: "Forgetting to exit tail -f (press Ctrl+C).", q: "How do you stream a log file in real-time? Use 'tail -f <file>'." },
+      { name: "cp", syntax: "cp [options] source destination", desc: "Copy files or directories.", ex: "cp -r device/sample/ device/myboard/\n# -r copies directories recursively.", err: "Trying to copy a folder without the '-r' recursive flag.", q: "What does the -r flag do in cp? It copies directories and their contents recursively." },
+      { name: "mv", syntax: "mv source destination", desc: "Move or rename files and directories.", ex: "mv Android.mk Android.mk.bak\n# Renames file.", err: "Accidentally overwriting files of the same name without warning.", q: "Does mv copy files? No, it changes the directory entry pointer (unless moving across disk partitions)." },
+      { name: "rm", syntax: "rm [options] path", desc: "Remove files or directories.", ex: "rm -rf out/\n# Recursively deletes the build folder.", err: "Running 'rm -rf /' or typing the wrong path, which can permanently delete system files.", q: "What does -rf stand for? r = recursive, f = force (suppresses confirmation prompts)." },
+      { name: "find", syntax: "find [path] [expression]", desc: "Search for files within a directory hierarchy.", ex: "find frameworks/ -name \"*.aidl\"\n# Finds AIDL files.", err: "Searching from root (/) without limiting path scopes, which can take a very long time.", q: "How do you search for files by name in a directory? Use 'find <directory> -name \"<pattern>\"'." },
+      { name: "grep", syntax: "grep [options] pattern [files]", desc: "Search for text patterns in files.", ex: "grep -rn \"ActivityManagerService\" frameworks/\n# Recursive search with line numbers.", err: "Forgetting the '-r' flag when searching recursively in directories.", q: "What does -rn stand for in grep? r = recursive, n = display line numbers." },
+      { name: "sed", syntax: "sed [options] 'commands' file", desc: "Stream Editor. Used for parsing and transforming text files.", ex: "sed -i 's/userdebug/user/g' build.prop\n# -i modifies the file in place.", err: "Using sed on files without backups, which can lead to data loss if the regex matches incorrectly.", q: "What does the 's' command do in sed? It performs a search-and-replace operation." },
+      { name: "awk", syntax: "awk 'pattern {action}' file", desc: "Pattern scanning and processing language.", ex: "awk '{print $1}' logcat.txt\n# Prints only the first column of the file.", err: "Confusing space delimiters with tabs, which can cause processing errors.", q: "What is awk primarily used for? Column-based text processing." },
+      { name: "chmod", syntax: "chmod [options] mode file", desc: "Change file permissions.", ex: "chmod +x build.sh\n# Makes the script executable.", err: "Setting files to 777 permissions, which creates security vulnerabilities.", q: "What does 'chmod +x' do? It adds execute permissions to the file." },
+      { name: "chown", syntax: "chown owner:group file", desc: "Change file ownership permissions.", ex: "chown developer:devgroup Android.bp", err: "Forgetting to run the command with sudo privileges.", q: "Who can run the chown command? Only root or users with sudo privileges." },
+      { name: "ps", syntax: "ps [options]", desc: "Display active processes.", ex: "ps -ef | grep zygote", err: "Running ps without options, which only lists processes in your current terminal session.", q: "What is the Zygote PID? Find it using 'ps -A | grep zygote'." },
+      { name: "top", syntax: "top", desc: "Real-time process monitor.", ex: "top", err: "Forgetting to press 'q' to exit the monitoring viewport.", q: "How do you exit top? Press 'q'." },
+      { name: "htop", syntax: "htop", desc: "Interactive process viewer (colored, easier navigation than top).", ex: "htop", err: "Running htop on systems without it installed.", q: "Why use htop? It provides a color-coded, scrollable list of all active processes." },
+      { name: "kill", syntax: "kill [options] PID", desc: "Send signals to terminate processes.", ex: "kill -9 1450\n# -9 sends SIGKILL to force exit.", err: "Killing the wrong PID, which can cause system instability.", q: "What does 'kill -9' do? It sends a SIGKILL signal to immediately terminate the process." },
+      { name: "systemctl", syntax: "systemctl [command] [service]", desc: "Control systemd system and services.", ex: "systemctl status docker", err: "Running systemctl in WSL environments that don't support systemd (requires setting wsl.conf).", q: "Why does systemctl fail in basic WSL? Legacy WSL configurations don't initialize systemd by default." },
+      { name: "service", syntax: "service service_name command", desc: "Legacy command to manage system services.", ex: "sudo service ssh start", err: "Using service when systemctl is available and required by the distro.", q: "What is the difference between service and systemctl? systemctl is the modern tool for managing systemd services." },
+      { name: "tar", syntax: "tar [options] file_name archive_name", desc: "Tape Archive tool used to combine multiple files into a single archive.", ex: "tar -cvzf aosp_logs.tar.gz out/logs/\n# Compresses files into a tarball.", err: "Forgetting the 'z' flag when trying to compress files (c = create, v = verbose, z = gzip, f = file).", q: "What does -cvzf mean in tar? c=create, v=verbose, z=gzip compress, f=file output." },
+      { name: "zip", syntax: "zip archive.zip files", desc: "Compresses files into a zip archive.", ex: "zip -r backup.zip device/", err: "Forgetting the '-r' recursive flag when zipping directories.", q: "How do you zip a directory recursively? Use 'zip -r archive.zip folder/'." },
+      { name: "unzip", syntax: "unzip archive.zip", desc: "Extracts files from a zip archive.", ex: "unzip backup.zip -d extracted/", err: "Overwriting files without validating directories first.", q: "How do you extract a zip to a specific directory? Use the '-d' flag." },
+      { name: "ssh", syntax: "ssh user@host", desc: "Secure Shell. Securely log in to remote systems.", ex: "ssh developer@buildserver.local", err: "Forgetting to configure public key permissions, causing login authentication loops.", q: "What port does SSH use? Default port is 22." },
+      { name: "scp", syntax: "scp [options] file user@host:path", desc: "Secure Copy. Copy files securely between local and remote hosts.", ex: "scp system.img developer@buildserver.local:/tmp/", err: "Accidentally swapping the local and remote paths.", q: "Does scp encrypt files? Yes, it uses SSH for encryption." },
+      { name: "curl", syntax: "curl [options] URL", desc: "Client URL tool to transfer data to or from a server.", ex: "curl -O https://android.googlesource.com/repo\n# -O downloads the file using its remote name.", err: "Forgetting to follow redirects with the '-L' flag.", q: "How do you download a file and follow redirects? Use 'curl -LO <url>'." },
+      { name: "wget", syntax: "wget URL", desc: "Non-interactive network downloader.", ex: "wget http://example.com/source.tar.gz", err: "Forgetting to check download progress during long sync sessions.", q: "What is the difference between curl and wget? curl can download/upload and supports more protocols, while wget is optimized for downloading files and folders recursively." },
+      { name: "ping", syntax: "ping host", desc: "Test network connectivity by sending ICMP packets.", ex: "ping google.com", err: "Running ping on systems without stopping it (press Ctrl+C to exit).", q: "How do you limit ping counts? Use 'ping -c <count> <host>'." },
+      { name: "ifconfig", syntax: "ifconfig", desc: "Legacy network interface configuration tool.", ex: "ifconfig", err: "Deprecated in modern distributions. Use the 'ip' command instead.", q: "What is the modern alternative to ifconfig? The 'ip' command." },
+      { name: "ip", syntax: "ip [options] object command", desc: "Configure network interfaces, routing, and tunnels.", ex: "ip a\n# Displays IP addresses.", err: "Typing the legacy 'ifconfig' command instead.", q: "How do you view all network interfaces and IP addresses? Use 'ip a'." },
+      { name: "netstat", syntax: "netstat [options]", desc: "Legacy network statistics tool.", ex: "netstat -tuln", err: "Deprecated in modern distros. Use 'ss' instead.", q: "What does 'netstat -tuln' show? Active TCP and UDP listening ports." },
+      { name: "ss", syntax: "ss [options]", desc: "Modern utility for inspecting socket statistics.", ex: "ss -tuln\n# Lists listening TCP and UDP sockets.", err: "Confusing it with system utilities.", q: "Why is ss faster than netstat? It retrieves socket stats directly from kernel memory spaces." },
+      { name: "df", syntax: "df [options]", desc: "Display free and used disk space on your filesystems.", ex: "df -h\n# -h displays sizes in human-readable format (GB, MB).", err: "Not checking disk space before checking out AOSP (requires 300GB+).", q: "What does -h do in df? Displays disk space in human-readable units (e.g. GB, MB)." },
+      { name: "du", syntax: "du [options] path", desc: "Estimate file space usage.", ex: "du -sh out/\n# Shows the total size of the out directory in a human-readable format.", err: "Running 'du' without options in large directories, which dumps output for every folder.", q: "How do you get the total size of a folder? Use 'du -sh <folder>'." },
+      { name: "mount", syntax: "mount device directory", desc: "Mount a filesystem.", ex: "sudo mount -t ext4 /dev/sdb1 /mnt/data", err: "Mounting filesystems to active folders without validating mount points.", q: "Where are devices mounted in WSL? Typically auto-mounted under '/mnt/'." },
+      { name: "umount", syntax: "umount directory", desc: "Unmount a filesystem.", ex: "sudo umount /mnt/data", err: "Running 'umount' while files in that directory are open (returns 'device is busy').", q: "How do you resolve a 'device is busy' error on umount? Close all terminal sessions or files open in that directory." },
+      { name: "history", syntax: "history", desc: "View the command history of your shell session.", ex: "history | grep git", err: "Running commands with sensitive info (like passwords) that get stored in your history log.", q: "Where is command history saved? In '~/.bash_history'." },
+      { name: "alias", syntax: "alias name='command'", desc: "Create shortcuts for long commands.", ex: "alias aosp_lunch='source build/envsetup.sh && lunch'", err: "Defining aliases that clash with existing system utilities.", q: "How do you make an alias permanent? Add it to your '~/.bashrc' or '~/.zshrc' file." },
+      { name: "export", syntax: "export var=value", desc: "Set environment variables to pass to child processes.", ex: "export PATH=$PATH:/usr/local/bin", err: "Setting PATH variables without including the existing '$PATH', which can break system utilities.", q: "What does export do? It shares the variable with all child shells spawned from the current session." },
+      { name: "echo", syntax: "echo [string]", desc: "Display text or output environment variables.", ex: "echo $PATH", err: "Forgetting the '$' prefix when printing variable values.", q: "What does 'echo $?' display? The exit status code of the last executed command." },
+      { name: "nano", syntax: "nano file_name", desc: "A simple, user-friendly terminal text editor.", ex: "nano ~/.bashrc", err: "Forgetting to press 'Ctrl+O' to save and 'Ctrl+X' to exit.", q: "How do you exit nano? Press 'Ctrl+X' (and select 'Y' to save changes)." },
+      { name: "vim", syntax: "vim file_name", desc: "An advanced, highly extensible modal text editor.", ex: "vim Android.bp", err: "Getting stuck in vim because you don't know how to switch modes or exit.", q: "How do you exit vim with saving? Press Escape, then type ':wq' and press Enter." },
+      { name: "vi", syntax: "vi file_name", desc: "The original standard visual text editor (often links to vim).", ex: "vi /etc/hosts", err: "Confusing command mode with insert mode.", q: "How do you switch to Insert Mode in vi? Press 'i'." }
+    ];
+
+    /* ==========================================
+       C. DATA STORE (50 INTERVIEW PREP QUESTIONS)
+       ========================================== */
+    const INTERVIEW_DATA = [
+      { id: 1, cat: "linux", q: "Explain Linux architecture.", 
+        ans: "Linux consists of the hardware layer, the Kernel (which manages system calls, memory, processes, and drivers), the Shell interpreter, and user space application libraries.",
+        beg: "Linux has a Kernel at its core that handles hardware, and user programs run on top of it. They talk to each other using System Calls.",
+        exp: "Privilege levels are divided into Ring 0 (Kernel Mode) and Ring 3 (User Mode). System calls use CPU trap instructions to transition from Ring 3 to Ring 0, executing core features like page scheduling and socket management.",
+        tips: "Highlight the privilege boundaries (Kernel space vs User space) and how system calls act as the gatekeeper." },
+        
+      { id: 2, cat: "linux", q: "Difference between process and thread.", 
+        ans: "A process is an isolated execution instance with its own allocated virtual memory space. A thread is the smallest schedulable execution unit within a process, sharing the parent process's memory space and resources.",
+        beg: "A process is a running app with its own memory. A thread is a task running inside that app, sharing memory with other threads of the same process.",
+        exp: "Processes do not share memory by default and require IPC (like Binder or sockets) to communicate. Threads share the heap memory space, file descriptors, and sockets of their parent process, but each thread maintains its own program counter, stack, and registers.",
+        tips: "Mention memory isolation and context-switching overhead differences." },
+
+      { id: 3, cat: "linux", q: "What is fork()?", 
+        ans: "The fork() system call creates a new child process by duplicating the calling parent process. The child process receives a copy of the parent's memory, file descriptors, and security context.",
+        beg: "fork() creates an exact clone of the current process running in memory.",
+        exp: "fork() uses a optimization called Copy-On-Write (COW). The memory pages are not duplicated initially; instead, both parent and child processes share the same physical pages until one process writes to them.",
+        tips: "Highlight the return values of fork(): 0 is returned to the child process, and the child's PID is returned to the parent process." },
+
+      { id: 4, cat: "linux", q: "What is exec()?", 
+        ans: "The exec() family of functions replaces the current process memory space with a new executable program, initializing its stack and registers.",
+        beg: "exec() stops the current program and starts a new one inside the same process container.",
+        exp: "Unlike fork() which creates a new process, exec() replaces the active process image (text, data, heap, stack segments) with a new binary loaded from disk, keeping the same PID.",
+        tips: "Explain how fork() and exec() are typically used together to spawn and run new programs." },
+
+      { id: 5, cat: "linux", q: "Explain zombie process.", 
+        ans: "A zombie process is a process that has completed execution but still has an entry in the system process table. This entry is kept so the parent process can read the child's exit status code.",
+        beg: "A zombie is a finished process waiting for its parent process to read its exit status.",
+        exp: "A zombie process has freed all its memory, but retains its process descriptor in the process table. If the parent fails to call wait() or waitpid() to read the status, the zombie persists. A large number of zombie processes can exhaust the system's PID pool.",
+        tips: "Mention how zombie processes are cleaned up: if the parent process dies, the init process (PID 1) inherits the zombie and calls wait() to clean it up." },
+
+      { id: 6, cat: "linux", q: "Explain orphan process.", 
+        ans: "An orphan process is a process that is still running, but whose parent process has terminated.",
+        beg: "An orphan process continues running after its parent process has finished or crashed.",
+        exp: "When a parent process terminates before its children, the Linux Kernel reparents the orphan processes to the init process (PID 1 or systemd). The init process regularly calls wait() to reap their exit codes when they terminate.",
+        tips: "Distinguish orphan processes (which are still running) from zombie processes (which have terminated)." },
+
+      { id: 7, cat: "linux", q: "What is init process?", 
+        ans: "The init process is the first user-space process started by the kernel during boot, running as PID 1. It acts as the parent of all other processes.",
+        beg: "init is the parent of all processes on a Linux system, running as PID 1.",
+        exp: "The init process reads system configuration files (like /etc/inittab or systemd units) to mount partitions, start background services, and clean up orphaned processes.",
+        tips: "Mention systemd on modern desktop distros, and compare it to init.rc/init in Android." },
+
+      { id: 8, cat: "linux", q: "Difference between hard link and soft link.", 
+        ans: "A hard link is a direct directory entry pointer pointing to the same file inode on disk. A soft link (symbolic link) is a separate file that contains a path pointer pointing to the target file.",
+        beg: "A hard link is a duplicate name pointing to the same file. A soft link is a shortcut file pointing to another path.",
+        exp: "Hard links share the same inode number and cannot span different filesystems or reference directories. Soft links have their own inode numbers, can span across filesystems, and can point to directories. If you delete the original file, soft links break, but hard links remain valid.",
+        tips: "Mention inodes and behavior when the source file is deleted." },
+
+      { id: 9, cat: "linux", q: "Explain Linux permissions.", 
+        ans: "Permissions are flags that control read (r), write (w), and execute (x) access for three user levels: Owner, Group, and Others.",
+        beg: "Permissions control who can read, edit, or run a file.",
+        exp: "Represented as 'rwxrwxrwx' (or octal numbers like 755). The first set is the owner, second is the group, and third is others. Octal values are calculated as: r=4, w=2, x=1.",
+        tips: "Be ready to calculate octal values (e.g. 644) and explain how permissions apply to directories." },
+
+      { id: 10, cat: "linux", q: "Difference between chmod and chown.", 
+        ans: "chmod changes the read, write, and execute permissions of a file or directory. chown changes the user and group ownership of the file.",
+        beg: "chmod changes file permissions (rwx), while chown changes who owns the file.",
+        exp: "chmod updates the file access permission flags (mode) in the file's metadata. chown changes the UID (User ID) and GID (Group ID) properties of the file's inode.",
+        tips: "Keep the explanation brief: chmod modifies access levels, chown modifies owner identity." },
+
+      { id: 11, cat: "linux", q: "What is grep?", 
+        ans: "grep is a command-line tool used to search text files for lines that match a regular expression pattern.",
+        beg: "grep searches files for lines containing a specific keyword or pattern.",
+        exp: "grep scans inputs line-by-line using regular expression engines. Common options include: -r (recursive search in directories), -i (case-insensitive), and -n (display line numbers).",
+        tips: "Explain how you use grep to filter logcat or find files in the AOSP codebase." },
+
+      { id: 12, cat: "linux", q: "Explain awk.", 
+        ans: "awk is a column-based text processing language used for parsing logs and formatting data fields.",
+        beg: "awk is a scripting language used to extract and format columns of text from logs or files.",
+        exp: "awk splits input lines into fields using a delimiter (whitespace by default, referenced as $1, $2, etc.). It supports loops, conditionals, and math operations, making it useful for parsing system logs.",
+        tips: "Give a simple example, like printing the process ID column from a 'ps' command output." },
+
+      { id: 13, cat: "linux", q: "What is sed?", 
+        ans: "sed (Stream Editor) is a tool used to perform basic text transformations on an input stream (a file or pipe input).",
+        beg: "sed is a tool used to find and replace text in files without opening them.",
+        exp: "sed works by reading input line-by-line, applying editing rules (like regex replacement 's/find/replace/g'), and printing the output. The '-i' option allows editing files in-place.",
+        tips: "Mention using sed in build scripts to automate configuration changes." },
+
+      { id: 14, cat: "wsl", q: "What is WSL?", 
+        ans: "WSL (Windows Subsystem for Linux) is a Windows compatibility layer that allows developers to run Linux distributions directly on Windows without the overhead of traditional virtual machines.",
+        beg: "WSL lets you run a Linux terminal and Linux programs natively inside Windows.",
+        exp: "WSL integration allows running Linux commands alongside Windows tools. It supports sharing files between filesystems and running GUI apps natively on Windows.",
+        tips: "Highlight how WSL enables developers to compile Linux codebases on a Windows machine." },
+
+      { id: 15, cat: "wsl", q: "Difference between WSL1 and WSL2.", 
+        ans: "WSL1 translates Linux system calls to Windows APIs on the fly. WSL2 runs a real Linux kernel in a lightweight utility VM, providing much faster disk performance and full system call compatibility.",
+        beg: "WSL2 runs a real Linux kernel inside a lightweight virtual machine, making it much faster for compiling code.",
+        exp: "WSL1 suffers from slow disk I/O when translating calls on Windows filesystems. WSL2 uses virtual disks (VHDX) with native ext4 filesystems, enabling faster disk speeds that are essential for large compilations like AOSP.",
+        tips: "Highlight that WSL2 is mandatory for AOSP development due to disk performance and tool compatibility." },
+
+      { id: 16, cat: "linux", q: "Explain Linux boot process.", 
+        ans: "The Linux boot process follows a sequence of steps: Power On -> BIOS/UEFI -> Bootloader (GRUB) -> Kernel Initialization -> Init Process -> User Space Services.",
+        beg: "The motherboard runs the bootloader, which loads the Linux kernel into memory, which then starts the first system processes.",
+        exp: "The BIOS/UEFI runs hardware checks (POST) and loads the bootloader from disk. The bootloader loads the kernel image and initramfs into RAM. The kernel initializes system drivers, mounts the root filesystem, and spawns the first user-space process (init, PID 1).",
+        tips: "Keep the steps sequential and clear, highlighting the role of the init process." },
+
+      { id: 17, cat: "linux", q: "What is systemd?", 
+        ans: "systemd is the modern initialization system and service manager used by most Linux distributions to bootstrap user space.",
+        beg: "systemd is the program that starts and manages background services on Linux.",
+        exp: "systemd replaced legacy SysV init scripts. It uses unit files (.service) to manage background processes, supporting parallel service initialization, dependency tracking, and automatic restarts.",
+        tips: "Note that while Ubuntu uses systemd, Android uses its own init program configured via init.rc scripts." },
+
+      { id: 18, cat: "linux", q: "Explain environment variables.", 
+        ans: "Environment variables are key-value pairs stored by the shell that configure the behavior of running programs and scripts.",
+        beg: "Environment variables are settings stored in the terminal that configure programs (e.g. $PATH tells the system where to find commands).",
+        exp: "Environment variables (like PATH, HOME, and USER) are inherited by child processes spawned from the shell. The 'export' command makes variables accessible to child processes.",
+        tips: "Mention that files like '.bashrc' or '.profile' are used to persist environment variables across sessions." },
+
+      { id: 19, cat: "linux", q: "Difference between SSH and SCP.", 
+        ans: "SSH (Secure Shell) is a protocol used to access and run commands on remote servers. SCP (Secure Copy) is a file transfer utility that uses SSH to copy files between machines.",
+        beg: "SSH logs you into a remote computer terminal. SCP uses that secure connection to copy files back and forth.",
+        exp: "Both run over port 22 by default and share the same encryption and authentication mechanisms. SCP is optimized for file transfers, while SSH is designed for interactive sessions.",
+        tips: "Mention that SFTP is a more modern alternative to SCP for file transfers." },
+
+      { id: 20, cat: "linux", q: "What is a daemon?", 
+        ans: "A daemon is a background process that runs continuously to handle system requests, without direct interaction from a user.",
+        beg: "A daemon is a background service that runs silently to manage system tasks.",
+        exp: "Daemons typically start at boot time and run with root or system privileges. Their names usually end with a 'd' (e.g. sshd, systemd, adbd, logd).",
+        tips: "Give examples of common daemons, such as 'adbd' on Android or 'sshd' on Linux." },
+
+      { id: 21, cat: "aosp", q: "What is AOSP?", 
+        ans: "AOSP (Android Open Source Project) is the open-source operating system codebase maintained by Google that developers can customize and build for various devices.",
+        beg: "AOSP is the core, open-source version of Android. Anyone can download, modify, and build it.",
+        exp: "AOSP includes the base operating system, the Linux kernel interface, the application framework, and core system apps. It does not include proprietary Google Mobile Services (GMS) like Google Play or Google Maps.",
+        tips: "Distinguish between AOSP (the open-source system) and proprietary OEM skins or GMS packages." },
+
+      { id: 22, cat: "android", q: "Explain Android architecture.", 
+        ans: "Android is organized into a modular system stack: Linux Kernel -> Hardware Abstraction Layer (HAL) -> Native C/C++ Libraries & Runtime -> Java API Framework -> System Applications.",
+        beg: "Android has a Linux kernel at the bottom, a HAL that talks to hardware, runtime libraries, a Java framework, and system apps at the top.",
+        exp: "The platform stack decouples applications from hardware dependencies. Applications interact with system APIs in the Java Framework, which call native libraries and HAL interfaces via Binder IPC to communicate with hardware drivers in the kernel.",
+        tips: "Be ready to sketch the architecture stack, highlighting the boundary layers." },
+
+      { id: 23, cat: "android", q: "What is HAL?", 
+        ans: "The Hardware Abstraction Layer (HAL) defines standard interfaces for hardware vendors to implement, decoupling the Android framework from low-level driver details.",
+        beg: "The HAL is a translator that allows Android to interact with device hardware (like cameras or sensors) without needing to know the specific brand or driver details.",
+        exp: "HAL modules are compiled as shared libraries (.so files) or implemented as AIDL/HIDL services. The Java framework communicates with these services via Binder IPC to access hardware features.",
+        tips: "Mention Project Treble and the transition of HALs to standalone Binderized services." },
+
+      { id: 24, cat: "android", q: "Explain Binder IPC.", 
+        ans: "Binder is Android's primary Inter-Process Communication (IPC) mechanism, implemented as a custom Linux kernel driver that allows processes to communicate securely and efficiently.",
+        beg: "Binder is a system that allows different running programs in Android to talk to each other and share data securely.",
+        exp: "Android runs processes in isolated sandboxes. Binder uses a kernel driver (/dev/binder) to copy transaction data directly from the sender's user space to the receiver's kernel buffer, reducing memory overhead and enabling fast IPC.",
+        tips: "Highlight that Binder is optimized for performance and enforces security permissions during calls." },
+
+      { id: 25, cat: "android", q: "What is Zygote?", 
+        ans: "Zygote is a warm-started process that spawns all Android application processes by cloning (forking) its pre-loaded memory state.",
+        beg: "Zygote is a process that pre-loads common system resources. When you open an app, Zygote clones itself to start the app quickly.",
+        exp: "During system boot, Zygote initializes a Dalvik/ART virtual machine instance and pre-loads common classes and resources. When a new app is launched, the system forks Zygote, cloning the pre-loaded memory state using Copy-On-Write (COW) to save memory and speed up startup.",
+        tips: "Highlight the use of fork() and Copy-On-Write optimization for memory efficiency." },
+
+      { id: 26, cat: "android", q: "What is System Server?", 
+        ans: "The System Server is a core Java process spawned by Zygote that starts and hosts critical system services like AMS, PMS, and WMS.",
+        beg: "System Server is the core Java service that runs background managers like the Activity Manager and Package Manager.",
+        exp: "System Server initializes key managers (like ActivityManagerService and WindowManagerService) and registers them with the Service Manager, making them accessible to applications via Binder IPC.",
+        tips: "Explain that a crash in the System Server will restart the Zygote process, causing the device to soft-boot." },
+
+      { id: 27, cat: "android", q: "Explain Android boot sequence.", 
+        ans: "The Android boot sequence proceeds in order: Boot ROM -> Bootloader -> Kernel -> Init -> Zygote -> System Server -> Launcher.",
+        beg: "The device runs the bootloader, which starts the Linux kernel. The kernel starts the init process, which runs Zygote. Zygote starts the System Server, which finally launches the home screen.",
+        exp: "The Bootloader loads the Linux kernel. The kernel initializes drivers and spawns '/init' (PID 1). Init reads configuration files (init.rc) and starts Zygote. Zygote pre-loads libraries and forks the System Server, which starts system services. Finally, the Launcher app is launched to display the home screen.",
+        tips: "Use the sequential diagram from Module 9 to explain each phase." },
+
+      { id: 28, cat: "android", q: "What is Android Runtime?", 
+        ans: "The Android Runtime (ART) is the execution engine that runs Java/Kotlin code on Android devices, replacing the legacy Dalvik VM.",
+        beg: "ART is the engine that compiles and executes app code on your Android device.",
+        exp: "ART uses Ahead-Of-Time (AOT) compilation to compile app bytecode (DEX) into native machine code on installation, reducing CPU usage and improving app performance compared to Dalvik's Just-In-Time (JIT) compilation.",
+        tips: "Mention that modern ART uses a hybrid model of AOT, JIT, and profile-guided compilation." },
+
+      { id: 29, cat: "android", q: "What is ART?", 
+        ans: "ART is the acronym for Android Runtime, which executes DEX bytecode on devices.",
+        beg: "ART stands for Android Runtime, the engine that executes application bytecode.",
+        exp: "ART manages memory allocation, garbage collection, and compilation profiles, translating DEX bytecode into native machine code.",
+        tips: "This is a brief follow-up to Question 28; focus on DEX compilation and garbage collection." },
+
+      { id: 30, cat: "aosp", q: "Explain Android build variants.", 
+        ans: "Build variants define the optimization and debugging configurations for an AOSP build: user, userdebug, and eng.",
+        beg: "Build variants let you compile Android for production (user), debugging (userdebug), or local development (eng).",
+        exp: "user builds disable debugging and restrict root access for production security. userdebug builds enable debugging and root access for testing. eng builds enable all debugging features and optimize for fast compile times.",
+        tips: "Contrast the security settings of user builds with the debugging options in userdebug builds." },
+
+      { id: 31, cat: "aosp", q: "Difference between user and userdebug builds.", 
+        ans: "user builds have strict security, disabled debugging, and blocked root access. userdebug builds enable debugging and root access while retaining standard system features.",
+        beg: "user builds are locked down for production devices, while userdebug builds allow root access and debugging for developers.",
+        exp: "user builds disable ADB root and compile code with full optimizations. userdebug builds enable developer features like logcat logging, ADB root, and system diagnostics.",
+        tips: "Focus on how the build variants affect development tasks and device security." },
+
+      { id: 32, cat: "aosp", q: "What is Soong?", 
+        ans: "Soong is the modern build system used in AOSP (Android 8.0+) that parses JSON-like 'Android.bp' configuration files to generate Ninja files.",
+        beg: "Soong is the system that replaces legacy Makefiles with 'Android.bp' files to configure AOSP builds.",
+        exp: "Soong translates blueprint configuration files (Android.bp) into Ninja build files, which coordinate the compiler commands to build the system.",
+        tips: "Mention the transition from legacy Makefiles (Android.mk) to Blueprint files (Android.bp)." },
+
+      { id: 33, cat: "aosp", q: "What is Ninja build system?", 
+        ans: "Ninja is a lightweight build system designed for speed. It executes build commands generated by higher-level configuration engines like Soong.",
+        beg: "Ninja is a build execution tool focused on speed. It reads simple compilation instructions and runs them in parallel.",
+        exp: "Ninja does not support complex configurations or logic. Instead, it reads a manifest file containing compiler commands and inputs, executing them in parallel based on file dependency graphs.",
+        tips: "Explain that Soong handles configuration logic, while Ninja handles build execution." },
+
+      { id: 34, cat: "android", q: "Explain Android partitions.", 
+        ans: "Android divides disk storage into separate partitions for stability and update updates: /boot, /system, /vendor, /product, and /data.",
+        beg: "Android splits storage into separate folders (partitions) for system files, vendor drivers, and user data.",
+        exp: "Splitting storage into separate partitions decouples system components. For example, system updates can overwrite /system without affecting vendor drivers in /vendor or user files in /data.",
+        tips: "Highlight the separation between read-only system partitions and the read-write user data partition." },
+
+      { id: 35, cat: "android", q: "What is SELinux?", 
+        ans: "SELinux (Security-Enhanced Linux) is a kernel security module that enforces Mandatory Access Control (MAC) policies on processes and files.",
+        beg: "SELinux is a security system in the kernel that blocks unauthorized programs from accessing files, even if the program runs with root access.",
+        exp: "SELinux uses policies to define access permissions for processes and resources. Even if a process runs as root, it is blocked if the SELinux policy does not explicitly permit the action.",
+        tips: "Mention the two modes: Permissive (log violations) and Enforcing (block violations)." },
+
+      { id: 36, cat: "android", q: "What is AVB?", 
+        ans: "AVB (Android Verified Boot) is a security system that verifies the integrity of boot partitions before mounting them.",
+        beg: "AVB verifies the cryptographic signature of system files during boot, preventing tampered software from running.",
+        exp: "AVB uses cryptographic signatures to establish a chain of trust. The bootloader verifies the signatures of the boot, system, and vendor partitions before mounting them, blocking the boot sequence if any partition has been modified.",
+        tips: "Explain how AVB establishes a Root of Trust to prevent unauthorized system modifications." },
+
+      { id: 37, cat: "android", q: "Explain Android signing process.", 
+        ans: "The Android signing process uses cryptographic keys to sign application packages (APKs) and system partition images to verify their origin.",
+        beg: "Android signs apps and system files with cryptographic keys to verify they come from a trusted source and haven't been modified.",
+        exp: "System partition images are signed during the build process using release keys. Apps are signed using developer keys, allowing the system to verify updates and enforce signature-level permissions.",
+        tips: "Differentiate between app signing (for APK updates) and system image signing (for boot verification)." },
+
+      { id: 38, cat: "git", q: "What is Repo tool?", 
+        ans: "The Repo tool is a Python wrapper script created by Google that coordinates operations across multiple git repositories.",
+        beg: "Repo is a command-line tool that lets you manage hundreds of separate git repositories at once.",
+        exp: "AOSP consists of hundreds of individual git repositories. The Repo tool reads a manifest file to initialize, sync, and coordinate git commands across all repositories simultaneously.",
+        tips: "Explain that Repo does not replace Git, but rather automates git tasks across multiple directories." },
+
+      { id: 39, cat: "git", q: "Explain manifest.xml.", 
+        ans: "The manifest.xml file is a configuration file used by the Repo tool that lists the git repositories, branches, and destination paths for a project.",
+        beg: "The manifest file is an XML list showing the Repo tool where to download every folder of the AOSP source code.",
+        exp: "The manifest XML defines the fetch servers, project names, revisions, and local destinations. The Repo tool parses this file during 'repo init' to download the codebase.",
+        tips: "Mention that local manifests can be used to override projects in the default manifest." },
+
+      { id: 40, cat: "aosp", q: "What is lunch command?", 
+        ans: "The lunch command is a utility in the AOSP build environment that configures target device and build variant settings.",
+        beg: "lunch is a menu command that lets you choose the target device and build variant you want to compile.",
+        exp: "Running 'lunch' sets environment variables (like TARGET_PRODUCT and TARGET_BUILD_VARIANT) that guide the build system during compilation.",
+        tips: "Explain the format of the target string, e.g. 'aosp_arm64-userdebug'." },
+
+      { id: 41, cat: "adb", q: "Explain adb shell.", 
+        ans: "adb shell is a command that starts an interactive command-line session on a connected Android device or emulator.",
+        beg: "adb shell opens a command terminal directly inside your connected Android phone.",
+        exp: "The command connects to the 'adbd' daemon running on the device, allowing you to run standard Linux shell commands and android utilities.",
+        tips: "Mention that you can run single commands directly, like 'adb shell getprop'." },
+
+      { id: 42, cat: "adb", q: "What is logcat?", 
+        ans: "logcat is an Android command-line tool used to view and filter system log messages from the device logs.",
+        beg: "logcat is a tool that streams developer logs and system messages from your phone.",
+        exp: "logcat accesses system logs managed by the logd daemon, allowing you to filter messages by priority level (V, D, I, W, E, F) and tag.",
+        tips: "Show examples of filtering logs, such as 'adb logcat *:E' to view only error logs." },
+
+      { id: 43, cat: "adb", q: "What is dumpsys?", 
+        ans: "dumpsys is an Android tool that dumps the current status of system services running on the device.",
+        beg: "dumpsys is a command that prints detailed diagnostic reports on the status of system services like battery or window management.",
+        exp: "dumpsys queries active system services via Binder IPC, printing their current states. For example, 'dumpsys battery' displays battery status.",
+        tips: "Mention that dumpsys can generate long outputs, so it is best filtered using grep." },
+
+      { id: 44, cat: "adb", q: "What is bugreport?", 
+        ans: "The bugreport command generates a zip file containing comprehensive system logs, process traces, dumpsys outputs, and hardware logs.",
+        beg: "bugreport compiles all system logs, active processes, and diagnostic reports into a single zip file for debugging.",
+        exp: "bugreport calls the dumpstate service to capture a snapshot of the device's state, writing logs to a zip archive that can be analyzed using tools like Bugreport Analyzer.",
+        tips: "Explain that bugreport is the standard file requested when debugging complex system issues." },
+
+      { id: 45, cat: "adb", q: "Explain tombstone logs.", 
+        ans: "A tombstone log is a crash report generated when a native C/C++ process terminates due to a fatal error like a segmentation fault.",
+        beg: "A tombstone is a crash report saved on the phone when a C++ program crashes.",
+        exp: "Tombstone reports are written to '/data/tombstones/'. They contain the crash address, register states, stack trace, and list of loaded shared libraries.",
+        tips: "Explain how you use a tombstone file and debug tools (like stack) to locate crashes in source code." },
+
+      { id: 46, cat: "adb", q: "What is ANR?", 
+        ans: "ANR (Application Not Responding) is an error triggered when an application's main thread is blocked for too long, preventing it from processing input events.",
+        beg: "ANR occurs when an app freezes for more than 5 seconds, prompting the system to show a 'Close App' dialog.",
+        exp: "The system triggers an ANR if the main thread is blocked for more than 5 seconds (or 10 seconds for broadcast receivers). The system writes process traces to '/data/anr/traces.txt' for analysis.",
+        tips: "Explain that heavy operations should be run on background threads to prevent ANRs." },
+
+      { id: 47, cat: "android", q: "Difference between framework and HAL.", 
+        ans: "The Java API Framework provides public APIs for apps to use. The Hardware Abstraction Layer (HAL) provides standard interfaces for framework services to communicate with hardware drivers.",
+        beg: "The framework provides the APIs that apps run on, while the HAL translates those calls for device hardware drivers.",
+        exp: "The Java API Framework runs in the Java VM space, while the HAL is implemented as C/C++ shared libraries or Binderized services, separating system logic from hardware dependencies.",
+        tips: "Focus on how the two components separate application APIs from hardware implementations." },
+
+      { id: 48, cat: "android", q: "Explain vendor partition.", 
+        ans: "The /vendor partition contains device-specific drivers, binaries, and configurations provided by hardware vendors.",
+        beg: "The vendor partition is a folder on the device that holds hardware-specific drivers separate from the main system files.",
+        exp: "The vendor partition isolates proprietary hardware drivers from the open-source system files in /system, allowing system updates without modifying vendor configurations.",
+        tips: "Mention Project Treble and the decoupling of the system and vendor partitions." },
+
+      { id: 49, cat: "android", q: "What happens after Zygote starts?", 
+        ans: "After initialization, Zygote forks the System Server process, which starts system services before launching the home screen.",
+        beg: "Zygote starts the System Server, which initializes the core system services that launch the home screen.",
+        exp: "Zygote initializes a virtual machine, pre-loads common system classes, forks the System Server, and then enters a loop to listen for socket commands to launch new applications.",
+        tips: "Focus on the execution flow from Zygote startup to System Server initialization." },
+
+      { id: 50, cat: "android", q: "Explain complete Android startup flow.", 
+        ans: "The Android startup flow runs: Power On -> Boot ROM -> Bootloader -> Kernel -> Init -> Zygote -> System Server -> Launcher.",
+        beg: "The device runs the bootloader to load the kernel. The kernel starts the init process, which spawns Zygote. Zygote starts the System Server, which finally launches the default home screen.",
+        exp: "The Bootloader initializes RAM and loads the Linux kernel. The kernel mounts the root partition and starts '/init' (PID 1). Init reads configuration files (init.rc) and starts Zygote. Zygote pre-loads libraries and forks the System Server, which starts system services. Finally, the Launcher app is launched to display the home screen.",
+        tips: "This question summarizes the Android boot sequence; explain the milestones of the startup flow clearly." }
+    ];
+
+    /* ==========================================
+       D. STATE MANAGER (LOCAL STORAGE & XP)
+       ========================================== */
+    const STATE = {
+      xp: 0,
+      streak: 0,
+      lastActiveDate: "",
+      bookmarks: [],
+      completedModules: [],
+      completedQuizzes: [],
+      masteredQuestions: [],
+      userName: "Developer",
+      simulatorsCompleted: []
+    };
+
+    function loadState() {
+      STATE.xp = parseInt(localStorage.getItem("aosp_xp")) || 0;
+      STATE.streak = parseInt(localStorage.getItem("aosp_streak")) || 0;
+      STATE.lastActiveDate = localStorage.getItem("aosp_last_date") || "";
+      STATE.userName = localStorage.getItem("aosp_user_name") || "Developer";
+      
+      try {
+        STATE.bookmarks = JSON.parse(localStorage.getItem("aosp_bookmarks")) || [];
+        STATE.completedModules = JSON.parse(localStorage.getItem("aosp_completed_modules")) || [];
+        STATE.completedQuizzes = JSON.parse(localStorage.getItem("aosp_completed_quizzes")) || [];
+        STATE.masteredQuestions = JSON.parse(localStorage.getItem("aosp_mastered_questions")) || [];
+        STATE.simulatorsCompleted = JSON.parse(localStorage.getItem("aosp_simulators_completed")) || [];
+      } catch (e) {
+        console.error("State parse error. Resetting sub arrays.");
+      }
+      
+      updateStreak();
+      updateUIElements();
+    }
+
+    function saveState() {
+      localStorage.setItem("aosp_xp", STATE.xp);
+      localStorage.setItem("aosp_streak", STATE.streak);
+      localStorage.setItem("aosp_last_date", STATE.lastActiveDate);
+      localStorage.setItem("aosp_user_name", STATE.userName);
+      localStorage.setItem("aosp_bookmarks", JSON.stringify(STATE.bookmarks));
+      localStorage.setItem("aosp_completed_modules", JSON.stringify(STATE.completedModules));
+      localStorage.setItem("aosp_completed_quizzes", JSON.stringify(STATE.completedQuizzes));
+      localStorage.setItem("aosp_mastered_questions", JSON.stringify(STATE.masteredQuestions));
+      localStorage.setItem("aosp_simulators_completed", JSON.stringify(STATE.simulatorsCompleted));
+    }
+
+    function updateStreak() {
+      const today = new Date().toISOString().split('T')[0];
+      if (STATE.lastActiveDate !== today) {
+        if (STATE.lastActiveDate) {
+          const lastDate = new Date(STATE.lastActiveDate);
+          const diffTime = Math.abs(new Date(today) - lastDate);
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          if (diffDays === 1) {
+            STATE.streak += 1;
+          } else if (diffDays > 1) {
+            STATE.streak = 1;
+          }
+        } else {
+          STATE.streak = 1;
+        }
+        STATE.lastActiveDate = today;
+        saveState();
+      }
+    }
+
+    function addXP(amount, reason) {
+      STATE.xp += amount;
+      saveState();
+      updateUIElements();
+      
+      // Floating notification trigger
+      const notif = document.getElementById("xp-float-notification");
+      const text = document.getElementById("xp-float-text");
+      text.innerText = `+${amount} XP: ${reason}`;
+      notif.classList.add("show");
+      
+      setTimeout(() => {
+        notif.classList.remove("show");
+      }, 3000);
+    }
+
+    function updateUIElements() {
+      // Calculate levels
+      const xpPerLevel = 500;
+      const level = Math.floor(STATE.xp / xpPerLevel) + 1;
+      const currentLevelXP = STATE.xp % xpPerLevel;
+      const progressPercent = (currentLevelXP / xpPerLevel) * 100;
+      
+      // Sync names & profile details
+      document.getElementById("user-display-name").innerText = STATE.userName;
+      document.getElementById("cert-name-input").value = STATE.userName;
+      document.getElementById("cert-svg-name").textContent = STATE.userName.toUpperCase();
+      
+      let title = "Novice System Eng";
+      if (level >= 3) title = "WSL Architect";
+      if (level >= 6) title = "AOSP System Engineer";
+      if (level >= 10) title = "Kernel Master";
+      document.getElementById("user-display-title").innerText = title;
+      
+      document.getElementById("user-avatar").innerText = STATE.userName.charAt(0).toUpperCase();
+      
+      // Update top header profile data
+      document.getElementById("xp-text").innerText = `${currentLevelXP} / ${xpPerLevel} XP`;
+      document.getElementById("level-text").innerText = `Lvl ${level}`;
+      document.getElementById("xp-bar-fill").style.width = `${progressPercent}%`;
+      
+      // Streak counter
+      document.getElementById("streak-counter").innerText = `${STATE.streak} Day${STATE.streak === 1 ? '' : 's'}`;
+      
+      // Stats page calculations
+      const totalSteps = MODULES_DATA.length * 2 + 6; // Reading + Quiz + 6 Playgrounds
+      const completedSteps = STATE.completedModules.length + STATE.completedQuizzes.length + STATE.simulatorsCompleted.length;
+      const completionPercent = Math.min(100, Math.round((completedSteps / totalSteps) * 100));
+      
+      document.getElementById("stats-progress").innerText = `${completionPercent}%`;
+      document.getElementById("stats-xp").innerText = `${STATE.xp} XP`;
+      document.getElementById("stats-qna").innerText = `${STATE.masteredQuestions.length} / 50`;
+      
+      // Render components lists
+      renderModuleLists();
+      renderBadges();
+      renderBookmarksList();
+      checkCertificateUnlock(completionPercent);
+    }
+
+    /* ==========================================
+       E. THEME MANAGER
+       ========================================== */
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute("data-theme");
+      const targetTheme = currentTheme === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", targetTheme);
+      
+      const themeIcon = document.getElementById("theme-icon");
+      if (targetTheme === "light") {
+        themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+      } else {
+        themeIcon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`;
+      }
+      localStorage.setItem("aosp_theme", targetTheme);
+    }
+
+    // Set theme on load
+    const savedTheme = localStorage.getItem("aosp_theme") || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    if (savedTheme === "light") {
+      setTimeout(() => {
+        const themeIcon = document.getElementById("theme-icon");
+        themeIcon.innerHTML = `<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>`;
+      }, 100);
+    }
+
+    /* ==========================================
+       F. ROUTING / PAGE SWITCHER
+       ========================================== */
+    let currentModuleId = null;
+
+    function switchPage(pageId, moduleId = null) {
+      document.querySelectorAll(".page").forEach(page => page.classList.add("hidden"));
+      document.querySelectorAll(".nav-item").forEach(item => item.classList.remove("active"));
+      
+      if (pageId === "dashboard") {
+        document.getElementById("page-dashboard").classList.remove("hidden");
+        document.querySelector(".nav-item[onclick*='dashboard']").classList.add("active");
+      } else if (pageId === "labs") {
+        document.getElementById("page-labs").classList.remove("hidden");
+        document.querySelector(".nav-item[onclick*='labs']").classList.add("active");
+      } else if (pageId === "interview") {
+        document.getElementById("page-interview").classList.remove("hidden");
+        document.querySelector(".nav-item[onclick*='interview']").classList.add("active");
+      } else if (pageId === "certificate") {
+        document.getElementById("page-certificate").classList.remove("hidden");
+        document.querySelector(".nav-item[onclick*='certificate']").classList.add("active");
+      } else if (pageId === "module" && moduleId) {
+        currentModuleId = moduleId;
+        document.getElementById("page-module").classList.remove("hidden");
+        
+        // Find nav link corresponding to module
+        const modNavItem = document.getElementById(`nav-link-${moduleId}`);
+        if (modNavItem) modNavItem.classList.add("active");
+        
+        loadModuleContent(moduleId);
+      }
+      
+      // Scroll to top
+      window.scrollTo(0,0);
+      
+      // Auto close sidebar on mobile
+      document.getElementById("sidebar").classList.remove("open");
+    }
+
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("open");
+    }
+
+    /* ==========================================
+       G. RENDER LEARNING INTERFACES
+       ========================================== */
+    function renderModuleLists() {
+      const navList = document.getElementById("module-nav-list");
+      const dashList = document.getElementById("dashboard-modules-list");
+      
+      navList.innerHTML = "";
+      dashList.innerHTML = "";
+      
+      MODULES_DATA.forEach((mod, idx) => {
+        const isRead = STATE.completedModules.includes(mod.id);
+        const isQuizPassed = STATE.completedQuizzes.includes(mod.id);
+        
+        let statusClass = "";
+        let badgeText = "Pending";
+        if (isRead && isQuizPassed) {
+          statusClass = "completed";
+          badgeText = "Passed";
+        } else if (isRead) {
+          statusClass = "in-progress";
+          badgeText = "Quiz Pending";
+        }
+        
+        // Navigation list link
+        const navItem = document.createElement("div");
+        navItem.className = `nav-item`;
+        navItem.id = `nav-link-${mod.id}`;
+        navItem.onclick = () => switchPage("module", mod.id);
+        navItem.innerHTML = `
+          <div class="nav-item-left">
+            <span class="nav-badge ${statusClass}">${idx+1}</span>
+            <span>M${idx+1}: ${mod.title.substring(0, 16)}...</span>
+          </div>
+        `;
+        navList.appendChild(navItem);
+
+        // Dashboard listing card
+        const dashCard = document.createElement("div");
+        dashCard.className = "module-card";
+        dashCard.onclick = () => switchPage("module", mod.id);
+        dashCard.innerHTML = `
+          <div class="module-card-left">
+            <div class="module-number">M${idx+1}</div>
+            <div class="module-details">
+              <h4>${mod.title}</h4>
+              <p>${mod.desc}</p>
+            </div>
+          </div>
+          <div class="module-card-right">
+            <span style="font-size:0.75rem; color:var(--text-muted);">${mod.readingTime}</span>
+            <span class="nav-badge ${isRead && isQuizPassed ? 'completed' : ''}">${badgeText}</span>
+          </div>
+        `;
+        dashList.appendChild(dashCard);
+      });
+    }
+
+    function loadModuleContent(moduleId) {
+      const mod = MODULES_DATA.find(m => m.id === moduleId);
+      if (!mod) return;
+      
+      const isRead = STATE.completedModules.includes(moduleId);
+      
+      // Update action button state
+      const bkBtn = document.getElementById("module-bookmark-action");
+      if (STATE.bookmarks.includes(moduleId)) {
+        bkBtn.classList.add("bookmarked");
+      } else {
+        bkBtn.classList.remove("bookmarked");
+      }
+      
+      const compStatus = document.getElementById("module-completion-status");
+      compStatus.innerText = isRead ? "Completed" : "Mark Read";
+      compStatus.className = `nav-badge ${isRead ? 'completed' : ''}`;
+      compStatus.style.cursor = isRead ? "default" : "pointer";
+      compStatus.onclick = isRead ? null : () => markModuleAsRead(moduleId);
+
+      // Set HTML Content
+      document.getElementById("module-content-placeholder").innerHTML = mod.content;
+      
+      // Populate syntax command highlights if Module 2
+      if (moduleId === "module-2") {
+        populateCommandsList();
+      }
+      
+      // Setup Quiz
+      renderModuleQuiz(mod);
+    }
+
+    function markModuleAsRead(moduleId) {
+      if (!STATE.completedModules.includes(moduleId)) {
+        STATE.completedModules.push(moduleId);
+        addXP(50, "Read lesson content");
+        updateUIElements();
+        
+        const compStatus = document.getElementById("module-completion-status");
+        compStatus.innerText = "Completed";
+        compStatus.className = "nav-badge completed";
+        compStatus.onclick = null;
+      }
+    }
+
+    /* ==========================================
+       H. INTERACTIVE COMMAND GENERATOR (MODULE 2)
+       ========================================== */
+    function populateCommandsList() {
+      const parent = document.getElementById("commands-list-container");
+      if (!parent) return;
+      parent.innerHTML = "";
+      
+      COMMANDS_DATA.forEach(cmd => {
+        const item = document.createElement("div");
+        item.className = "cmd-item";
+        item.innerHTML = `
+          <div class="cmd-header" onclick="toggleCommandExpansion(this)">
+            <h4>${cmd.name}</h4>
+            <span class="cmd-header-desc">${cmd.desc}</span>
+            <span style="font-size:0.8rem; color:var(--text-muted);">&blacktriangledown;</span>
+          </div>
+          <div class="cmd-details">
+            <div class="cmd-section-title">Syntax</div>
+            <code style="display:block; background:#020617; padding:0.5rem; border-radius:4px; margin-bottom:0.5rem;">$ ${cmd.syntax}</code>
+            
+            <div class="cmd-section-title">Example Command</div>
+            <div class="code-container" style="margin: 0.5rem 0;">
+              <div class="code-header">
+                <span>Terminal</span>
+                <button class="copy-btn" onclick="copyToClipboard(\`${cmd.ex.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">Copy</button>
+              </div>
+              <pre><code>${cmd.ex}</code></pre>
+            </div>
+            
+            <div class="cmd-section-title">Common Mistake</div>
+            <p style="font-size:0.85rem; margin-bottom:0.5rem;">${cmd.err}</p>
+            
+            <div class="cmd-section-title">Interview Question</div>
+            <p style="font-size:0.85rem; font-style:italic; margin:0;">${cmd.q}</p>
+          </div>
+        `;
+        parent.appendChild(item);
+      });
+    }
+
+    function toggleCommandExpansion(header) {
+      header.parentElement.classList.toggle("expanded");
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        addXP(5, "Copied snippet to clipboard");
+      });
+    }
+
+    /* ==========================================
+       I. DYNAMIC QUIZ SYSTEM
+       ========================================== */
+    let currentQuizAnswers = [];
+
+    function renderModuleQuiz(moduleObj) {
+      const qList = document.getElementById("quiz-questions-list");
+      qList.innerHTML = "";
+      currentQuizAnswers = [];
+      
+      const quizContainer = document.getElementById("module-quiz-container");
+      
+      // If quiz already passed, lock inputs
+      const isPassed = STATE.completedQuizzes.includes(moduleObj.id);
+      
+      moduleObj.quiz.forEach((qObj, qIdx) => {
+        currentQuizAnswers.push(-1); // track selected index
+        
+        const qDiv = document.createElement("div");
+        qDiv.className = "quiz-question-container";
+        qDiv.innerHTML = `
+          <div class="quiz-question-text">${qIdx+1}. ${qObj.q}</div>
+          <div class="quiz-options" id="quiz-options-${moduleObj.id}-${qIdx}">
+            ${qObj.a.map((opt, optIdx) => `
+              <div class="quiz-option" onclick="${isPassed ? '' : `selectQuizOption('${moduleObj.id}', ${qIdx}, ${optIdx})`}" id="opt-${moduleObj.id}-${qIdx}-${optIdx}">
+                <span>${opt}</span>
+              </div>
+            `).join("")}
+          </div>
+          <div class="quiz-feedback" id="feedback-${moduleObj.id}-${qIdx}">${qObj.feedback}</div>
+        `;
+        qList.appendChild(qDiv);
+        
+        if (isPassed) {
+          // Preselect correct answer visually
+          setTimeout(() => {
+            const correctOpt = document.getElementById(`opt-${moduleObj.id}-${qIdx}-${qObj.correct}`);
+            if (correctOpt) correctOpt.classList.add("correct");
+            const fb = document.getElementById(`feedback-${moduleObj.id}-${qIdx}`);
+            if (fb) fb.style.display = "block";
+          }, 50);
+        }
+      });
+    }
+
+    function selectQuizOption(moduleId, qIdx, optIdx) {
+      // Clear selections for this question
+      const parent = document.getElementById(`quiz-options-${moduleId}-${qIdx}`);
+      parent.querySelectorAll(".quiz-option").forEach(opt => opt.className = "quiz-option");
+      
+      // Select active option
+      const selected = document.getElementById(`opt-${moduleId}-${qIdx}-${optIdx}`);
+      selected.classList.add("correct"); // Temp selection styling
+      currentQuizAnswers[qIdx] = optIdx;
+    }
+
+    function checkModuleQuiz() {
+      const mod = MODULES_DATA.find(m => m.id === currentModuleId);
+      if (!mod) return;
+      
+      if (STATE.completedQuizzes.includes(mod.id)) {
+        alert("You have already passed this quiz successfully.");
+        return;
+      }
+      
+      // Check if all answered
+      const unanswered = currentQuizAnswers.indexOf(-1);
+      if (unanswered !== -1) {
+        alert("Please answer all questions before submitting.");
+        return;
+      }
+      
+      let allCorrect = true;
+      mod.quiz.forEach((qObj, qIdx) => {
+        const userSel = currentQuizAnswers[qIdx];
+        const optRow = document.getElementById(`opt-${mod.id}-${qIdx}-${userSel}`);
+        const feedback = document.getElementById(`feedback-${mod.id}-${qIdx}`);
+        
+        // Reset styles first
+        const parent = document.getElementById(`quiz-options-${mod.id}-${qIdx}`);
+        parent.querySelectorAll(".quiz-option").forEach(opt => opt.className = "quiz-option");
+        
+        feedback.style.display = "block";
+        
+        if (userSel === qObj.correct) {
+          optRow.classList.add("correct");
+        } else {
+          optRow.classList.add("incorrect");
+          // show correct
+          document.getElementById(`opt-${mod.id}-${qIdx}-${qObj.correct}`).classList.add("correct");
+          allCorrect = false;
+        }
+      });
+      
+      if (allCorrect) {
+        STATE.completedQuizzes.push(mod.id);
+        addXP(100, "Solved Module Quiz correctly!");
+        updateUIElements();
+        alert("Excellent! All answers are correct. +100 XP gained.");
+      } else {
+        alert("Some answers are incorrect. Review the feedbacks and try again.");
+      }
+    }
+
+    /* ==========================================
+       J. BOOKMARKS SYSTEM
+       ========================================== */
+    function toggleCurrentBookmark() {
+      if (!currentModuleId) return;
+      const index = STATE.bookmarks.indexOf(currentModuleId);
+      const btn = document.getElementById("module-bookmark-action");
+      
+      if (index === -1) {
+        STATE.bookmarks.push(currentModuleId);
+        btn.classList.add("bookmarked");
+        addXP(10, "Bookmarked lesson");
+      } else {
+        STATE.bookmarks.splice(index, 1);
+        btn.classList.remove("bookmarked");
+      }
+      saveState();
+      updateUIElements();
+    }
+
+    function renderBookmarksList() {
+      const container = document.getElementById("dashboard-bookmarks");
+      if (!container) return;
+      
+      if (STATE.bookmarks.length === 0) {
+        container.innerHTML = `<p style="font-size: 0.85rem; color:var(--text-muted);">No bookmarked items yet. Click bookmark icons inside lessons.</p>`;
+        return;
+      }
+      
+      container.innerHTML = "";
+      STATE.bookmarks.forEach(modId => {
+        const mod = MODULES_DATA.find(m => m.id === modId);
+        if (mod) {
+          const item = document.createElement("div");
+          item.className = "bookmark-list-item";
+          item.onclick = () => switchPage("module", mod.id);
+          item.innerHTML = `
+            <span>${mod.title}</span>
+            <span style="color:var(--primary); font-size:0.8rem;">Read &rarr;</span>
+          `;
+          container.appendChild(item);
+        }
+      });
+    }
+
+    /* ==========================================
+       K. ACHIEVEMENTS & BADGES
+       ========================================== */
+    const ALL_BADGES = [
+      { name: "starter", title: "Linux Rookie", emoji: "🐧", desc: "Gain your first 100 XP" },
+      { name: "wsl_wizard", title: "WSL Wizard", emoji: "🪟", desc: "Complete Module 3 & WSL Lab" },
+      { name: "git_master", title: "Git Master", emoji: "🌿", desc: "Run Git simulator exercises" },
+      { name: "aosp_builder", title: "AOSP Builder", emoji: "🤖", desc: "Run AOSP Compiler Simulator" },
+      { name: "interview_star", title: "Interview Ready", emoji: "🎓", desc: "Master 20+ interview questions" },
+      { name: "certified", title: "Certified Eng", emoji: "🏆", desc: "Unlock final certificate" }
+    ];
+
+    function renderBadges() {
+      // Evaluate badge unlocks
+      const level = Math.floor(STATE.xp / 500) + 1;
+      
+      const unlocked = [];
+      if (STATE.xp >= 100) unlocked.push("starter");
+      if (STATE.completedModules.includes("module-3") && STATE.simulatorsCompleted.includes("wsl")) unlocked.push("wsl_wizard");
+      if (STATE.simulatorsCompleted.includes("git")) unlocked.push("git_master");
+      if (STATE.simulatorsCompleted.includes("build")) unlocked.push("aosp_builder");
+      if (STATE.masteredQuestions.length >= 20) unlocked.push("interview_star");
+      
+      const totalSteps = MODULES_DATA.length * 2 + 6;
+      const completedSteps = STATE.completedModules.length + STATE.completedQuizzes.length + STATE.simulatorsCompleted.length;
+      if (completedSteps >= totalSteps) {
+        unlocked.push("certified");
+      }
+      
+      const grid = document.getElementById("dashboard-badges");
+      if (!grid) return;
+      grid.innerHTML = "";
+      
+      ALL_BADGES.forEach(badge => {
+        const isUnlocked = unlocked.includes(badge.name);
+        const item = document.createElement("div");
+        item.className = `badge-item ${isUnlocked ? 'unlocked' : ''}`;
+        item.title = `${badge.title}: ${badge.desc}`;
+        item.innerHTML = `
+          <div class="badge-icon">${badge.emoji}</div>
+          <div class="badge-label">${badge.title}</div>
+        `;
+        grid.appendChild(item);
+      });
+    }
+
+    /* ==========================================
+       L. SEARCH SYSTEM
+       ========================================== */
+    function handleSearch(query) {
+      if (!query.trim()) {
+        // Switch back to active pages or clean search overlay
+        return;
+      }
+      
+      // Simple search query matching over commands database and QnA
+      const q = query.toLowerCase();
+      
+      // Let's filter elements when search is typed on interview or commands page
+      // Or show a floating modal logic. To keep it clean, if search is active on Interview prep page,
+      // trigger filter logic:
+      const activePage = document.querySelector(".page:not(.hidden)");
+      if (activePage.id === "page-interview") {
+        filterInterviewSearch(q);
+      }
+    }
+
+    function filterInterviewSearch(query) {
+      const cards = document.querySelectorAll(".qna-item");
+      cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        if (text.includes(query)) {
+          card.style.display = "block";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
+
+    /* ==========================================
+       M. 6 INTERACTIVE PLAYGROUND LABS
+       ========================================== */
+    function switchLabTab(labId) {
+      document.querySelectorAll(".lab-tab").forEach(tab => tab.classList.remove("active"));
+      document.querySelectorAll(".lab-section-content").forEach(sec => sec.style.display = "none");
+      
+      // Set active
+      const clickedTab = Array.from(document.querySelectorAll(".lab-tab")).find(tab => tab.innerText.toLowerCase().includes(labId));
+      if (clickedTab) clickedTab.classList.add("active");
+      
+      const activeSec = document.getElementById(`lab-sec-${labId}`);
+      if (activeSec) activeSec.style.display = "block";
+      
+      // Focus terminal input
+      focusTerm(`term-input-${labId}`);
+    }
+
+    function focusTerm(inputId) {
+      const input = document.getElementById(inputId);
+      if (input) input.focus();
+    }
+
+    // Terminal History Logs
+    const TERM_LOGS = {
+      linux: ["Welcome to Linux Command Terminal! Type help to view operations."],
+      wsl: ["PS C:\\Users\\Administrator> WSL Installation simulator. Type 'wsl --install'"],
+      git: ["Git revision controller environment initialized."],
+      repo: ["AOSP Code synchronization terminal. Type 'repo init'."],
+      build: ["Android compiler engine terminal. Set scripts: 'source build/envsetup.sh'"],
+      adb: ["Android Debug Bridge console ready."]
+    };
+
+    // State Variables for simulators
+    let mockLinuxDir = ["frameworks", "system", "device", "hardware", "out", "Android.bp"];
+    let mockLinuxPath = "/home/developer";
+    let gitInitialized = false;
+    let gitCommits = [];
+    let gitBranch = "main";
+    let buildSourced = false;
+    let buildTarget = "";
+    
+    function logTermLine(termId, text, type = "output") {
+      const outputDiv = document.getElementById(`term-output-${termId}`);
+      if (!outputDiv) return;
+      
+      const line = document.createElement("div");
+      line.className = `terminal-line ${type}`;
+      line.innerText = text;
+      outputDiv.appendChild(line);
+      
+      // Scroll to bottom
+      outputDiv.scrollTop = outputDiv.scrollHeight;
+    }
+
+    function handleTermInput(event, termId) {
+      if (event.key !== "Enter") return;
+      
+      const inputField = document.getElementById(`term-input-${termId}`);
+      const rawCmd = inputField.value.trim();
+      inputField.value = "";
+      
+      if (!rawCmd) return;
+      
+      // Output user command line
+      const promptText = document.getElementById(`term-prompt-${termId}`) ? document.getElementById(`term-prompt-${termId}`).innerText : "$";
+      logTermLine(termId, `${promptText} ${rawCmd}`, "input");
+      
+      // Parse commands
+      const parts = rawCmd.split(/\s+/);
+      const cmd = parts[0];
+      const args = parts.slice(1);
+      
+      if (termId === "linux") {
+        executeLinuxCommand(cmd, args);
+      } else if (termId === "wsl") {
+        executeWslCommand(cmd, args);
+      } else if (termId === "git") {
+        executeGitCommand(cmd, args);
+      } else if (termId === "repo") {
+        executeRepoCommand(cmd, args);
+      } else if (termId === "build") {
+        executeBuildCommand(cmd, args);
+      } else if (termId === "adb") {
+        executeAdbCommand(cmd, args);
+      }
+    }
+
+    // 1. Linux Command Executor
+    function executeLinuxCommand(cmd, args) {
+      const termId = "linux";
+      switch (cmd) {
+        case "help":
+          logTermLine(termId, "Available Commands: help, pwd, ls, cd, mkdir, rm, clear, whoami, uname");
+          break;
+        case "pwd":
+          logTermLine(termId, mockLinuxPath);
+          break;
+        case "whoami":
+          logTermLine(termId, "developer");
+          break;
+        case "uname":
+          logTermLine(termId, "Linux aosp-mastery-node 5.15.0-72-generic #79-Ubuntu SMP x86_64 GNU/Linux");
+          break;
+        case "clear":
+          document.getElementById("term-output-linux").innerHTML = "";
+          break;
+        case "ls":
+          logTermLine(termId, mockLinuxDir.join("    "));
+          break;
+        case "mkdir":
+          if (!args[0]) {
+            logTermLine(termId, "mkdir: missing operand", "error");
+          } else {
+            mockLinuxDir.push(args[0]);
+            logTermLine(termId, `Directory '${args[0]}' created successfully.`, "success");
+            markSimulatorCompleted("linux");
+          }
+          break;
+        case "cd":
+          if (!args[0] || args[0] === "~") {
+            mockLinuxPath = "/home/developer";
+          } else if (args[0] === "..") {
+            mockLinuxPath = "/home";
+          } else {
+            mockLinuxPath = `${mockLinuxPath}/${args[0]}`;
+          }
+          document.getElementById("term-prompt-linux").innerText = `developer@aosp-mastery:${mockLinuxPath.replace("/home/developer", "~")}~$`;
+          break;
+        case "rm":
+          if (!args[0]) {
+            logTermLine(termId, "rm: missing operand", "error");
+          } else {
+            const index = mockLinuxDir.indexOf(args[0]);
+            if (index > -1) {
+              mockLinuxDir.splice(index, 1);
+              logTermLine(termId, `Removed '${args[0]}'`);
+            } else {
+              logTermLine(termId, `rm: cannot remove '${args[0]}': No such file or directory`, "error");
+            }
+          }
+          break;
+        default:
+          logTermLine(termId, `bash: ${cmd}: command not found`, "error");
+      }
+    }
+
+    // 2. WSL setup command simulator
+    function executeWslCommand(cmd, args) {
+      const termId = "wsl";
+      const fullCmd = `${cmd} ${args.join(" ")}`.trim();
+      
+      if (fullCmd === "wsl --install") {
+        logTermLine(termId, "Installing: Virtual Machine Platform...", "output");
+        setTimeout(() => {
+          logTermLine(termId, "Installing: Windows Subsystem for Linux...", "output");
+          setTimeout(() => {
+            logTermLine(termId, "Downloading: Ubuntu Linux distribution... [==========>] 100%", "output");
+            setTimeout(() => {
+              logTermLine(termId, "Installation complete. System reboot simulated.", "success");
+              logTermLine(termId, "Enter new UNIX username: developer", "input");
+              logTermLine(termId, "Enter new UNIX password: *****", "input");
+              logTermLine(termId, "Installation successful. Ubuntu is now active inside WSL2.", "success");
+              markSimulatorCompleted("wsl");
+            }, 1000);
+          }, 800);
+        }, 800);
+      } else if (fullCmd === "wsl -l -v" || fullCmd === "wsl --list --verbose") {
+        logTermLine(termId, "  NAME            STATE           VERSION\n* Ubuntu          Running         2", "output");
+      } else if (cmd === "clear") {
+        document.getElementById("term-output-wsl").innerHTML = "";
+      } else {
+        logTermLine(termId, `WSL CLI: command '${fullCmd}' not recognized. Try 'wsl --install' or 'wsl -l -v'`, "error");
+      }
+    }
+
+    // 3. Git visual tree simulator
+    function executeGitCommand(cmd, args) {
+      const termId = "git";
+      if (cmd === "git") {
+        const action = args[0];
+        if (action === "init") {
+          gitInitialized = true;
+          gitCommits = [];
+          logTermLine(termId, "Initialized empty Git repository in /home/developer/android/.git/", "success");
+          addGitCommitNode("Initial commit", "main");
+          markSimulatorCompleted("git");
+        } else if (!gitInitialized) {
+          logTermLine(termId, "fatal: not a git repository (or any of the parent directories): .git", "error");
+          return;
+        } else if (action === "commit") {
+          const msgFlagIdx = args.indexOf("-m");
+          let msg = "Commit node " + (gitCommits.length + 1);
+          if (msgFlagIdx !== -1 && args[msgFlagIdx+1]) {
+            msg = args.slice(msgFlagIdx+1).join(" ").replace(/"/g, '');
+          }
+          addGitCommitNode(msg, gitBranch);
+          logTermLine(termId, `[${gitBranch} ${gitCommits[gitCommits.length-1].hash}] ${msg}`, "success");
+        } else if (action === "checkout") {
+          const isNewBranch = args[0] === "-b";
+          const bName = isNewBranch ? args[1] : args[0];
+          
+          if (!bName) {
+            logTermLine(termId, "error: branch name required", "error");
+            return;
+          }
+          gitBranch = bName;
+          logTermLine(termId, `Switched to branch '${gitBranch}'`, "success");
+          
+          // If checkout new branch, draw connection from current head
+          if (isNewBranch) {
+            addGitCommitNode(`Branch ${bName} created`, bName);
+          }
+        } else if (action === "merge") {
+          const sourceBranch = args[0];
+          if (!sourceBranch) {
+            logTermLine(termId, "error: target merge branch required", "error");
+            return;
+          }
+          addGitCommitNode(`Merge branch '${sourceBranch}' into ${gitBranch}`, gitBranch, true);
+          logTermLine(termId, `Merged branch '${sourceBranch}' successfully.`, "success");
+        } else if (action === "log") {
+          gitCommits.forEach(c => {
+            logTermLine(termId, `commit ${c.hash} (HEAD -> ${c.branch})\nAuthor: developer <aosp-mastery>\nDate: Sat Jun 20 08:10:00 2026\n\n    ${c.msg}\n`);
+          });
+        } else {
+          logTermLine(termId, "Git Simulator: supported arguments include init, commit -m, checkout -b, merge, log", "error");
+        }
+      } else if (cmd === "clear") {
+        document.getElementById("term-output-git").innerHTML = "";
+      } else {
+        logTermLine(termId, `command '${cmd}' not recognized. Start git actions with 'git'`, "error");
+      }
+    }
+
+    function addGitCommitNode(msg, branch, isMerge = false) {
+      const hash = Math.random().toString(16).substring(2, 9);
+      const node = {
+        hash: hash,
+        msg: msg,
+        branch: branch,
+        isMerge: isMerge,
+        x: (gitCommits.length * 70) + 40,
+        y: branch === "main" ? 55 : (branch === "feature" ? 25 : 85)
+      };
+      
+      gitCommits.push(node);
+      redrawGitGraph();
+    }
+
+    function redrawGitGraph() {
+      const svg = document.getElementById("git-graph-svg");
+      if (!svg) return;
+      
+      svg.innerHTML = "";
+      
+      if (gitCommits.length === 0) return;
+      
+      // Draw links
+      for (let i = 1; i < gitCommits.length; i++) {
+        const from = gitCommits[i-1];
+        const to = gitCommits[i];
+        
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", from.x);
+        line.setAttribute("y1", from.y);
+        line.setAttribute("x2", to.x);
+        line.setAttribute("y2", to.y);
+        line.setAttribute("stroke", to.branch === "main" ? "#6366f1" : (to.branch === "feature" ? "#14b8a6" : "#f43f5e"));
+        line.setAttribute("stroke-width", "3");
+        svg.appendChild(line);
+      }
+      
+      // Draw node circles
+      gitCommits.forEach(c => {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", c.x);
+        circle.setAttribute("cy", c.y);
+        circle.setAttribute("r", "10");
+        circle.setAttribute("fill", c.branch === "main" ? "#4f46e5" : (c.branch === "feature" ? "#0d9488" : "#e11d48"));
+        
+        // Tooltip
+        const title = document.createElementNS("http://www.w3.org/2000/svg", "title");
+        title.textContent = `[${c.branch}] ${c.hash}: ${c.msg}`;
+        circle.appendChild(title);
+        
+        svg.appendChild(circle);
+
+        // Branch Labels
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("x", c.x);
+        text.setAttribute("y", c.y + 22);
+        text.setAttribute("fill", "#94a3b8");
+        text.setAttribute("font-size", "9px");
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("font-family", "sans-serif");
+        text.textContent = c.hash;
+        svg.appendChild(text);
+      });
+    }
+
+    // 4. Repo Sync download simulation
+    function executeRepoCommand(cmd, args) {
+      const termId = "repo";
+      const fullCmd = `${cmd} ${args.join(" ")}`.trim();
+      
+      if (fullCmd.startsWith("repo init")) {
+        logTermLine(termId, "Downloading manifest from upstream URL...", "output");
+        setTimeout(() => {
+          logTermLine(termId, "Checking out git directory paths...", "output");
+          setTimeout(() => {
+            logTermLine(termId, "repo has been initialized in /home/developer/android/. System ready for sync.", "success");
+            markSimulatorCompleted("repo");
+          }, 800);
+        }, 800);
+      } else if (fullCmd === "repo sync" || fullCmd === "repo sync -j8") {
+        logTermLine(termId, "Fetching projects recursively...", "output");
+        
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 25;
+          logTermLine(termId, `Sync progress: [${'='.repeat(progress/10)}${'.'.repeat(10 - progress/10)}] ${progress}% synced...`, "output");
+          if (progress >= 100) {
+            clearInterval(interval);
+            logTermLine(termId, "Sync complete. Downloaded 180GB from upstream AOSP manifest.", "success");
+          }
+        }, 600);
+      } else if (cmd === "clear") {
+        document.getElementById("term-output-repo").innerHTML = "";
+      } else {
+        logTermLine(termId, `repo: command not recognized. Run 'repo init' or 'repo sync'`, "error");
+      }
+    }
+
+    // 5. Build system thread simulator
+    function executeBuildCommand(cmd, args) {
+      const termId = "build";
+      const fullCmd = `${cmd} ${args.join(" ")}`.trim();
+      
+      if (fullCmd === "source build/envsetup.sh") {
+        buildSourced = true;
+        logTermLine(termId, "Including device/common/groups...", "output");
+        logTermLine(termId, "Including vendor/google/setup...", "output");
+        logTermLine(termId, "Shell functions initialized. Run 'lunch' to configure compile variants.", "success");
+      } else if (cmd === "lunch") {
+        if (!buildSourced) {
+          logTermLine(termId, "lunch: command not found (did you run 'source build/envsetup.sh'?)", "error");
+          return;
+        }
+        const target = args[0] || "aosp_arm64-userdebug";
+        buildTarget = target;
+        logTermLine(termId, `============================================\nPLATFORM_VERSION_CODENAME=REL\nPLATFORM_VERSION=13\nTARGET_PRODUCT=${target.split('-')[0]}\nTARGET_BUILD_VARIANT=${target.split('-')[1] || 'userdebug'}\n============================================`, "success");
+      } else if (cmd === "make" || cmd === "m") {
+        if (!buildTarget) {
+          logTermLine(termId, "make: target build variant not set (run 'lunch' first)", "error");
+          return;
+        }
+        logTermLine(termId, "Starting compile threads using Ninja compilation layout...", "output");
+        
+        let buildProgress = 0;
+        const filesToCompile = 8450;
+        const interval = setInterval(() => {
+          buildProgress += 1690;
+          const pct = (buildProgress / filesToCompile) * 100;
+          
+          logTermLine(termId, `[ ${Math.round(pct)}% ${buildProgress}/${filesToCompile} ] Compiling target AOSP classes...`, "output");
+          if (buildProgress >= filesToCompile) {
+            clearInterval(interval);
+            logTermLine(termId, "#### build completed successfully (00:02:40 (hh:mm:ss)) ####", "success");
+            logTermLine(termId, `Created target images under out/target/product/:\n  - boot.img\n  - system.img\n  - vendor.img`, "success");
+            markSimulatorCompleted("build");
+          }
+        }, 800);
+      } else if (cmd === "clear") {
+        document.getElementById("term-output-build").innerHTML = "";
+      } else {
+        logTermLine(termId, `make error: target not found. Did you run build/envsetup.sh ?`, "error");
+      }
+    }
+
+    // 6. ADB device interface simulator
+    let adbStreamingLog = false;
+    let logcatInterval = null;
+
+    function executeAdbCommand(cmd, args) {
+      const termId = "adb";
+      const fullCmd = `${cmd} ${args.join(" ")}`.trim();
+      
+      if (cmd === "adb") {
+        const action = args[0];
+        
+        if (action === "devices") {
+          logTermLine(termId, "List of devices attached\nemulator-5554   device", "success");
+          markSimulatorCompleted("adb");
+        } else if (action === "shell" && args[1] === "logcat") {
+          if (adbStreamingLog) return;
+          adbStreamingLog = true;
+          logTermLine(termId, "Streaming logcat logs... Press Ctrl+C or enter 'exit' to stop log stream.", "output");
+          
+          const logLines = [
+            "D/Zygote  (  120): Process fork completed",
+            "I/ActivityManager(  450): Start activity: com.android.settings",
+            "W/WindowMS(  450): Window freezing timeout",
+            "E/AndroidRuntime( 2040): FATAL EXCEPTION IN MAIN THREAD",
+            "D/Binder  (  320): IPC transaction successful"
+          ];
+          
+          logcatInterval = setInterval(() => {
+            const randLine = logLines[Math.floor(Math.random() * logLines.length)];
+            logTermLine(termId, randLine, "output");
+          }, 500);
+        } else if (action === "shell") {
+          logTermLine(termId, "emulator-5554:/$ ", "success");
+        } else if (action === "push") {
+          logTermLine(termId, `Pushing '${args[0]}' to device paths... [==========>] 100%`, "success");
+        } else {
+          logTermLine(termId, "ADB client: arguments list supported: devices, shell, shell logcat, push", "error");
+        }
+      } else if (cmd === "clear") {
+        document.getElementById("term-output-adb").innerHTML = "";
+      } else if (cmd === "exit" || (event.ctrlKey && event.key === "c")) {
+        if (adbStreamingLog) {
+          clearInterval(logcatInterval);
+          adbStreamingLog = false;
+          logTermLine(termId, "Streaming connection terminated.", "error");
+        }
+      } else {
+        logTermLine(termId, `command '${cmd}' not recognized. ADB tools compile with 'adb'`, "error");
+      }
+    }
+
+    function markSimulatorCompleted(labName) {
+      if (!STATE.simulatorsCompleted.includes(labName)) {
+        STATE.simulatorsCompleted.push(labName);
+        addXP(200, `Completed ${labName.toUpperCase()} simulator lab`);
+        updateUIElements();
+      }
+    }
+
+    /* ==========================================
+       N. BOOT SEQUENCE SIMULATOR (MODULE 9)
+       ========================================== */
+    const BOOT_LOGS = {
+      1: {
+        title: "1. Boot ROM",
+        desc: "The CPU exits reset state and loads a hard-coded read-only code program located in system ASIC. It sets up foundational clock rates, maps boot targets, and loads the Primary Bootloader.",
+        log: "BOOTROM: Reset exception caught\nBOOTROM: Checking storage tables...\nBOOTROM: Bootloader signature key verified.\nBOOTROM: Loading Bootloader into SRAM."
+      },
+      2: {
+        title: "2. Bootloader",
+        desc: "The bootloader (LK / ABL) runs in external RAM memory. It initializes critical hardware buses, checks fastboot recovery parameters, and loads both the kernel and init ramdisk (initramfs) into memory.",
+        log: "LK: Bootloader initialized\nLK: DRAM calibrated successfully\nLK: Checking recovery keys... Normal boot\nLK: Loading boot.img -> Loading kernel & ramdisk."
+      },
+      3: {
+        title: "3. Linux Kernel",
+        desc: "The Linux kernel mounts system virtual paths, schedules virtual memory setups, loads low-level drivers (including the Binder IPC driver), and starts the first user process: /init.",
+        log: "KERNEL: Linux version 5.10.43-android-gki\nKERNEL: Memory initialization complete\nKERNEL: Binder driver loaded at /dev/binder\nKERNEL: Executing user space init process (/init)"
+      },
+      4: {
+        title: "4. Init Process",
+        desc: "The /init binary parses XML/text init.rc scripts, mounts physical partitions (/system, /vendor, /data), sets up SELinux policies, and spawns core background system services.",
+        log: "INIT: Parsing /etc/init.rc...\nINIT: SELinux set to Enforcing mode\nINIT: Mounting /system and /vendor partitions\nINIT: Spawning zygote daemon service (/system/bin/app_process)"
+      },
+      5: {
+        title: "5. Zygote Daemon",
+        desc: "Zygote loads core Java SDK libraries, instantiates a prebuilt Android Runtime environment, starts socket connections, and clones its JVM image to launch new application containers.",
+        log: "ZYGOTE: Dalvik VM instantiation loaded\nZYGOTE: Preloading 2400 core system classes...\nZYGOTE: Opening socket daemon interface\nZYGOTE: Forking System Server process (PID: 450)"
+      },
+      6: {
+        title: "6. System Server",
+        desc: "The System Server launches core background system services (AMS, PMS, WMS) and registers them with the Service Manager to expose Binder interfaces to applications.",
+        log: "SYSTEM_SERVER: Initializing Bootstrap Services...\nSYSTEM_SERVER: Starting PackageManagerService (PMS)\nSYSTEM_SERVER: Starting ActivityManagerService (AMS)\nSYSTEM_SERVER: System services initialization complete."
+      },
+      7: {
+        title: "7. Launcher Home",
+        desc: "The Activity Manager sends a start Intent to the default Home Screen Launcher package, opening user space layouts and completing the system boot sequence.",
+        log: "ACTIVITY_MANAGER: Start home activity: com.android.launcher3\nSYSTEM: Boot sequence completed successfully.\nDISPLAY: Screen state ON."
+      }
+    };
+
+    function triggerBootStep(stepIdx) {
+      // Clear active classes
+      const stepBoxes = document.querySelectorAll(".boot-step-box");
+      stepBoxes.forEach((box, idx) => {
+        if (idx < stepIdx) {
+          box.className = "boot-step-box completed";
+        } else if (idx === stepIdx - 1) {
+          box.className = "boot-step-box active";
+        } else {
+          box.className = "boot-step-box";
+        }
+      });
+      
+      const step = BOOT_LOGS[stepIdx];
+      if (step) {
+        document.getElementById("boot-desc-output").innerHTML = `
+          <h4>${step.title}</h4>
+          <p>${step.desc}</p>
+        `;
+        
+        const consoleLog = document.getElementById("boot-log-console");
+        consoleLog.innerHTML += `\n\n${step.log}`;
+        consoleLog.scrollTop = consoleLog.scrollHeight;
+        
+        addXP(10, `Investigated boot step ${stepIdx}`);
+      }
+    }
+
+    /* ==========================================
+       O. INTERVIEW PREP COMPONENT (MODULE 14)
+       ========================================== */
+    function renderInterviewQuestions() {
+      const container = document.getElementById("interview-questions-container");
+      if (!container) return;
+      container.innerHTML = "";
+      
+      INTERVIEW_DATA.forEach(item => {
+        const isMastered = STATE.masteredQuestions.includes(item.id);
+        const card = document.createElement("div");
+        card.className = "qna-item";
+        card.id = `qna-card-${item.id}`;
+        card.dataset.category = item.cat;
+        
+        card.innerHTML = `
+          <div class="qna-header">
+            <div class="qna-header-left">
+              <div class="qna-check ${isMastered ? 'mastered' : ''}" onclick="toggleMasterQuestion(event, ${item.id})">
+                <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <span class="qna-q">${item.id}. ${item.q}</span>
+            </div>
+            <button class="btn btn-secondary" style="padding:0.4rem 0.8rem; font-size:0.75rem;" onclick="toggleQnaCard(${item.id})">Examine</button>
+          </div>
+          
+          <div class="qna-body" id="qna-body-${item.id}">
+            <div class="qna-tabs">
+              <div class="qna-tab active" onclick="switchQnaTab(${item.id}, 'ans')">Detailed Answer</div>
+              <div class="qna-tab" onclick="switchQnaTab(${item.id}, 'beg')">Beginner Friendly</div>
+              <div class="qna-tab" onclick="switchQnaTab(${item.id}, 'exp')">Expert Concept</div>
+              <div class="qna-tab" onclick="switchQnaTab(${item.id}, 'tips')">Interview Tips</div>
+            </div>
+            
+            <div class="qna-tab-content active" id="qna-content-${item.id}-ans">
+              <p>${item.ans}</p>
+            </div>
+            <div class="qna-tab-content" id="qna-content-${item.id}-beg">
+              <p>${item.beg}</p>
+            </div>
+            <div class="qna-tab-content" id="qna-content-${item.id}-exp">
+              <p>${item.exp}</p>
+            </div>
+            <div class="qna-tab-content" id="qna-content-${item.id}-tips">
+              <p style="font-weight:600; color:var(--accent);">${item.tips}</p>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function toggleQnaCard(id) {
+      const card = document.getElementById(`qna-card-${id}`);
+      card.classList.toggle("expanded");
+    }
+
+    function switchQnaTab(id, tabName) {
+      const body = document.getElementById(`qna-body-${id}`);
+      body.querySelectorAll(".qna-tab").forEach(tab => tab.classList.remove("active"));
+      body.querySelectorAll(".qna-tab-content").forEach(content => content.classList.remove("active"));
+      
+      // Find exact clicked
+      const activeTab = Array.from(body.querySelectorAll(".qna-tab")).find(tab => tab.innerText.toLowerCase().includes(tabName === "ans" ? "detailed" : (tabName === "beg" ? "beginner" : (tabName === "exp" ? "expert" : "tips"))));
+      if (activeTab) activeTab.classList.add("active");
+      
+      const targetContent = document.getElementById(`qna-content-${id}-${tabName}`);
+      if (targetContent) targetContent.classList.add("active");
+    }
+
+    function toggleMasterQuestion(event, id) {
+      event.stopPropagation(); // prevent expanding card
+      
+      const qIdx = STATE.masteredQuestions.indexOf(id);
+      const checkbox = event.currentTarget;
+      
+      if (qIdx === -1) {
+        STATE.masteredQuestions.push(id);
+        checkbox.classList.add("mastered");
+        addXP(20, "Mastered interview question");
+      } else {
+        STATE.masteredQuestions.splice(qIdx, 1);
+        checkbox.classList.remove("mastered");
+      }
+      saveState();
+      updateUIElements();
+    }
+
+    function filterInterview(category) {
+      document.querySelectorAll(".filter-pill").forEach(pill => pill.classList.remove("active"));
+      event.currentTarget.classList.add("active");
+      
+      const cards = document.querySelectorAll(".qna-item");
+      cards.forEach(card => {
+        if (category === "all" || card.dataset.category === category) {
+          card.style.display = "block";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
+
+    /* ==========================================
+       P. CERTIFICATE STAMPS & GENERATION
+       ========================================== */
+    function checkCertificateUnlock(completionPercent) {
+      const overlay = document.getElementById("cert-lock-overlay");
+      const completeAll = completionPercent >= 100;
+      
+      if (completeAll) {
+        overlay.style.display = "none";
+      } else {
+        overlay.style.display = "flex";
+        document.getElementById("cert-lock-reason").innerText = `Complete all modules and simulator labs to unlock (Current progress: ${completionPercent}%).`;
+      }
+    }
+
+    function updateCertPreviewName(nameVal) {
+      STATE.userName = nameVal || "Developer";
+      document.getElementById("cert-svg-name").textContent = STATE.userName.toUpperCase();
+      saveState();
+    }
+
+    function triggerPrintCertificate() {
+      // Set current date on print layout
+      const dateText = document.getElementById("cert-svg-date");
+      const today = new Date().toISOString().split('T')[0];
+      dateText.textContent = `Date: ${today}`;
+      
+      window.print();
+    }
+
+    /* ==========================================
+       Q. SYSTEM INIT
+       ========================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      renderInterviewQuestions();
+      switchPage("dashboard");
+    });
+  </script>
+</body>
+</html>

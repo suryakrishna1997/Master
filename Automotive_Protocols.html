@@ -1,0 +1,4169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AUTO-X: Advanced Automotive Protocol Mastery Portal</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap"
+    rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    /* Design Variables & Theme System */
+    :root[data-theme="dark"] {
+      --bg-primary: #080c14;
+      --bg-secondary: #0f172a;
+      --bg-tertiary: #0b0f19;
+      --glass-bg: rgba(15, 23, 42, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #f59e0b;
+      /* Amber Instrument Glow */
+      --accent-hover: #d97706;
+      --accent-glow: rgba(245, 158, 11, 0.15);
+      --secondary-accent: #06b6d4;
+      /* Diagnostic Blue-Green */
+      --secondary-glow: rgba(6, 182, 212, 0.15);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --card-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.6);
+      --border-color: rgba(255, 255, 255, 0.06);
+      --sidebar-width: 290px;
+      --header-height: 70px;
+      --bottom-nav-height: 65px;
+    }
+
+    :root[data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f1f5f9;
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(15, 23, 42, 0.08);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent: #b45309;
+      /* Deeper Amber */
+      --accent-hover: #92400e;
+      --accent-glow: rgba(180, 83, 9, 0.08);
+      --secondary-accent: #0891b2;
+      --secondary-glow: rgba(8, 145, 178, 0.08);
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      --border-color: rgba(15, 23, 42, 0.06);
+      --sidebar-width: 290px;
+      --header-height: 70px;
+      --bottom-nav-height: 65px;
+    }
+
+    /* Core Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      scroll-behavior: smooth;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      line-height: 1.6;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    a {
+      color: var(--secondary-accent);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    a:hover {
+      color: var(--accent);
+    }
+
+    code {
+      font-family: 'Fira Code', monospace;
+      background: var(--bg-tertiary);
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+      border: 1px solid var(--border-color);
+      color: var(--secondary-accent);
+    }
+
+    pre {
+      background: var(--bg-tertiary);
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      border: 1px solid var(--border-color);
+      margin-bottom: 1.5rem;
+    }
+
+    pre code {
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+    }
+
+    /* Layout Configurations */
+    #app {
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    /* Top Navigation bar */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--header-height);
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      background: linear-gradient(135deg, var(--accent), var(--secondary-accent));
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 1.25rem;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title span {
+      background: linear-gradient(to right, var(--accent), var(--secondary-accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .icon-btn {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      touch-action: manipulation;
+    }
+
+    .icon-btn:hover {
+      background: var(--accent-glow);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .progress-widget {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--bg-tertiary);
+      padding: 0.4rem 0.8rem;
+      border-radius: 99px;
+      border: 1px solid var(--glass-border);
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .progress-bar-container {
+      width: 80px;
+      height: 6px;
+      background: var(--border-color);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--accent), var(--secondary-accent));
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Main Container (Body wrapper) */
+    .main-container {
+      display: flex;
+      margin-top: var(--header-height);
+      min-height: calc(100vh - var(--header-height));
+    }
+
+    /* Sticky Collapsible Sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      position: fixed;
+      top: var(--header-height);
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      z-index: 999;
+      padding: 1.5rem 1rem;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      scrollbar-width: thin;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 2px;
+    }
+
+    .sidebar-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .sidebar-section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      padding-left: 0.5rem;
+      font-weight: bold;
+    }
+
+    .sidebar-list {
+      list-style: none;
+    }
+
+    .sidebar-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.8rem;
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .sidebar-link:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .sidebar-link.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding-left: calc(0.8rem - 3px);
+    }
+
+    .sidebar-link-content {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .sidebar-checkbox {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      border: 1px solid var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .sidebar-checkbox.checked {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .sidebar-checkbox.checked::after {
+      content: '✓';
+      color: white;
+      font-size: 8px;
+      font-weight: bold;
+    }
+
+    /* Folders in Sidebar */
+    .folder-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.6rem 0.8rem;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .folder-header i.chevron {
+      transition: transform 0.2s;
+    }
+
+    .folder-header.collapsed i.chevron {
+      transform: rotate(-90deg);
+    }
+
+    .folder-body {
+      display: block;
+      padding-left: 1rem;
+      border-left: 1px dashed var(--border-color);
+      margin-left: 1rem;
+    }
+
+    .folder-body.collapsed {
+      display: none;
+    }
+
+    /* Main Scrolling Frame */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      padding: 2.5rem 3rem;
+      max-width: 1200px;
+      width: calc(100% - var(--sidebar-width));
+      padding-bottom: 5rem;
+    }
+
+    /* Mobile Bottom Navigation (Sticky) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: var(--bottom-nav-height);
+      background: var(--glass-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--glass-border);
+      display: none;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 1000;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .bottom-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 500;
+      gap: 0.2rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .bottom-nav-item.active {
+      color: var(--accent);
+    }
+
+    /* Floating Action Buttons */
+    .floating-actions {
+      position: fixed;
+      right: 1.5rem;
+      bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      z-index: 1001;
+    }
+
+    .fab {
+      background: linear-gradient(135deg, var(--accent), var(--secondary-accent));
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      color: #ffffff;
+      cursor: pointer;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      touch-action: manipulation;
+    }
+
+    .fab:active {
+      transform: scale(0.9);
+    }
+
+    /* Blur Backdrop for mobile drawer opening */
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+      display: none;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    /* Card Layouts */
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+
+    .card-tag {
+      background: var(--accent-glow);
+      color: var(--accent);
+      padding: 0.25rem 0.6rem;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-description {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    /* Expandable Cards */
+    .expandable-card .card-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+
+    .expandable-card.expanded .card-body {
+      max-height: 2000px;
+      transition: max-height 0.5s ease-in;
+    }
+
+    .card-toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--secondary-accent);
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      padding: 0.5rem 0;
+      margin-top: 0.5rem;
+    }
+
+    .card-toggle-btn i {
+      transition: transform 0.3s;
+    }
+
+    .expandable-card.expanded .card-toggle-btn i {
+      transform: rotate(180deg);
+    }
+
+    /* Bookmarking */
+    .bookmark-toggle-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .bookmark-toggle-btn:hover,
+    .bookmark-toggle-btn.active {
+      color: var(--accent);
+    }
+
+    /* Interactive Diagrams Section */
+    .diagram-section {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 2rem;
+      margin-bottom: 3rem;
+      background: var(--bg-secondary);
+      border-radius: 20px;
+      padding: 2rem;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+    }
+
+    .stack-visualizer {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      min-width: 0;
+    }
+
+    .stack-layer {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .stack-layer:hover {
+      border-color: var(--secondary-accent);
+      transform: translateX(5px);
+    }
+
+    .stack-layer.active {
+      background: linear-gradient(135deg, var(--accent), var(--secondary-accent));
+      color: #ffffff;
+      border-color: transparent;
+    }
+
+    .info-panel {
+      background: var(--bg-tertiary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 1.5rem;
+      min-height: 350px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 0;
+    }
+
+    .info-panel-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .info-panel h4 {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-panel p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Grids & Layout Containers */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+      margin-bottom: 2rem;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-secondary);
+      text-align: left;
+    }
+
+    .comparison-table th {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-weight: 700;
+      padding: 1rem 1.25rem;
+      border-bottom: 2px solid var(--border-color);
+      font-size: 0.95rem;
+    }
+
+    .comparison-table td {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .comparison-table tr:hover {
+      background: var(--bg-tertiary);
+    }
+
+    /* Tabs Layout */
+    .tab-headers {
+      display: flex;
+      gap: 0.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-headers::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      background: var(--accent-glow);
+      color: var(--accent);
+    }
+
+    /* Test Case Suite & Filters Control */
+    .suite-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      background: var(--bg-secondary);
+      padding: 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: bold;
+    }
+
+    .select-dropdown,
+    .input-search {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      outline: none;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .input-search {
+      width: 250px;
+      cursor: text;
+    }
+
+    .btn-action {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      transition: background-color 0.2s;
+      touch-action: manipulation;
+    }
+
+    .btn-action:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-action.secondary-btn {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+    }
+
+    .btn-action.secondary-btn:hover {
+      background: var(--border-color);
+    }
+
+    /* Test Case Item Styling */
+    .test-cases-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 800px;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .test-case-item {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+      transition: border-color 0.2s;
+    }
+
+    .test-case-item:hover {
+      border-color: var(--accent);
+    }
+
+    .tc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .tc-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .tc-id {
+      font-weight: 700;
+      color: var(--accent);
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+    }
+
+    .tc-domain-badge {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .tc-domain-badge.can {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent);
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    .tc-domain-badge.uds {
+      background: rgba(6, 182, 212, 0.1);
+      color: var(--secondary-accent);
+      border-color: rgba(6, 182, 212, 0.2);
+    }
+
+    .tc-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .tc-body {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+      display: none;
+    }
+
+    .test-case-item.expanded .tc-body {
+      display: block;
+    }
+
+    .tc-row {
+      margin-bottom: 1rem;
+    }
+
+    .tc-row-title {
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .tc-row-content {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      white-space: pre-line;
+    }
+
+    .tc-checkbox {
+      width: 18px;
+      height: 18px;
+      border: 2px solid var(--text-muted);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tc-checkbox.completed {
+      background: var(--success);
+      border-color: var(--success);
+    }
+
+    .tc-checkbox.completed::after {
+      content: '✓';
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    .tc-chevron {
+      transition: transform 0.2s;
+      color: var(--text-muted);
+    }
+
+    .test-case-item.expanded .tc-chevron {
+      transform: rotate(180deg);
+    }
+
+    /* Q&A Cards styling */
+    .qa-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.01);
+      margin-bottom: 1rem;
+    }
+
+    .qa-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      gap: 1rem;
+    }
+
+    .qa-meta {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .qa-difficulty {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.15rem 0.5rem;
+      border-radius: 99px;
+      font-weight: 700;
+    }
+
+    .qa-difficulty.easy {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .qa-difficulty.medium {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .qa-difficulty.hard {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .qa-question {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .qa-answer {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      border-left: 3px solid var(--accent);
+      padding-left: 1rem;
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .qa-card.revealed .qa-answer {
+      display: block;
+    }
+
+    /* Mock Interview Dashboard */
+    .mock-start-screen,
+    .mock-active-screen,
+    .mock-results-screen {
+      background: var(--bg-secondary);
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+      padding: 2rem;
+      box-shadow: var(--card-shadow);
+      max-width: 750px;
+      margin: 0 auto;
+    }
+
+    .mock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .mock-timer {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--bg-tertiary);
+      padding: 0.4rem 0.8rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .mock-draft-area {
+      width: 100%;
+      height: 120px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--glass-border);
+      color: var(--text-primary);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      margin: 1rem 0;
+    }
+
+    .grading-box {
+      background: var(--bg-tertiary);
+      padding: 1.25rem;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      margin-top: 1rem;
+      display: none;
+    }
+
+    .grading-btn-row {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .grade-btn {
+      flex: 1;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.6rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.8rem;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .grade-btn.incorrect:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .grade-btn.partial:hover {
+      background: rgba(245, 158, 11, 0.1);
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+
+    .grade-btn.correct:hover {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      margin: 0.75rem 0;
+      font-size: 0.95rem;
+      border-bottom: 1px dashed var(--border-color);
+      padding-bottom: 0.5rem;
+    }
+
+    .mock-performance-rating {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-align: center;
+      margin: 1rem 0;
+    }
+
+    /* Lab Simulator Styling modules */
+    .sim-container {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: var(--card-shadow);
+    }
+
+    .sim-header {
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sim-arena {
+      background: var(--bg-tertiary);
+      border-radius: 10px;
+      padding: 1.25rem;
+      border: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+      overflow-x: auto;
+    }
+
+    .sim-console {
+      background: #000000;
+      color: #00ff00;
+      font-family: 'Fira Code', monospace;
+      padding: 0.85rem;
+      border-radius: 8px;
+      height: 150px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .sim-control-panel {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    /* Bit displays */
+    .bit-row {
+      display: flex;
+      gap: 0.35rem;
+      margin: 0.75rem 0;
+      flex-wrap: wrap;
+    }
+
+    .bit-cell {
+      width: 32px;
+      height: 38px;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    .bit-cell .bit-val {
+      font-size: 0.95rem;
+    }
+
+    .bit-cell .bit-lbl {
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .bit-cell.active-bit {
+      border-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    .bit-cell.dominant {
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border-color: var(--success);
+    }
+
+    .bit-cell.recessive {
+      background: rgba(59, 130, 246, 0.15);
+      color: #3b82f6;
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    /* Quiz Module */
+    .quiz-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: var(--card-shadow);
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    .quiz-option {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--secondary-accent);
+      background: var(--secondary-glow);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success);
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+    }
+
+    /* Active Bookmarks Drawer overlay */
+    .bookmarks-drawer {
+      position: fixed;
+      top: var(--header-height);
+      right: -350px;
+      bottom: 0;
+      width: 350px;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border-color);
+      box-shadow: var(--card-shadow);
+      z-index: 1001;
+      padding: 1.5rem;
+      overflow-y: auto;
+      transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .bookmarks-drawer.open {
+      right: 0;
+    }
+
+    .bookmarks-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .bookmark-list-item {
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      position: relative;
+    }
+
+    .remove-bookmark-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: transparent;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    /* Cheat Sheets Cards */
+    .cheat-sheet-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .cheat-sheet-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.25rem;
+      box-shadow: var(--card-shadow);
+    }
+
+    .cheat-sheet-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.5rem;
+      color: var(--accent);
+    }
+
+    .cheat-sheet-list {
+      list-style-type: none;
+    }
+
+    .cheat-sheet-list li {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .cheat-sheet-list li strong {
+      color: var(--text-primary);
+      min-width: 90px;
+      display: inline-block;
+    }
+
+    /* Section block headers */
+    .section-block {
+      margin-bottom: 4rem;
+      scroll-margin-top: calc(var(--header-height) + 1.5rem);
+    }
+
+    .section-title {
+      font-size: 2.25rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -1px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 2rem;
+    }
+
+    /* Responsiveness Configurations */
+    @media (max-width: 1024px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 2rem 1.5rem;
+      }
+
+      .header-actions .search-wrapper {
+        display: none;
+      }
+
+      .bottom-nav {
+        display: flex;
+      }
+
+      #mobile-nav-toggle {
+        display: flex;
+      }
+
+      .mobile-search-container {
+        display: block !important;
+      }
+
+      .sidebar-overlay.active {
+        display: block;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .header {
+        padding: 0 1rem;
+      }
+
+      .progress-widget {
+        font-size: 0.75rem;
+      }
+
+      .progress-bar-container {
+        display: none;
+      }
+
+      .suite-controls {
+        flex-direction: column;
+        padding: 1rem;
+      }
+
+      .filter-group {
+        width: 100%;
+      }
+
+      .select-dropdown,
+      .input-search {
+        width: 100% !important;
+      }
+
+      .btn-action {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .grading-btn-row {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .mock-active-screen,
+      .mock-start-screen,
+      .mock-results-screen {
+        padding: 1.25rem 1rem;
+      }
+
+      .mock-draft-area {
+        height: 100px;
+      }
+
+      .diagram-section {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+
+      .grid-2,
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 1.25rem 1rem;
+      }
+
+      .section-title {
+        font-size: 1.75rem;
+      }
+
+      .main-content {
+        padding: 1.5rem 1rem;
+      }
+
+      .brand-title span {
+        display: none;
+      }
+    }
+
+    /* Print styling overrides */
+    @media print {
+      body {
+        background: #ffffff;
+        color: #000000;
+      }
+
+      .sidebar,
+      .header,
+      .icon-btn,
+      .btn-action,
+      .bottom-nav,
+      .floating-actions,
+      .bookmarks-drawer,
+      .suite-controls,
+      .tab-headers,
+      .grading-box,
+      .mock-timer {
+        display: none !important;
+      }
+
+      .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        padding: 0 !important;
+      }
+
+      .section-block {
+        page-break-after: always;
+      }
+
+      .expandable-card .card-body,
+      .qa-answer,
+      .tc-body {
+        display: block !important;
+        max-height: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="app">
+    <!-- Sidebar Overlay backdrop -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Top Sticky Header -->
+    <header class="header">
+      <div class="brand">
+        <!-- Brand Hamburger Menu -->
+        <button class="icon-btn" id="mobile-nav-toggle" onclick="toggleSidebar()">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="brand-logo">A</div>
+        <div class="brand-title">AUTO-X<span> Protocols</span></div>
+      </div>
+
+      <div class="header-actions">
+        <!-- Search bar -->
+        <div class="search-wrapper" style="position: relative;">
+          <input type="text" class="search-input input-search" id="global-search" placeholder="Search portal..."
+            oninput="handleGlobalSearch()">
+        </div>
+
+        <!-- Progress tracking -->
+        <div class="progress-widget" title="Completion Progress">
+          <i data-lucide="award" style="color: var(--accent); width: 18px; height: 18px;"></i>
+          <span>Readiness:</span>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="overall-progress-bar"></div>
+          </div>
+          <span id="overall-progress-percentage">0%</span>
+        </div>
+
+        <!-- Bookmarks -->
+        <button class="icon-btn" onclick="toggleBookmarksDrawer()" title="View Bookmarks">
+          <i data-lucide="bookmark"></i>
+          <span id="bookmark-badge"
+            style="position: absolute; top: -3px; right: -3px; background: var(--accent); color: #000; font-size: 10px; font-weight: bold; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; visibility: hidden;">0</span>
+        </button>
+
+        <!-- Dark/Light Theme -->
+        <button class="icon-btn" onclick="toggleTheme()" title="Switch Theme">
+          <i data-lucide="sun" id="theme-icon-sun"></i>
+          <i data-lucide="moon" id="theme-icon-moon" style="display: none;"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="main-container">
+
+      <!-- Left sidebar folder structure -->
+      <aside class="sidebar" id="app-sidebar">
+
+        <!-- Mobile Search mirror -->
+        <div style="margin-bottom: 1.5rem; display: none;" class="mobile-search-container">
+          <input type="text" class="search-input input-search" id="mobile-search" style="width:100%;"
+            placeholder="Search..." oninput="handleGlobalSearch()">
+        </div>
+
+        <!-- Section List folders -->
+        <div class="sidebar-section">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span><i data-lucide="layers" style="width:16px; height:16px; vertical-align:middle; margin-right:6px;"></i>
+              Foundations</span>
+            <i data-lucide="chevron-down" class="chevron" style="width:14px;"></i>
+          </div>
+          <div class="folder-body">
+            <ul class="sidebar-list">
+              <li class="sidebar-item">
+                <a href="#networking-fundamentals" class="sidebar-link active" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">1. Fundamentals</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'networking-fundamentals')"></span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#osi-model" class="sidebar-link" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">2. OSI Layer Model</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'osi-model')"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span><i data-lucide="cpu" style="width:16px; height:16px; vertical-align:middle; margin-right:6px;"></i>
+              Controller Area Network</span>
+            <i data-lucide="chevron-down" class="chevron" style="width:14px;"></i>
+          </div>
+          <div class="folder-body">
+            <ul class="sidebar-list">
+              <li class="sidebar-item">
+                <a href="#can-protocol" class="sidebar-link" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">3. CAN Protocol</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'can-protocol')"></span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#can-fd" class="sidebar-link" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">4. CAN FD Guide</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'can-fd')"></span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#can-tp" class="sidebar-link" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">5. CAN-TP Protocol</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'can-tp')"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span><i data-lucide="activity"
+                style="width:16px; height:16px; vertical-align:middle; margin-right:6px;"></i> Diagnostics & DCM</span>
+            <i data-lucide="chevron-down" class="chevron" style="width:14px;"></i>
+          </div>
+          <div class="folder-body">
+            <ul class="sidebar-list">
+              <li class="sidebar-item">
+                <a href="#uds-protocol" class="sidebar-link" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">6. UDS (ISO 14229)</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'uds-protocol')"></span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#autosar-diagnostics" class="sidebar-link" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">7. AUTOSAR Diag</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'autosar-diagnostics')"></span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#debugging-logs" class="sidebar-link" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">8. Log Debugging</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'debugging-logs')"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="folder-header" onclick="toggleFolder(this)">
+            <span><i data-lucide="terminal"
+                style="width:16px; height:16px; vertical-align:middle; margin-right:6px;"></i> Simulators & Lab</span>
+            <i data-lucide="chevron-down" class="chevron" style="width:14px;"></i>
+          </div>
+          <div class="folder-body">
+            <ul class="sidebar-list">
+              <li class="sidebar-item">
+                <a href="#lab-simulators" class="sidebar-link" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">9. Simulators</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'lab-simulators')"></span>
+                </a>
+              </li>
+              <li class="sidebar-item">
+                <a href="#vector-toolchain" class="sidebar-link" onclick="highlightSidebar(this)">
+                  <span class="sidebar-link-content">10. Vector Toolchain</span>
+                  <span class="sidebar-checkbox" onclick="toggleProgress(event, 'vector-toolchain')"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-section-title">Assessment & Prep</div>
+          <ul class="sidebar-list">
+            <li class="sidebar-item">
+              <a href="#interview-prep" class="sidebar-link" onclick="highlightSidebar(this)">
+                <span class="sidebar-link-content"><i data-lucide="help-circle"></i> 11. Interview Prep</span>
+                <span class="sidebar-checkbox" onclick="toggleProgress(event, 'interview-prep')"></span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a href="#quizzes" class="sidebar-link" onclick="highlightSidebar(this)">
+                <span class="sidebar-link-content"><i data-lucide="clipboard-list"></i> 12. Quizzes</span>
+                <span class="sidebar-checkbox" onclick="toggleProgress(event, 'quizzes')"></span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a href="#cheat-sheets" class="sidebar-link" onclick="highlightSidebar(this)">
+                <span class="sidebar-link-content"><i data-lucide="zap"></i> 13. Cheat Sheets</span>
+                <span class="sidebar-checkbox" onclick="toggleProgress(event, 'cheat-sheets')"></span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a href="#downloads" class="sidebar-link" onclick="highlightSidebar(this)">
+                <span class="sidebar-link-content"><i data-lucide="download"></i> 14. Exports</span>
+                <span class="sidebar-checkbox" onclick="toggleProgress(event, 'downloads')"></span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Main Learning Content -->
+      <main class="main-content">
+
+        <!-- ============================================== -->
+        <!-- SECTION 1: AUTOMOTIVE NETWORKING FUNDAMENTALS -->
+        <!-- ============================================== -->
+        <section id="networking-fundamentals" class="section-block">
+          <h1 class="section-title"><i data-lucide="layers" style="color: var(--accent);"></i> 1. Automotive Networking
+            Fundamentals</h1>
+          <p class="section-subtitle">Core principles of vehicle bus networks, domain controllers, zonal network
+            layouts, and protocol properties.</p>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-tag">Foundations</span>
+              <button class="bookmark-toggle-btn"
+                onclick="toggleBookmark(event, 'networking-fundamentals', 'Automotive Networking Fundamentals', 'Section 1')">
+                <i data-lucide="bookmark"></i>
+              </button>
+            </div>
+            <h3 class="card-title">ECU Communication Architecture</h3>
+            <div class="card-description">
+              <p>In modern vehicles, an <strong>Electronic Control Unit (ECU)</strong> is an embedded microcontroller
+                node handling specific systems (e.g. Engine, Braking, Infotainment). Historically, point-to-point wiring
+                (connecting every sensor directly to every actuator) created massive wiring harness weights and cost
+                limitations. To address this, shared serial networks (buses) were introduced. Modern vehicles have
+                evolved from simple decentralized structures into <strong>Domain Controller Architectures</strong>
+                (grouping ECUs logically like Powertrain, ADAS, Body) and are transitioning to <strong>Zonal
+                  Architectures</strong> (grouping ECUs geographically by physical zone, linked by high-bandwidth
+                Gigabit Ethernet backbones to central compute brains).</p>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="comparison-table">
+              <thead>
+                <tr>
+                  <th>Protocol Bus</th>
+                  <th>Maximum Data Rate</th>
+                  <th>Network Topology</th>
+                  <th>Primary Automotive Applications</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="highlight-col"><strong>LIN</strong></td>
+                  <td>20 kbps</td>
+                  <td>Master-Slave (Single wire)</td>
+                  <td>Body controls, mirrors, window lifters, seat adjusters.</td>
+                </tr>
+                <tr>
+                  <td class="highlight-col"><strong>CAN (Classic)</strong></td>
+                  <td>1 Mbps</td>
+                  <td>Multi-Master Bus (Differential pair)</td>
+                  <td>Powertrain, chassis control loops, basic diagnostic interfaces.</td>
+                </tr>
+                <tr>
+                  <td class="highlight-col"><strong>CAN FD</strong></td>
+                  <td>5 - 8 Mbps</td>
+                  <td>Multi-Master Bus (Differential pair)</td>
+                  <td>ADAS radar links, high-speed gateways, flashing payloads.</td>
+                </tr>
+                <tr>
+                  <td class="highlight-col"><strong>FlexRay</strong></td>
+                  <td>10 Mbps</td>
+                  <td>Point-to-Point / Star topologies</td>
+                  <td>Steer-by-wire, brake-by-wire, safety-critical real-time paths.</td>
+                </tr>
+                <tr>
+                  <td class="highlight-col"><strong>MOST</strong></td>
+                  <td>150 Mbps</td>
+                  <td>Optical / Copper Ring topology</td>
+                  <td>Legacy infotainment streaming, camera projections, amplifiers.</td>
+                </tr>
+                <tr>
+                  <td class="highlight-col"><strong>Automotive Ethernet</strong></td>
+                  <td>100 / 1000 Mbps</td>
+                  <td>Switched Star topology (UTP cable)</td>
+                  <td>ADAS camera feeds, FOTA downloads, LIDAR networks, backbone links.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 2: OSI MODEL FOR AUTOMOTIVE            -->
+        <!-- ============================================== -->
+        <section id="osi-model" class="section-block">
+          <h2 class="section-title"><i data-lucide="layers" style="color: var(--secondary-accent);"></i> 2. OSI Model
+            for Automotive Networks</h2>
+          <p class="section-subtitle">Understand how automotive communication layers map to standard OSI layers, from
+            transceiver signals up to UDS commands.</p>
+
+          <div class="diagram-section">
+            <div class="stack-visualizer">
+              <div class="stack-layer active" onclick="selectOSILayer('OSI7')">Application Layer (UDS - ISO 14229) <i
+                  data-lucide="chevron-right"></i></div>
+              <div class="stack-layer" onclick="selectOSILayer('OSI6')">Presentation Layer (DBC database scaling) <i
+                  data-lucide="chevron-right"></i></div>
+              <div class="stack-layer" onclick="selectOSILayer('OSI5')">Session Layer (Diagnostic Session states) <i
+                  data-lucide="chevron-right"></i></div>
+              <div class="stack-layer" onclick="selectOSILayer('OSI4')">Transport Layer (CAN-TP ISO 15765-2) <i
+                  data-lucide="chevron-right"></i></div>
+              <div class="stack-layer" onclick="selectOSILayer('OSI3')">Network Layer (CAN-TP addressing) <i
+                  data-lucide="chevron-right"></i></div>
+              <div class="stack-layer" onclick="selectOSILayer('OSI2')">Data Link Layer (CAN/CAN FD framing & MAC) <i
+                  data-lucide="chevron-right"></i></div>
+              <div class="stack-layer" onclick="selectOSILayer('OSI1')">Physical Layer (Differential transceivers) <i
+                  data-lucide="chevron-right"></i></div>
+            </div>
+
+            <div class="info-panel" id="osi-info-panel">
+              <h3 class="info-panel-title" id="osi-panel-title">Application Layer (OSI 7)</h3>
+              <div id="osi-panel-content">
+                <p><strong>Purpose:</strong> Serves as the interface for end-user diagnostic software applications to
+                  send service identifiers.</p>
+                <br>
+                <p><strong>Protocol Mapping:</strong> <strong>UDS (Unified Diagnostic Services - ISO 14229)</strong>
+                  operates at this layer, defining command codes like <code>ReadDataByIdentifier (0x22)</code>.</p>
+                <br>
+                <p><strong>Example Flow:</strong> Tester requests VIN: <code>22 F1 90</code>.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 3: CAN PROTOCOL COMPLETE GUIDE         -->
+        <!-- ============================================== -->
+        <section id="can-protocol" class="section-block">
+          <h2 class="section-title"><i data-lucide="cpu" style="color: var(--accent);"></i> 3. CAN Protocol Complete
+            Guide (ISO 11898)</h2>
+          <p class="section-subtitle">Physical layer differential signaling, bus arbitration, bit timing layouts, signal
+            endianness formats, and CAN frame bits.</p>
+
+          <div class="card">
+            <h3 class="card-title">CAN Physical & Data Link Layers</h3>
+            <div class="card-description">
+              <p>Classic CAN operates over a twisted-pair copper cable using differential signaling to resist
+                electromagnetic noise.
+              <ul>
+                <li><strong>Recessive State (Logical 1):</strong> Both CAN_H and CAN_L sit at approximately 2.5V
+                  (difference is 0V).</li>
+                <li><strong>Dominant State (Logical 0):</strong> CAN_H rises to 3.5V, and CAN_L drops to 1.5V
+                  (difference is 2.0V). The dominant bit overcomes recessive bits on the bus.</li>
+                <li><strong>Termination Resistors:</strong> A 120-ohm resistor is placed at each end of the bus to
+                  prevent signal reflections.</li>
+              </ul>
+              </p>
+            </div>
+          </div>
+
+          <div class="card expandable-card">
+            <h3 class="card-title">CAN 11-Bit standard frame bits</h3>
+            <div class="card-description">
+              <ul>
+                <li><strong>SOF (Start of Frame):</strong> 1 dominant bit indicating the start of transmission.</li>
+                <li><strong>Identifier:</strong> 11 bits specifying message priority and data definition.</li>
+                <li><strong>RTR (Remote Transmission Request):</strong> 1 bit (dominant for data frames, recessive for
+                  remote requests).</li>
+                <li><strong>IDE (Identifier Extension):</strong> 1 dominant bit specifying standard 11-bit ID.</li>
+                <li><strong>DLC (Data Length Code):</strong> 4 bits specifying payload byte count (0 to 8).</li>
+                <li><strong>DATA:</strong> 0 to 8 bytes payload.</li>
+                <li><strong>CRC:</strong> 15 bits cyclic redundancy check for error detection, followed by a 1-bit
+                  delimiter.</li>
+                <li><strong>ACK (Acknowledgment):</strong> 1 bit (transmitter sends recessive; receiving nodes overwrite
+                  with dominant to confirm validation).</li>
+                <li><strong>EOF (End of Frame):</strong> 7 recessive bits.</li>
+              </ul>
+            </div>
+            <button class="card-toggle-btn" onclick="toggleCardExpand(this)">
+              <span>View Details</span>
+              <i data-lucide="chevron-down"></i>
+            </button>
+            <div class="card-body">
+              <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                <h4>CAN Extended Frame (29-Bit) Details</h4>
+                <p>The Extended frame uses a 29-bit identifier by setting the **IDE** bit to recessive (logical 1) and
+                  introducing an 18-bit identifier extension after the **SRR (Substitute Remote Request)** bit,
+                  supporting complex message mappings in large networks.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 4: CAN FD COMPLETE GUIDE               -->
+        <!-- ============================================== -->
+        <section id="can-fd" class="section-block">
+          <h2 class="section-title"><i data-lucide="cpu" style="color: var(--secondary-accent);"></i> 4. CAN FD
+            (Flexible Data-rate) Complete Guide</h2>
+          <p class="section-subtitle">Why CAN FD exists, payload sizing options up to 64 bytes, and bit rate switching
+            mechanics.</p>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3 class="card-title">CAN vs CAN FD</h3>
+              <div class="card-description">
+                <p>Classic CAN is limited to an 8-byte payload and a 1 Mbps speed limit. High bus loads caused by modern
+                  ECUs (like ADAS and active gateways) require a higher bandwidth protocol.
+                  <br><br>
+                  <strong>CAN FD (ratified in ISO 11898-1:2015)</strong> addresses this by:
+                <ul>
+                  <li><strong>Extended Payloads:</strong> Supports data lengths of 8, 12, 16, 20, 24, 32, 48, and 64
+                    bytes.</li>
+                  <li><strong>Dual Bit Rate:</strong> The arbitration phase operates at standard rates (e.g. 500kbps to
+                    1Mbps), while the data phase switches to higher speeds (e.g. 5Mbps) during payload transmission.
+                  </li>
+                </ul>
+                </p>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">Control Field Flags</h3>
+              <div class="card-description">
+                <ul>
+                  <li><strong>FDF (FD Format Indicator):</strong> Set to recessive (1) to declare CAN FD frame type.
+                  </li>
+                  <li><strong>BRS (Bit Rate Switch):</strong> Set to recessive (1) to trigger transition to the data
+                    phase bit speed.</li>
+                  <li><strong>ESI (Error State Indicator):</strong> 1 bit indicating node error state (dominant = error
+                    active, recessive = error passive).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 5: CAN-TP PROTOCOL (ISO 15765-2)       -->
+        <!-- ============================================== -->
+        <section id="can-tp" class="section-block">
+          <h2 class="section-title"><i data-lucide="activity" style="color: var(--accent);"></i> 5. CAN Transport
+            Protocol (ISO 15765-2)</h2>
+          <p class="section-subtitle">Segmentation, reassembly, Flow Control parameters, and frame sequence traces.</p>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3 class="card-title">Frame Typologies</h3>
+              <div class="card-description">
+                <p>CAN frames are limited to 8 bytes (or 64 bytes in CAN FD), but UDS payloads (like firmware files) can
+                  exceed thousands of bytes. **CAN-TP** manages the transport layer segmentation and reassembly.
+                <ul>
+                  <li><strong>Single Frame (SF):</strong> Used for payloads up to 7 bytes. Byte 0 specifies frame type
+                    `0x0` and length.</li>
+                  <li><strong>First Frame (FF):</strong> Sent first for segmented transfers. Byte 0-1 specifies type
+                    `0x1` and the total payload length.</li>
+                  <li><strong>Flow Control (FC):</strong> Receiver responds with flow parameters (type `0x3`):
+                    **FlowStatus** (CTS, WAIT, OVERFLOW), **BlockSize (BS)**, and **STmin** (separation time between
+                    subsequent frames).</li>
+                  <li><strong>Consecutive Frame (CF):</strong> Transmits the segmented payload. Byte 0 type is `0x2`
+                    with a 4-bit Sequence Number (SN).</li>
+                </ul>
+                </p>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 class="card-title">Timing Parameters</h3>
+              <div class="card-description">
+                <ul>
+                  <li><strong>N_As:</strong> Time for transmitter to send a frame on the physical layer.</li>
+                  <li><strong>N_Bs:</strong> Time between transmitter sending FF and receiving the FC frame (Timeout =
+                    1000ms).</li>
+                  <li><strong>N_Cs:</strong> Time between transmitter sending CF and receiving the next CF slot.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 6: UDS PROTOCOL COMPLETE GUIDE         -->
+        <!-- ============================================== -->
+        <section id="uds-protocol" class="section-block">
+          <h2 class="section-title"><i data-lucide="activity" style="color: var(--secondary-accent);"></i> 6. UDS (ISO
+            14229) & ECU Reset Sequences</h2>
+          <p class="section-subtitle">Detailed service configurations, positive/negative responses, security Seed-Key
+            flows, DTC masks, and bootloader programming timelines.</p>
+
+          <div class="card">
+            <h3 class="card-title">UDS Architecture Overview</h3>
+            <div class="card-description">
+              <p>Unified Diagnostic Services (UDS) is the standard application layer protocol for automotive
+                diagnostics. It defines service request and response formats. Requests start with a **Service Identifier
+                (SID)**. Responses return `SID + 0x40` for positive results, or a **Negative Response Frame (7F SID
+                NRC)** when an error occurs.</p>
+            </div>
+          </div>
+
+          <div class="card expandable-card">
+            <h3 class="card-title">UDS Service 0x19: ReadDTCInformation - Deep Dive</h3>
+            <div class="card-description">
+              <p>UDS Service <code>0x19</code> is the primary method for extracting fault diagnostic data from an ECU. Because DTCs track fault states, severity levels, occurrence counters, and operating conditions, Service 0x19 is highly versatile, using various sub-functions to access different information layers.</p>
+              <br>
+              <h4>1. The 1-Byte DTC Status Mask Structure</h4>
+              <p>Every DTC stored in the ECU is associated with a status byte. Understanding this status byte is essential for interpreting UDS 0x19 responses:</p>
+              <div class="table-container" style="margin-top:0.5rem; margin-bottom:1rem;">
+                <table class="comparison-table">
+                  <thead>
+                    <tr>
+                      <th>Bit Pos</th>
+                      <th>Status Name</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Bit 0</strong></td>
+                      <td><code>testFailed</code></td>
+                      <td>The most recent test run failed (fault is currently active).</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Bit 1</strong></td>
+                      <td><code>testFailedThisOperationCycle</code></td>
+                      <td>The fault has failed at least once during the current driving cycle.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Bit 2</strong></td>
+                      <td><code>pendingDTC</code></td>
+                      <td>The fault is active in the current cycle but not yet confirmed.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Bit 3</strong></td>
+                      <td><code>confirmedDTC</code></td>
+                      <td>The fault has been verified across multiple cycles and is stored in NVRAM.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Bit 4</strong></td>
+                      <td><code>testNotCompletedSinceLastClear</code></td>
+                      <td>The diagnostic test has not finished running since the last clear command.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Bit 5</strong></td>
+                      <td><code>testFailedSinceLastClear</code></td>
+                      <td>The diagnostic test has failed at least once since DTCs were cleared.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Bit 6</strong></td>
+                      <td><code>testNotCompletedThisOperationCycle</code></td>
+                      <td>The test has not completed during the current driving/operating cycle.</td>
+                    </tr>
+                    <tr>
+                      <td><strong>Bit 7</strong></td>
+                      <td><code>warningIndicatorRequested</code></td>
+                      <td>The ECU requests a warning indicator (e.g. Check Engine MIL lamp) to be illuminated.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <button class="card-toggle-btn" onclick="toggleCardExpand(this)">
+              <span>View Details</span>
+              <i data-lucide="chevron-down"></i>
+            </button>
+            <div class="card-body">
+              <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                <h4>2. Key Sub-functions (Basics to End)</h4>
+                <ul style="padding-left: 20px;">
+                  <li style="margin-bottom:0.5rem; line-height:1.6;"><strong>0x01 - reportNumberOfDTCByStatusMask:</strong> Returns the total count of DTCs that match a provided status mask. Extremely basic check to see if any faults are present.
+                    <br><code>Request: 19 01 [StatusMask]</code> &rarr; <code>Response: 59 01 [StatusAvailabilityMask] [DTCFormat] [CountHigh] [CountLow]</code>
+                  </li>
+                  <li style="margin-bottom:0.5rem; line-height:1.6;"><strong>0x02 - reportDTCByStatusMask:</strong> Returns a list of DTC numbers along with their status bytes matching the mask.
+                    <br><code>Request: 19 02 [StatusMask]</code> &rarr; <code>Response: 59 02 [StatusAvailabilityMask] [DTC1_H] [DTC1_M] [DTC1_L] [Status1] ...</code>
+                  </li>
+                  <li style="margin-bottom:0.5rem; line-height:1.6;"><strong>0x04 - reportDTCSnapshotRecordByDTCNumber:</strong> Retrieves environmental sensor data (freeze frames) captured when the fault first occurred (e.g., engine RPM, coolant temperature, vehicle speed).
+                    <br><code>Request: 19 04 [DTC_H] [DTC_M] [DTC_L] [RecordNumber]</code>
+                  </li>
+                  <li style="margin-bottom:0.5rem; line-height:1.6;"><strong>0x06 - reportDTCExtendedDataRecordByDTCNumber:</strong> Retrieves supplementary diagnostic information such as fault occurrence counters, aging counters, update status, and cycle timers.
+                    <br><code>Request: 19 06 [DTC_H] [DTC_M] [DTC_L] [RecordNumber]</code>
+                  </li>
+                  <li style="margin-bottom:0.5rem; line-height:1.6;"><strong>0x0A - reportSupportedDTC:</strong> Lists all DTCs that the ECU is programmed to monitor, regardless of whether they are currently active or not. Helpful to build diagnostic databases.
+                    <br><code>Request: 19 0A</code> &rarr; <code>Response: 59 0A [StatusAvailabilityMask] [DTCs...]</code>
+                  </li>
+                  <li style="margin-bottom:0.5rem; line-height:1.6;"><strong>0x1A - reportSupportedDTCExtendedDataRecord:</strong> Lists all the extended data records supported by the ECU. Represents the end of standard DTC introspection features.
+                    <br><code>Request: 19 1A</code>
+                  </li>
+                </ul>
+                <br>
+                <h4>3. Standard Frame Traces</h4>
+                <pre><code>// 1. Tester requests list of active confirmed DTCs (Status Mask = 0x08)
+TX: 19 02 08
+// 2. ECU returns two matching confirmed DTCs:
+//    - P0102 (Mass Air Flow circuit low) -> encoded as 0x01 02 15, Status = 0x08 (confirmed)
+//    - P0300 (Random/Multiple Cylinder Misfire) -> encoded as 0x03 00 00, Status = 0x0C (pending & confirmed)
+RX: 59 02 09 01 02 15 08 03 00 00 0C</code></pre>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-container">
+            <div class="tab-headers" id="uds-service-tabs">
+              <!-- Dynamically populated UDS services tabs -->
+            </div>
+            <div class="card" style="margin-top: 1.5rem;" id="uds-service-detail-card">
+              <!-- Dynamic UDS services explanation -->
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 7: AUTOSAR FOR DIAGNOSTICS             -->
+        <!-- ============================================== -->
+        <section id="autosar-diagnostics" class="section-block">
+          <h2 class="section-title"><i data-lucide="cpu" style="color: var(--accent);"></i> 7. AUTOSAR Core Diagnostics
+            Layer</h2>
+          <p class="section-subtitle">Classic and Adaptive modules, DEM/DCM interfaces, and PDU router flow layouts.</p>
+
+          <div class="card">
+            <h3 class="card-title">AUTOSAR Layer mapping</h3>
+            <div class="card-description">
+              <p>Inside an AUTOSAR ECU stack, diagnostic services are partitioned into modular layers:
+              <ul>
+                <li><strong>DCM (Diagnostic Communication Manager):</strong> Manages diagnostic sessions (0x10),
+                  security levels (0x27), and service request routing (0x22/0x2E).</li>
+                <li><strong>DEM (Diagnostic Event Manager):</strong> Processes DTC storage, freeze frames, and fault
+                  conditions reported by software components.</li>
+                <li><strong>NvM (Non-Volatile Memory Manager):</strong> Saves persistent DTC values and configuration
+                  blocks to EEPROM/Flash.</li>
+                <li><strong>PduR (PDU Router):</strong> Routes diagnostic payload data packets between L2CAP/CAN-TP
+                  buffers and the DCM.</li>
+              </ul>
+              </p>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 8: DEBUGGING & LOG ANALYSIS            -->
+        <!-- ============================================== -->
+        <section id="debugging-logs" class="section-block">
+          <h2 class="section-title"><i data-lucide="terminal" style="color: var(--secondary-accent);"></i> 8. Debugging
+            & Trace Log Analysis</h2>
+          <p class="section-subtitle">Trace analysis, troubleshooting negative responses, timeout debugging, and
+            flashing failure diagnostics.</p>
+
+          <div class="card">
+            <h3 class="card-title">Trace Debugging Snippet: Missing Response</h3>
+            <div class="card-description">
+              <pre><code>// Tester sends Request
+10:15:30.100  TX  18DA10F1  8  02 10 03 55 55 55 55 55  (Session Control: Extended)
+// ECU positive response
+10:15:30.120  RX  18DAF110  8  06 50 03 00 32 01 F4 55  (P2=50ms, P2*=5000ms)
+// Tester requests ECU Reset
+10:15:30.150  TX  18DA10F1  8  02 11 01 55 55 55 55 55  (Hard Reset Request)
+// Timeout occurred - No response frame received from ECU
+10:15:35.150  TIMEOUT error: ECU failed to return response within P2 limit.
+Root Cause: Bootloader crashed during hardware reinitialization before sending the positive response frame.</code></pre>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 9: INTERACTIVE LAB SIMULATORS           -->
+        <!-- ============================================== -->
+        <section id="lab-simulators" class="section-block">
+          <h2 class="section-title"><i data-lucide="terminal" style="color: var(--accent);"></i> 9. Interactive
+            Protocol Lab Simulators</h2>
+          <p class="section-subtitle">Interact directly with bus signals, error triggers, frame structures, and
+            diagnostic session states.</p>
+
+          <!-- Simulator 1: CAN Arbitration -->
+          <div class="sim-container" id="sim-arbitration-box">
+            <div class="sim-header">
+              <h3>1. CAN Bus Bitwise Arbitration Simulator</h3>
+              <span class="card-tag">Arbitration Layer</span>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">
+              Set identifiers for three ECUs. Click "Run Arbitration Step" to see how dominant bits (logical 0)
+              overwrite recessive bits (logical 1) bit-by-bit.
+            </p>
+            <div style="display:flex; gap:1rem; margin-bottom:1rem; flex-wrap:wrap;">
+              <div class="filter-group">
+                <label>ECU A ID (Hex)</label>
+                <input type="text" id="sim-id-a" class="input-search" style="width:100px;" value="3A1">
+              </div>
+              <div class="filter-group">
+                <label>ECU B ID (Hex)</label>
+                <input type="text" id="sim-id-b" class="input-search" style="width:100px;" value="3A7">
+              </div>
+              <div class="filter-group">
+                <label>ECU C ID (Hex)</label>
+                <input type="text" id="sim-id-c" class="input-search" style="width:100px;" value="12A">
+              </div>
+            </div>
+
+            <div class="sim-arena" id="arbitration-arena">
+              <!-- Dynamically rendered bit cell outputs -->
+              <p style="color:var(--text-muted);">Configure Hex IDs and start the simulation.</p>
+            </div>
+
+            <div class="sim-console" id="arbitration-console">Console log initialized...</div>
+
+            <div class="sim-control-panel">
+              <button class="btn-action" onclick="startArbitrationSim()"><i data-lucide="play"></i> Start Sim</button>
+              <button class="btn-action secondary-btn" onclick="stepArbitrationSim()"><i data-lucide="arrow-right"></i>
+                Next Bit Step</button>
+              <button class="btn-action secondary-btn" onclick="resetArbitrationSim()"><i data-lucide="refresh-cw"></i>
+                Reset</button>
+            </div>
+          </div>
+
+          <!-- Simulator 5: UDS Console Simulator -->
+          <div class="sim-container" id="sim-uds-box">
+            <div class="sim-header">
+              <h3>2. Interactive UDS Diagnostic Console</h3>
+              <span class="card-tag">UDS Service Layer</span>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">
+              Send UDS requests to a virtual ECU to inspect diagnostic states and responses. Enter request frames (e.g.,
+              `10 03`, `22 F1 90`, `27 01`, `27 02`, `2E F1 90 01`).
+            </p>
+            <div style="display:flex; gap:1rem; align-items:center; margin-bottom:1rem;">
+              <input type="text" id="uds-terminal-input" class="input-search" style="flex:1;"
+                placeholder="Enter request bytes (e.g. 10 03)">
+              <button class="btn-action" onclick="sendUDSTerminal()"><i data-lucide="send"></i> Send</button>
+            </div>
+
+            <div class="sim-arena" style="background:#020617; padding:0.75rem;">
+              <div
+                style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;">
+                <span>Virtual ECU State</span>
+                <span>Session: <strong id="uds-state-session" style="color:var(--accent);">Default</strong> | Security:
+                  <strong id="uds-state-security" style="color:var(--danger);">Locked</strong></span>
+              </div>
+            </div>
+
+            <div class="sim-console" id="uds-terminal-console" style="height:200px;">
+              [System] Virtual ECU diagnostics online.
+              [System] Enforce Security Access before executing writes!
+            </div>
+
+            <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+              <button class="btn-action secondary-btn" onclick="setUDSTerminalPreset('10 03')">Preset: Extended Session
+                (10 03)</button>
+              <button class="btn-action secondary-btn" onclick="setUDSTerminalPreset('22 F1 90')">Preset: Read VIN (22
+                F1 90)</button>
+              <button class="btn-action secondary-btn" onclick="setUDSTerminalPreset('27 01')">Preset: Request Seed (27
+                01)</button>
+              <button class="btn-action secondary-btn" onclick="setUDSTerminalPreset('19 02 08')">Preset: Read DTCs (19
+                02 08)</button>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 10: VECTOR TOOLCHAIN                    -->
+        <!-- ============================================== -->
+        <section id="vector-toolchain" class="section-block">
+          <h2 class="section-title"><i data-lucide="terminal" style="color: var(--secondary-accent);"></i> 10. Vector
+            Software Toolchain & CAPL</h2>
+          <p class="section-subtitle">CANoe, CANalyzer configuration, and advanced CAPL diagnostic scripting syntax.</p>
+
+          <div class="card">
+            <h3 class="card-title">CAPL Diagnostic Scripting Example</h3>
+            <div class="card-description">
+              <p>CAPL (CAN Access Programming Language) scripting is used inside Vector CANoe configurations to simulate
+                ECUs, inject test patterns, and automate diagnostic validation loops.</p>
+              <pre><code>/* Simulated ECU responding to Tester Present */
+variables
+{
+  message 0x18DAF110 responseMsg;
+}
+
+on message 0x18DA10F1
+{
+  // Check if first payload byte is Tester Present (0x3E)
+  if (this.byte(1) == 0x3E)
+  {
+    responseMsg.dlc = 8;
+    responseMsg.byte(0) = 0x02; // SF Length
+    responseMsg.byte(1) = 0x7E; // Positive Response (0x3E + 0x40)
+    responseMsg.byte(2) = this.byte(2); // Sub-function
+    responseMsg.byte(3) = 0x55; responseMsg.byte(4) = 0x55;
+    
+    output(responseMsg); // Send frame on the bus
+    write("CAPL: Returned positive response for Tester Present");
+  }
+}</code></pre>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 11: AUTOMOTIVE V&V TESTING             -->
+        <!-- ============================================== -->
+        <!-- SECTION 11: INTERVIEW PREPARATION               -->
+        <!-- ============================================== -->
+        <section id="interview-prep" class="section-block">
+          <div class="section-header-container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-bottom:1.5rem; border-bottom:2px solid var(--border-color); padding-bottom:0.75rem;">
+            <h2 class="section-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;"><i data-lucide="help-circle" style="color: var(--accent);"></i> 11. Interview Preparation</h2>
+            <button class="btn-action secondary-btn" onclick="revealAllQA()"><i data-lucide="eye"></i> Toggle All Answers</button>
+          </div>
+          <p class="section-subtitle">Study the 70 most asked real-world vehicle network and diagnostic protocol questions.</p>
+
+          <!-- Q&A Dashboard Controls -->
+          <div class="suite-controls">
+            <div class="filter-group">
+              <label for="filter-qa-domain">Protocol Domain</label>
+              <select id="filter-qa-domain" class="select-dropdown" onchange="filterQA()">
+                <option value="all">All Domains (70 Qs)</option>
+                <option value="CAN">CAN Protocol (20 Qs)</option>
+                <option value="CAN FD">CAN FD (15 Qs)</option>
+                <option value="CAN-TP">CAN-TP Transport (15 Qs)</option>
+                <option value="UDS">UDS Diagnostics (20 Qs)</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filter-qa-difficulty">Difficulty</label>
+              <select id="filter-qa-difficulty" class="select-dropdown" onchange="filterQA()">
+                <option value="all">All Levels</option>
+                <option value="Easy">Easy / Foundational</option>
+                <option value="Medium">Medium / Applied</option>
+                <option value="Hard">Hard / Advanced</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filter-qa-progress">Study State</label>
+              <select id="filter-qa-progress" class="select-dropdown" onchange="filterQA()">
+                <option value="all">All States</option>
+                <option value="completed">Completed Qs</option>
+                <option value="uncompleted">Uncompleted Qs</option>
+                <option value="bookmarked">Bookmarked Qs</option>
+              </select>
+            </div>
+
+            <div class="filter-group" style="flex-grow: 2;">
+              <label for="search-qa">Keyword Search</label>
+              <input type="text" id="search-qa" class="input-search" placeholder="Search questions, answers..." oninput="filterQA()" style="width: 100%;">
+            </div>
+          </div>
+
+          <div class="qa-grid" id="qa-output-container">
+            <!-- Programmatically Injected Q&As -->
+          </div>
+        </section>
+
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 12: QUIZZES                            -->
+        <!-- ============================================== -->
+        <section id="quizzes" class="section-block">
+          <h2 class="section-title"><i data-lucide="clipboard-list" style="color: var(--secondary-accent);"></i> 12.
+            Section Quizzes</h2>
+          <p class="section-subtitle">Validate your structural understanding of protocols. Choose a quiz category and
+            verify your answers immediately.</p>
+
+          <div class="quiz-card" id="quiz-box">
+            <div style="text-align:center; padding:1rem;" id="quiz-start-view">
+              <h3 style="margin-bottom:1rem;">Assess Protocol Knowledge</h3>
+              <div style="display:flex; flex-direction:column; gap:0.75rem; max-width:300px; margin:0 auto 1.5rem;">
+                <button class="btn-action secondary-btn" onclick="loadQuiz('CAN')">Classic CAN Protocol</button>
+                <button class="btn-action secondary-btn" onclick="loadQuiz('CAN FD')">CAN FD Protocol</button>
+                <button class="btn-action secondary-btn" onclick="loadQuiz('CAN-TP')">CAN-TP Transport</button>
+                <button class="btn-action secondary-btn" onclick="loadQuiz('UDS')">UDS Diagnostics</button>
+                <button class="btn-action secondary-btn" onclick="loadQuiz('AUTOSAR')">AUTOSAR Stack</button>
+              </div>
+            </div>
+
+            <div id="quiz-active-view" style="display:none;">
+              <div
+                style="display:flex; justify-content:space-between; margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.5rem;">
+                <span class="card-tag" id="quiz-tag">Category</span>
+                <span style="font-size:0.85rem; color:var(--text-muted);" id="quiz-progress">1 of 5</span>
+              </div>
+              <h3 id="quiz-question" style="margin-bottom:1.5rem; line-height:1.4;">Question text...</h3>
+              <div id="quiz-options-container">
+                <!-- Option selections -->
+              </div>
+              <div style="display:flex; justify-content:space-between; margin-top:1.5rem; align-items:center;">
+                <span id="quiz-feedback" style="font-weight:600; font-size:0.95rem;"></span>
+                <button class="btn-action" id="quiz-next-btn" style="display:none;" onclick="nextQuizQuestion()">Next
+                  Question</button>
+              </div>
+            </div>
+
+            <div id="quiz-results-view" style="display:none; text-align:center; padding:1rem;">
+              <i data-lucide="check-circle"
+                style="width:48px; height:48px; color:var(--success); margin-bottom:1rem;"></i>
+              <h3 style="margin-bottom:0.5rem;">Quiz Completed</h3>
+              <p style="font-size:1.5rem; font-weight:800; color:var(--accent); margin-bottom:1rem;"
+                id="quiz-final-score">Score: 4 / 5</p>
+              <button class="btn-action" onclick="resetQuizView()">Take Another Quiz</button>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 13: QUICK REVISION CHEAT SHEETS        -->
+        <!-- ============================================== -->
+        <section id="cheat-sheets" class="section-block">
+          <h2 class="section-title"><i data-lucide="zap" style="color: var(--accent);"></i> 13. Quick Revision Cheat
+            Sheets</h2>
+          <p class="section-subtitle">One-page summaries of frames, timings, services, diagnostics configuration, and
+            error state transitions.</p>
+
+          <div class="cheat-sheet-grid" id="cheat-sheets-container">
+            <!-- Dynamically populated cheat sheets -->
+          </div>
+        </section>
+
+
+        <!-- ============================================== -->
+        <!-- SECTION 14: DOWNLOADS                           -->
+        <!-- ============================================== -->
+        <section id="downloads" class="section-block">
+          <h2 class="section-title"><i data-lucide="download" style="color: var(--secondary-accent);"></i> 14. Print &
+            Data Exporter</h2>
+          <p class="section-subtitle">Save notes, export profile data, or print the entire guide offline.</p>
+
+          <div class="grid-3">
+            <div class="card" style="text-align: center;">
+              <i data-lucide="printer"
+                style="width: 32px; height: 32px; color: var(--accent); margin-bottom: 0.5rem;"></i>
+              <h3 class="card-title">Print Portal</h3>
+              <p class="card-description" style="font-size: 0.85rem; margin-bottom: 1rem;">Prints the full documentation
+                formatted for paper structures (collapsing navigation layouts).</p>
+              <button class="btn-action" style="width: 100%; justify-content: center;" onclick="window.print()"><i
+                  data-lucide="printer"></i> Print Notes</button>
+            </div>
+
+            <div class="card" style="text-align: center;">
+              <i data-lucide="file-text"
+                style="width: 32px; height: 32px; color: var(--accent); margin-bottom: 0.5rem;"></i>
+              <h3 class="card-title">Export Q&As</h3>
+              <p class="card-description" style="font-size: 0.85rem; margin-bottom: 1rem;">Downloads all 70 technical questions and answers formatted as a clean, offline text reference document.</p>
+              <button class="btn-action" style="width: 100%; justify-content: center;" onclick="exportQAData()"><i
+                  data-lucide="download"></i> Export Q&As</button>
+            </div>
+
+            <div class="card" style="text-align: center;">
+              <i data-lucide="bookmark"
+                style="width: 32px; height: 32px; color: var(--accent); margin-bottom: 0.5rem;"></i>
+              <h3 class="card-title">Export Profile</h3>
+              <p class="card-description" style="font-size: 0.85rem; margin-bottom: 1rem;">Backs up your checked completed sections, bookmarks, and interview study metrics to a JSON configuration file.</p>
+              <button class="btn-action" style="width: 100%; justify-content: center;" onclick="exportUserData()"><i
+                  data-lucide="download"></i> Export Progress</button>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- Mobile Bottom Navigation bar (Only visible on small viewports) -->
+    <nav class="bottom-nav">
+      <button class="bottom-nav-item active" onclick="jumpToSectionMobile('networking-fundamentals')">
+        <i data-lucide="book-open"></i>
+        <span>Guide</span>
+      </button>
+      <button class="bottom-nav-item" onclick="jumpToSectionMobile('lab-simulators')">
+        <i data-lucide="play"></i>
+        <span>Sims</span>
+      </button>
+      <button class="bottom-nav-item" onclick="jumpToSectionMobile('interview-prep')">
+        <i data-lucide="help-circle"></i>
+        <span>Prep</span>
+      </button>
+      <button class="bottom-nav-item" onclick="jumpToSectionMobile('quizzes')">
+        <i data-lucide="clipboard-list"></i>
+        <span>Quizzes</span>
+      </button>
+      <button class="bottom-nav-item" onclick="toggleSidebar()">
+        <i data-lucide="menu"></i>
+        <span>Menu</span>
+      </button>
+    </nav>
+
+    <!-- Floating Back to Top Button -->
+    <div class="floating-actions">
+      <button class="fab" id="back-to-top" onclick="window.scrollTo({top:0})" title="Back to Top">
+        <i data-lucide="arrow-up"></i>
+      </button>
+    </div>
+
+    <!-- Right slide out Bookmarks Drawer overlay -->
+    <div class="bookmarks-drawer" id="bookmarks-wrapper">
+      <div class="bookmarks-header">
+        <h3 style="display:flex; align-items:center; gap:0.5rem;"><i data-lucide="bookmark"
+            style="color:var(--accent);"></i> Bookmarked</h3>
+        <button class="icon-btn" onclick="toggleBookmarksDrawer()"><i data-lucide="x"></i></button>
+      </div>
+      <div id="bookmark-list-container">
+        <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; margin-top: 2rem;">No bookmarks saved
+          yet. Click bookmark buttons on cards to save.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Database & Operations logic -->
+  <script>
+
+    // Core Databases: UDS Services, OSI Mapping, Cheat Sheets, Quizzes, Q&A Index, and Test Suite.
+    const UDS_SERVICES_DB = {
+      "0x10": {
+        title: "0x10 Diagnostic Session Control",
+        purpose: "Enables transitioning the ECU to different diagnostic states.",
+        req: "SID (1 byte: 0x10) + Sub-function (1 byte: e.g. 0x01 Default, 0x02 Programming, 0x03 Extended).",
+        resp: "Positive: 0x50 + Sub-function + timing params (P2 and P2* limits).",
+        pos: "50 03 00 32 01 F4 (Indicates transition to Extended session; P2=50ms, P2*=5000ms).",
+        neg: "7F 10 12 (Sub-function not supported) or 7F 10 22 (Conditions not correct).",
+        example: "Tester transitions ECU to Extended session before requesting Seed-Key unlocking.",
+        trace: "TX: 10 03 | RX: 50 03 00 32 01 F4",
+        q: "What is the difference between P2 and P2* timings? (P2 is the standard response time limits, typically 50ms; P2* is active after an ECU returns NRC 0x78 (response pending), extending response timeouts up to 5000ms)."
+      },
+      "0x11": {
+        title: "0x11 ECU Reset",
+        purpose: "Requests the ECU to perform a reset (reboot).",
+        req: "SID (1 byte: 0x11) + Sub-function (1 byte: e.g. 0x01 Hard Reset, 0x02 Key Off On Reset, 0x03 Soft Reset).",
+        resp: "Positive: 0x51 + Sub-function + optional powerDownTime (1 byte).",
+        pos: "51 01 (ECU acknowledges Hard Reset request and will execute reboot).",
+        neg: "7F 11 12 (Sub-function not supported) or 7F 11 22 (Conditions not correct).",
+        example: "Rebooting the ECU after flashing new software or changing static DIDs.",
+        trace: "TX: 11 01 | RX: 51 01",
+        q: "What is the difference between Hard Reset (0x01) and Soft Reset (0x03)? (Hard Reset simulates physical power loss, executing full bootloader and hardware init; Soft Reset only restarts the application layer, preserving RAM variables)."
+      },
+      "0x14": {
+        title: "0x14 Clear Diagnostic Information",
+        purpose: "Clears DTCs and stored freeze frame data from non-volatile memory.",
+        req: "SID (1 byte: 0x14) + groupOfDTC (3 bytes: e.g. 0xFF FFFF for all DTCs).",
+        resp: "Positive: 0x54.",
+        pos: "54 (Confirmation that all matching DTC records have been cleared).",
+        neg: "7F 14 31 (Request out of range) or 7F 14 22 (Conditions not correct).",
+        example: "Clearing historical fault codes after performing physical vehicle maintenance.",
+        trace: "TX: 14 FF FF FF | RX: 54",
+        q: "Can you clear specific groups of DTCs? (Yes, by replacing 0xFFFFFF with group-specific masks, e.g., 0xD00000 for network codes, or 0x100000 for powertrain codes)."
+      },
+      "0x19": {
+        title: "0x19 Read DTC Information",
+        purpose: "Allows the tester to query ECU Diagnostic Trouble Codes (DTCs) and fault statuses.",
+        req: "SID (1 byte: 0x19) + Sub-function (1 byte: e.g. 0x01 Count by Mask, 0x02 List by Mask, 0x04 Snapshot by DTC, 0x06 Extended Data by DTC) + parameters.",
+        resp: "Positive: 0x59 + Sub-function + report details.",
+        pos: "59 02 09 01 02 15 08 03 00 00 0C (Returns matching DTCs and status mask).",
+        neg: "7F 19 12 (Sub-function not supported) or 7F 19 31 (Request out of range).",
+        example: "Reading all active and historical fault codes stored in ECU memory.",
+        trace: "TX: 19 02 08 | RX: 59 02 09 01 02 15 08 03 00 00 0C",
+        q: "What does DTC Status Mask bit 3 (confirmedDTC) indicate? (It indicates a fault has been detected multiple times within a driving cycle and is officially logged as a confirmed active fault)."
+      },
+      "0x22": {
+        title: "0x22 Read Data By Identifier",
+        purpose: "Allows reading configuration parameters, sensor values, or DID values from ECU memory.",
+        req: "SID (1 byte: 0x22) + Identifier (2 bytes: DID e.g. 0xF1 0x90 for VIN).",
+        resp: "Positive: 0x62 + Identifier + Data bytes.",
+        pos: "62 F1 90 57 41 55 5A 5A 5A ... (Returns VIN string in ASCII).",
+        neg: "7F 22 31 (Request out of range) or 7F 22 33 (Security access denied).",
+        example: "Diagnostics tester pulling active sensor odometer counts or part number identifiers.",
+        trace: "TX: 22 F1 90 | RX: 62 F1 90 57 41 ...",
+        q: "How does UDS handle requesting multiple DIDs in a single frame? (Enables stacking DIDs in request bytes e.g. `22 F1 90 F1 89`. ECU returns DIDs sequentially separated by 0x62 header lines)."
+      },
+      "0x23": {
+        title: "0x23 Read Memory By Address",
+        purpose: "Allows the tester to read raw memory from physical ECU addresses.",
+        req: "SID (1 byte: 0x23) + addressAndLengthFormatIdentifier (1 byte) + memoryAddress (variable) + memorySize (variable).",
+        resp: "Positive: 0x63 + dataBytes.",
+        pos: "63 AB CD EF (Returns data bytes read from the target address).",
+        neg: "7F 23 31 (Request out of range) or 7F 23 33 (Security access denied).",
+        example: "Reading direct RAM values or raw flash zones during engineering debug phases.",
+        trace: "TX: 23 24 00 10 20 00 00 04 | RX: 63 11 22 33 44",
+        q: "Why is Service 0x23 rarely supported in production passenger vehicle ECUs? (Due to security and IP protection; exposing direct memory addresses allows reverse-engineering firmware)."
+      },
+      "0x24": {
+        title: "0x24 Read Scaling Data By Identifier",
+        purpose: "Requests the scaling information of a Data Identifier (DID) to interpret raw values.",
+        req: "SID (1 byte: 0x24) + Identifier (2 bytes).",
+        resp: "Positive: 0x64 + DID + scalingByte + scalingParameters.",
+        pos: "64 F1 90 01 95 (Returns scaling formulas and multiplier coefficients for VIN).",
+        neg: "7F 24 31 (Request out of range) or 7F 24 33 (Security access denied).",
+        example: "Querying scaling factors to dynamically display numerical sensor values correctly.",
+        trace: "TX: 24 F1 90 | RX: 64 F1 90 01 95",
+        q: "What is the primary benefit of Service 0x24? (It allows generic OBD/diagnostic scanners to display raw DID data in human-readable units without having the OEM database)."
+      },
+      "0x27": {
+        title: "0x27 Security Access",
+        purpose: "Unlocks restricted diagnostic services (such as flashing or EEPROM modifications) via Seed-Key.",
+        req: "Request Seed: SID (1 byte: 0x27) + Level odd (e.g. 0x01). Send Key: SID (0x27) + Level even (e.g. 0x02) + Key bytes.",
+        resp: "Positive Seed: 0x67 + Level + Seed bytes. Positive Key: 0x67 + Level.",
+        pos: "67 01 AB CD EF (Returns 4-byte seed). 67 02 (Key verification passed, security unlocked).",
+        neg: "7F 27 35 (Invalid Key) or 7F 27 36 (Max number of attempts exceeded).",
+        example: "Gaining security permissions to execute write DID commands.",
+        trace: "TX: 27 01 | RX: 67 01 12 34\nTX: 27 02 5A 6D | RX: 67 02",
+        q: "What security measures prevent key brute-force attacks? (ECUs enforce anti-scanning delay loops, locking out further 0x27 requests for 10 minutes after 3 key failures)."
+      },
+      "0x28": {
+        title: "0x28 Communication Control",
+        purpose: "Controls the transmission and reception of non-diagnostic messages (e.g. normal CAN signals).",
+        req: "SID (1 byte: 0x28) + controlType (1 byte: e.g. 0x00 Enable, 0x03 Disable Rx/Tx) + communicationType (1 byte: e.g. 0x01 Normal Inter-ECU Comm).",
+        resp: "Positive: 0x68 + controlType.",
+        pos: "68 03 (Confirms non-diagnostic communication has been disabled).",
+        neg: "7F 28 12 (Sub-function not supported) or 7F 28 22 (Conditions not correct).",
+        example: "Silencing normal vehicle bus traffic before starting high-speed software flashing.",
+        trace: "TX: 28 03 01 | RX: 68 03",
+        q: "Why is Service 0x28 critical for software downloading? (It prevents periodic vehicle control messages from colliding with flashing packets, optimizing bus load and preventing timeouts)."
+      },
+      "0x2A": {
+        title: "0x2A Read Data By Periodic Identifier",
+        purpose: "Requests the ECU to periodically transmit selected DID values at defined intervals.",
+        req: "SID (1 byte: 0x2A) + transmissionMode (1 byte: e.g. 0x02 Send Fast) + periodicDataIdentifier (1 byte).",
+        resp: "Positive: No direct 0x6A header; ECU starts sending periodic frames with DID data.",
+        pos: "ECU broadcasts designated CAN frames containing the requested data periodically.",
+        neg: "7F 2A 31 (Request out of range) or 7F 2A 33 (Security access denied).",
+        example: "Monitoring wheel speeds in real-time during chassis dynamometer testing.",
+        trace: "TX: 2A 02 E1 | RX: periodic frames...",
+        q: "How does 0x2A differ from 0x22? (0x22 is a one-time request-response; 0x2A sets up an active scheduler in the ECU to stream updates automatically)."
+      },
+      "0x2C": {
+        title: "0x2C Dynamically Define Data Identifier",
+        purpose: "Allows the tester to create a custom DID containing a mix of parameters from other DIDs.",
+        req: "SID (1 byte: 0x2C) + Sub-function (1 byte: e.g. 0x01 Define by DID) + newDID (2 bytes) + sourceDIDs and offsets.",
+        resp: "Positive: 0x6C + Sub-function + newDID.",
+        pos: "6C 01 F2 00 (Custom composite DID 0xF200 successfully defined).",
+        neg: "7F 2C 31 (Request out of range) or 7F 2C 22 (Conditions not correct).",
+        example: "Grouping engine RPM, oil temperature, and throttle position into a single custom DID.",
+        trace: "TX: 2C 01 F2 00 F1 90 01 02 | RX: 6C 01 F2 00",
+        q: "What is the main benefit of Dynamically Defining DIDs? (It reduces the number of requests needed to poll multiple parameters, optimizing bandwidth during high-frequency telemetry)."
+      },
+      "0x2E": {
+        title: "0x2E Write Data By Identifier",
+        purpose: "Allows writing configuration data or calibrations to an ECU DID location.",
+        req: "SID (1 byte: 0x2E) + Identifier (2 bytes) + Write Payload.",
+        resp: "Positive: 0x6E + Identifier.",
+        pos: "6E F1 90 (Odometer/VIN write positive response).",
+        neg: "7F 2E 33 (Security access denied) or 7F 2E 22 (Conditions not correct).",
+        example: "Configuring a replacement module's VIN code on the assembly line.",
+        trace: "TX: 2E F1 90 57 41 ... | RX: 6E F1 90",
+        q: "Why does 0x2E write often return NRC 0x22 (Conditions not correct)? (ECUs typically reject writes if engine is running, vehicle speed is not zero, or terminal voltage is unstable)."
+      },
+      "0x2F": {
+        title: "0x2F Input Output Control By Identifier",
+        purpose: "Enables overriding internal ECU control loops to directly actuate outputs or freeze inputs.",
+        req: "SID (1 byte: 0x2F) + Identifier (2 bytes) + controlOptionRecord + controlEnableMask.",
+        resp: "Positive: 0x6F + Identifier + controlStatus.",
+        pos: "6F F0 12 03 (ECU confirms output override, e.g. radiator fan turned ON).",
+        neg: "7F 2F 22 (Conditions not correct) or 7F 2F 33 (Security access denied).",
+        example: "Manually activating fuel pumps, diagnostic LEDs, or wiping blades to verify electrical loops.",
+        trace: "TX: 2F F0 12 03 01 | RX: 6F F0 12 03",
+        q: "What are the common controlOptionRecord parameters? (0x00 ReturnControlToECU, 0x01 ResetToDefault, 0x02 FreezeCurrentState, 0x03 ShortTermAdjustment)."
+      },
+      "0x31": {
+        title: "0x31 Routine Control",
+        purpose: "Triggers internal ECU test routines (e.g., self-tests, check memory, erase memory).",
+        req: "SID (1 byte: 0x31) + ControlType (1 byte: 0x01 Start, 0x02 Stop, 0x03 RequestResults) + RoutineID (2 bytes).",
+        resp: "Positive: 0x71 + ControlType + RoutineID + optional results.",
+        pos: "71 01 FF 01 (Routine 'Erase Memory' started successfully).",
+        neg: "7F 31 24 (Request sequence error) or 7F 31 31 (Request out of range).",
+        example: "Initiating memory erasure during ECU flashing routines.",
+        trace: "TX: 31 01 FF 01 | RX: 71 01 FF 01",
+        q: "How does Routine Control differ from DID writing? (Routine Control executes procedural logic routines inside the ECU firmware, whereas DIDs represent static memory properties)."
+      },
+      "0x34": {
+        title: "0x34 Request Download",
+        purpose: "Initiates a data transfer from tester to ECU (typically for software flashing).",
+        req: "SID (1 byte: 0x34) + dataFormatIdentifier (1 byte) + addressAndLengthFormatIdentifier (1 byte) + memoryAddress + memorySize.",
+        resp: "Positive: 0x74 + maxNumberOfBlockLength (defines max chunk size for 0x36).",
+        pos: "74 20 04 00 (ECU accepts download request; max block length is 0x0400 bytes).",
+        neg: "7F 34 31 (Request out of range) or 7F 34 70 (Upload/Download not accepted).",
+        example: "Proposing a memory address and firmware image size to the ECU bootloader.",
+        trace: "TX: 34 00 44 00 10 00 00 00 05 00 00 | RX: 74 20 04 00",
+        q: "What is the purpose of the dataFormatIdentifier parameter? (It specifies compression and encryption algorithms used on the download image so the ECU can decrypt or extract it)."
+      },
+      "0x35": {
+        title: "0x35 Request Upload",
+        purpose: "Initiates a data transfer from ECU to tester (typically to read out calibration files or dumps).",
+        req: "SID (1 byte: 0x35) + dataFormatIdentifier + addressAndLengthFormatIdentifier + memoryAddress + memorySize.",
+        resp: "Positive: 0x75 + maxNumberOfBlockLength (defines max chunk size for 0x36).",
+        pos: "75 20 04 00 (ECU accepts upload request; max block length is 0x0400 bytes).",
+        neg: "7F 35 31 (Request out of range) or 7F 35 33 (Security access denied).",
+        example: "Dumping ECU ROM mapping tables to verify firmware integrity.",
+        trace: "TX: 35 00 44 00 20 00 00 00 01 00 00 | RX: 75 20 04 00",
+        q: "How does 0x35 differ from 0x23? (0x35 is for structured block transfers using 0x36/0x37 protocols; 0x23 reads raw memory directly in a single frame)."
+      },
+      "0x36": {
+        title: "0x36 Transfer Data",
+        purpose: "Transmits structured blocks of data (used in download or upload sequences).",
+        req: "SID (1 byte: 0x36) + blockSequenceCounter (1 byte, starts at 1, increments and rolls over) + transferRequestDataPayload.",
+        resp: "Positive: 0x76 + blockSequenceCounter.",
+        pos: "76 01 (ECU confirms block 1 successfully written to flash memory).",
+        neg: "7F 36 71 (Transfer suspended) or 7F 36 73 (Wrong block sequence counter).",
+        example: "Streaming firmware code blocks sequentially to ECU memory during flashing.",
+        trace: "TX: 36 01 11 22 33 44... | RX: 76 01",
+        q: "What happens if a blockSequenceCounter mismatch is detected by the ECU? (The ECU returns NRC 0x73, aborting the download sequence to prevent corrupt data writes)."
+      },
+      "0x37": {
+        title: "0x37 Request Transfer Exit",
+        purpose: "Signals the completion of a block data transfer sequence.",
+        req: "SID (1 byte: 0x37) + optional parameters.",
+        resp: "Positive: 0x77.",
+        pos: "77 (ECU confirms download/upload sequence is terminated).",
+        neg: "7F 37 24 (Request sequence error) or 7F 37 72 (General programming failure).",
+        example: "Finishing the transfer of calibration tables and returning the ECU to normal control.",
+        trace: "TX: 37 | RX: 77",
+        q: "What verification step usually follows Service 0x37? (A checkMemory Routine (0x31) is triggered to verify the CRC checksum of the programmed memory block)."
+      },
+      "0x3E": {
+        title: "0x3E Tester Present",
+        purpose: "Indicates that the tester is still active, keeping non-default diagnostic sessions from timing out.",
+        req: "SID (1 byte: 0x3E) + subFunction (1 byte: e.g. 0x00 Send Response, 0x80 Suppress Response).",
+        resp: "Positive: 0x7E + subFunction (only if subFunction is 0x00).",
+        pos: "7E 00 (ECU acknowledges tester is present, resetting the session timeout timer).",
+        neg: "7F 3E 12 (Sub-function not supported) or 7F 3E 22 (Conditions not correct).",
+        example: "Preventing the ECU from reverting to the default session during pauses in a test suite.",
+        trace: "TX: 3E 80 | RX: (No response due to suppress bit)",
+        q: "What is the purpose of setting the high bit of the sub-function (e.g. 3E 80)? (It acts as a 'suppress positive response' bit, telling the ECU not to send a response frame, which reduces unnecessary bus traffic)."
+      }
+    };
+
+    const OSI_LAYERS_DB = {
+      "OSI7": {
+        title: "Application Layer (OSI 7)",
+        purpose: "Serves as the interface for end-user diagnostic software applications to send service identifiers.",
+        protocol: "UDS (Unified Diagnostic Services - ISO 14229) operates at this layer, defining command codes like <code>ReadDataByIdentifier (0x22)</code>.",
+        flow: "TX: 22 F1 90 (Read VIN request from diagnostics tester)."
+      },
+      "OSI6": {
+        title: "Presentation Layer (OSI 6)",
+        purpose: "Handles data formatting, syntax translation, and database scaling representations.",
+        protocol: "Automotive databases (DBC/ODX) map binary signals to human-readable values using scaling variables (e.g. Odometer = raw * 0.1 offset).",
+        flow: "Translating payload byte string `0x1F4` to decimal `50.0 km` based on DBC scaling rules."
+      },
+      "OSI5": {
+        title: "Session Layer (OSI 5)",
+        purpose: "Manages connection sessions, tester present heartbeats, and authorization states.",
+        protocol: "UDS Diagnostic Sessions (0x10) and Security states (0x27) manage communication authorization layers.",
+        flow: "Tester Present (0x3E) frame keeps Extended Session active, preventing default timeout revert."
+      },
+      "OSI4": {
+        title: "Transport Layer (OSI 4)",
+        purpose: "Manages end-to-end data flow controls, payload segmentation, and frame sequence numbers.",
+        protocol: "CAN-TP (ISO 15765-2) segments diagnostic messages larger than 8 bytes into structured SF/FF/CF sequences.",
+        flow: "Splitting a 20-byte UDS response into a First Frame (FF) and Consecutive Frame (CF) controlled by Flow Control (FC) frame parameters."
+      },
+      "OSI3": {
+        title: "Network Layer (OSI 3)",
+        purpose: "Handles logical addressing and routing pathways between tester and ECU ports.",
+        protocol: "CAN-TP handles functional (broadcast to all) vs physical (point-to-point target node) addressing IDs.",
+        flow: "Mapping Tester Request to CAN ID `0x18DA10F1` (Physical destination 0x10)."
+      },
+      "OSI2": {
+        title: "Data Link Layer (OSI 2)",
+        purpose: "Enforces frame structures, bit arbitration priority checks, and error code flag checks.",
+        protocol: "Classic CAN / CAN FD MAC framing controls bus arbitration, CRC generation, stuff bits, and ACK validations.",
+        flow: "Arbitrating identifier bits to determine priority; injecting Error Frame if a Stuff Error is detected."
+      },
+      "OSI1": {
+        title: "Physical Layer (OSI 1)",
+        purpose: "Handles electrical voltage transmissions, transceivers, and twisted pair termination nodes.",
+        protocol: "Differential signaling across CAN_H and CAN_L lines; standard 120-ohm termination resistance nodes.",
+        flow: "Converting logical dominant bit '0' into 2.0V differential (CAN_H=3.5V, CAN_L=1.5V) on bus wires."
+      }
+    };
+
+    const CHEAT_SHEETS_DATA = [
+      {
+        title: "CAN Protocol Limits",
+        items: [
+          { label: "Bands", val: "Up to 1 Mbps bandwidth (Classic)" },
+          { label: "Channels", val: "Single shared bus, terminating in 120-ohm nodes" },
+          { label: "V-Recessive", val: "CAN_H = 2.5V, CAN_L = 2.5V (Diff = 0V)" },
+          { label: "V-Dominant", val: "CAN_H = 3.5V, CAN_L = 1.5V (Diff = 2.0V)" },
+          { label: "DLC Limits", val: "0 to 8 bytes maximum standard payload" },
+          { label: "Error States", val: "Error Active, Error Passive, Bus Off" }
+        ]
+      },
+      {
+        title: "CAN FD Enhancements",
+        items: [
+          { label: "FDF Flag", val: "FD Format bit (Recessive = CAN FD frame)" },
+          { label: "BRS Flag", val: "Bit Rate Switch (Data phase speed transition)" },
+          { label: "Data Speed", val: "Typically 5 Mbps to 8 Mbps data payload phase" },
+          { label: "Payloads", val: "Up to 64 bytes (8, 12, 16, 20, 24, 32, 48, 64)" },
+          { label: "CRC Length", val: "17-bit for data <=16B, 21-bit for data >16B" },
+          { label: "Applications", val: "ADAS systems, gateways, firmware flashing" }
+        ]
+      },
+      {
+        title: "CAN-TP Frame Types",
+        items: [
+          { label: "SF (0x0)", val: "Single Frame (Max payload 7 bytes on Classic)" },
+          { label: "FF (0x1)", val: "First Frame (Declares total size, up to 4095B)" },
+          { label: "CF (0x2)", val: "Consecutive Frame (Carries payload segments)" },
+          { label: "FC (0x3)", val: "Flow Control Frame (CTS, WAIT, OVERFLOW)" },
+          { label: "STmin", val: "Separation Time minimum parameter (ms/us)" },
+          { label: "BS", val: "Block Size (CF frames sent before next FC check)" }
+        ]
+      },
+      {
+        title: "UDS Service Presets",
+        items: [
+          { label: "0x10 DSC", val: "Diagnostic Session Control (01 Default, 02 Prog, 03 Ext)" },
+          { label: "0x11 Reset", val: "ECU Reset (01 Hard, 02 Key Off-On, 03 Soft)" },
+          { label: "0x22 RDBI", val: "Read Data By DID (VIN 0xF190)" },
+          { label: "0x27 SecAcc", val: "Security Access (Seed-Key unlock algorithm)" },
+          { label: "0x2E WDBI", val: "Write Data By DID (Requires security permission)" },
+          { label: "0x31 Routine", val: "Routine Control (01 Start, 02 Stop, 03 Results)" }
+        ]
+      }
+    ];
+
+    const QUIZ_QUESTIONS = {
+      "CAN": [
+        {
+          q: "What electrical voltage difference represents a Dominant bit (Logical 0) on a High-Speed CAN Bus?",
+          o: ["0.0V", "1.0V", "2.0V", "5.0V"],
+          a: 2,
+          f: "A dominant bit is represented by a differential voltage of ~2.0V (CAN_H rises to 3.5V, CAN_L drops to 1.5V)."
+        },
+        {
+          q: "Why are 120-ohm resistors placed at the ends of the CAN bus network?",
+          o: ["To increase line current", "To match impedance and prevent signal reflections", "To filter out high-frequency noise", "To step down voltage levels"],
+          a: 1,
+          f: "Termination resistors match the characteristic impedance of the twisted-pair cable (120 ohms) to prevent electrical reflections."
+        }
+      ],
+      "CAN FD": [
+        {
+          q: "Which bit indicates that a frame is using CAN FD format rather than Classic CAN?",
+          o: ["BRS", "ESI", "FDF", "RTR"],
+          a: 2,
+          f: "The FDF (FD Format) bit is set to recessive (1) to declare CAN FD frame type."
+        }
+      ],
+      "CAN-TP": [
+        {
+          q: "What is the N_Bs timing parameter timeout value limit inside the ISO 15765-2 standard?",
+          o: ["100 ms", "500 ms", "1000 ms", "5000 ms"],
+          a: 2,
+          f: "N_Bs timeout is standard 1000 ms, specifying the max time between sending FF and receiving FC frame."
+        }
+      ],
+      "UDS": [
+        {
+          q: "Which Negative Response Code (NRC) is represented by code 0x78?",
+          o: ["SubfunctionNotSupported", "SecurityAccessDenied", "RequestCorrectlyReceived-ResponsePending", "ConditionsNotCorrect"],
+          a: 2,
+          f: "NRC 0x78 (RequestCorrectlyReceived-ResponsePending) is sent by the ECU when a routine takes longer than the P2 timeout, resetting the P2* timing tracker."
+        }
+      ],
+      "AUTOSAR": [
+        {
+          q: "Which AUTOSAR Basic Software module handles UDS protocol routing implementations?",
+          o: ["NvM", "COM", "DEM", "DCM"],
+          a: 3,
+          f: "The DCM (Diagnostic Communication Manager) parses and handles application UDS request frames."
+        }
+      ]
+    };
+
+    // 70 Unique, Real-World Automotive Diagnostic Protocol Interview Q&As
+    const INTERVIEW_QA_DATABASE = [
+      // === CAN PROTOCOL (20 Qs) ===
+      {
+        id: "QA-01",
+        domain: "CAN",
+        difficulty: "Easy",
+        question: "Explain the difference between Dominant and Recessive bits on a physical CAN bus layer.",
+        answer: "On a High-Speed CAN network (ISO 11898-2), a Dominant bit represents logical '0' and a Recessive bit represents logical '1'. Dominant bits are actively driven by transceivers, forcing CAN_H to ~3.5V and CAN_L to ~1.5V (creating a differential voltage of ~2.0V). Recessive bits are passive; the transceiver output drivers are open, allowing the 120-ohm termination resistors to pull CAN_H and CAN_L back to a common-mode level of ~2.5V (differential voltage of 0V). A dominant bit always overrides a recessive bit on the bus, which forms the basis for bitwise collision-free arbitration."
+      },
+      {
+        id: "QA-02",
+        domain: "CAN",
+        difficulty: "Easy",
+        question: "Why does a High-Speed CAN bus require exactly two 120-ohm termination resistors at its physical ends?",
+        answer: "High-speed CAN uses differential signaling over a twisted-pair line with a characteristic impedance of 120 ohms. To prevent electrical signals from reflecting back when they reach the ends of the bus (which would corrupt following bits), a 120-ohm termination resistor is placed at each physical end. The two resistors in parallel create an overall bus load of 60 ohms, matching the transmission line impedance and stabilizing high-speed bit transition timings."
+      },
+      {
+        id: "QA-03",
+        domain: "CAN",
+        difficulty: "Medium",
+        question: "What are the rules regarding maximum stub lengths on a CAN network, and what happens if they are exceeded?",
+        answer: "A stub is the un-terminated cable segment connecting an ECU node to the main CAN bus trunk. According to ISO 11898, individual stub lengths should not exceed 0.3 meters at 1 Mbps to minimize impedance mismatches and ringing. If stubs are too long, they create signal reflections that distort the differential voltage waveforms, leading to Bit Errors, CRC Errors, and nodes transitioning into Error Passive or Bus Off states."
+      },
+      {
+        id: "QA-04",
+        domain: "CAN",
+        difficulty: "Medium",
+        question: "How does the CAN protocol execute collision-free bitwise arbitration?",
+        answer: "When multiple nodes transmit simultaneously, they start synchronized. As they output the message identifier bit-by-bit (starting with the MSB), they also read the bus state. If Node A outputs a Recessive bit (1) but detects a Dominant bit (0) on the bus (indicating another node is outputting a Dominant bit), Node A loses arbitration, immediately switches to receiver mode, and stops transmitting. The node with the lower identifier value (more dominant zeros) wins uninterrupted bus access without packet collision or transmission delay."
+      },
+      {
+        id: "QA-05",
+        domain: "CAN",
+        difficulty: "Easy",
+        question: "What is the CAN bit stuffing rule, and what is its primary purpose?",
+        answer: "The bit stuffing rule states that whenever a transmitter detects five consecutive bits of the same logical state (five 0s or five 1s) in the active frame stream (from Start of Frame to CRC), it must automatically insert a complementary bit of the opposite polarity. The receiver automatically detects and strips this stuff bit. Its primary purpose is to guarantee sufficient signal edge transitions (voltage changes) to maintain phase-locked clock synchronization between all nodes on the bus."
+      },
+      {
+        id: "QA-06",
+        domain: "CAN",
+        difficulty: "Hard",
+        question: "Explain the three error states of a CAN node and the transition rules based on TEC and REC counters.",
+        answer: "A CAN node maintains two counters: Transmit Error Counter (TEC) and Receive Error Counter (REC). 1) <strong>Error Active:</strong> The default state when both TEC and REC are &lt;= 127. The node can transmit Active Error Flags (6 dominant bits). 2) <strong>Error Passive:</strong> Entered if TEC &gt; 127 or REC &gt; 127. The node can only transmit Passive Error Flags (6 recessive bits) and must wait an additional Suspend Transmission time (8 bits) before starting new transmissions. 3) <strong>Bus Off:</strong> Entered if TEC exceeds 255. The node physically disconnects from the bus (cannot transmit or acknowledge). It can only recover after a standard reset or waiting for 128 occurrences of 11 consecutive recessive bits."
+      },
+      {
+        id: "QA-07",
+        domain: "CAN",
+        difficulty: "Medium",
+        question: "What are the structural differences between Standard CAN (CAN 2.0A) and Extended CAN (CAN 2.0B) frames?",
+        answer: "Standard frames use an 11-bit identifier, whereas Extended frames use a 29-bit identifier split into an 11-bit Base ID and an 18-bit Identifier Extension. In the Standard frame header, the IDE (Identifier Extension) bit is dominant (0) and the RTR bit is present. In the Extended frame, the IDE bit is recessive (1), the SRR (Substitute Remote Request) bit is recessive (1) and replaces the RTR slot, and the actual RTR bit follows the 18-bit extension."
+      },
+      {
+        id: "QA-08",
+        domain: "CAN",
+        difficulty: "Easy",
+        question: "Describe the role of the physical CAN transceiver compared to the CAN controller.",
+        answer: "The CAN controller (typically integrated into the microcontroller) manages the protocol logic, handling framing, bit stuffing, CRC calculation, and error management. The CAN transceiver is the electrical interface. It converts the single-ended logical TX/RX signals from the controller into the differential voltages (CAN_H and CAN_L) sent over the bus wires, and vice versa."
+      },
+      {
+        id: "QA-09",
+        domain: "CAN",
+        difficulty: "Medium",
+        question: "What is a Remote Transmission Request (RTR) frame, and why is it deprecated in modern automotive network design?",
+        answer: "An RTR frame is a request sent by a node asking another node to transmit specific data associated with that ID. It has the same identifier but the RTR bit is recessive (1) and contains no data payload. It is deprecated because it lacks data consistency controls, can lead to bus flooding due to simultaneous responses, and standard periodic broadcast architectures are much safer and more predictable."
+      },
+      {
+        id: "QA-10",
+        domain: "CAN",
+        difficulty: "Hard",
+        question: "How does a software stack handle a CAN Bus-Off recovery sequence safely?",
+        answer: "When a node enters the Bus Off state (TEC &gt; 255), the transceiver is disabled. The microcontroller software stack detects this state and must execute a recovery sequence. To prevent a faulty ECU from immediately re-entering the bus and causing failure loops, standard protocols (like AUTOSAR CanSM) implement a delay. The node waits for a recovery sequence (e.g., waiting for the bus to be idle for 128 iterations of 11 recessive bits) and initiates recovery. If it immediately fails again, the recovery interval increases exponentially."
+      },
+      {
+        id: "QA-11",
+        domain: "CAN",
+        difficulty: "Hard",
+        question: "Why does the CAN protocol require tight clock tolerances, and what are the limits?",
+        answer: "CAN is an asynchronous protocol; nodes do not share a common clock line. Clock synchronization occurs only on recessive-to-dominant edges. Standard Classic CAN requires clock tolerance (df) &lt; 0.5% for normal frames, while CAN FD (due to the higher bit rate in the data phase) requires extremely tight oscillator tolerances, typically &lt; 0.1% (requiring quartz crystals instead of ceramic resonators) to prevent bit synchronization errors during fast data transitions."
+      },
+      {
+        id: "QA-12",
+        domain: "CAN",
+        difficulty: "Medium",
+        question: "What are the segments of a single CAN bit time, and how is the Sample Point calculated?",
+        answer: "A single bit time is divided into time quanta (Tq) across four segments: 1) Sync_Seg (always 1 Tq), 2) Prop_Seg (compensates for physical cable delays), 3) Phase_Seg1, and 4) Phase_Seg2 (compensates for phase shifts). The Sample Point is the instant when the CAN controller reads the bus level, located at the boundary between Phase_Seg1 and Phase_Seg2. The sample point is calculated as: <code>(Sync_Seg + Prop_Seg + Phase_Seg1) / (Total Bit Time in Tq) * 100%</code>. Typically, automotive networks specify sample points between 75% and 85%."
+      },
+      {
+        id: "QA-13",
+        domain: "CAN",
+        difficulty: "Medium",
+        question: "What is the purpose of Synchronization Jump Width (SJW) in CAN controllers?",
+        answer: "SJW is the maximum number of time quanta (Tq) by which the Phase_Seg1 can be lengthened or Phase_Seg2 can be shortened during resynchronization. It defines the controller's capacity to adjust its internal bit timings to match drift or clock frequency deviations of other transmitting ECUs on the bus."
+      },
+      {
+        id: "QA-14",
+        domain: "CAN",
+        difficulty: "Easy",
+        question: "What is a 'Babbling Idiot' error on a CAN bus, and how can it be mitigated?",
+        answer: "A Babbling Idiot error occurs when a faulty controller or software bug causes a node to continuously transmit dominant frames or high-priority messages without releasing the bus. This prevents other nodes from arbitrating. It is mitigated using hardware bus guards, transceiver timeout loops (Transmitter Timeout or TXD dominant timeout, which disables the transceiver driver if TXD is low for too long), or gateway monitoring configurations."
+      },
+      {
+        id: "QA-15",
+        domain: "CAN",
+        difficulty: "Hard",
+        question: "What is the visual difference on an oscilloscope between an Active Error Flag and a Passive Error Flag?",
+        answer: "An Active Error Flag is transmitted by an Error Active node when it detects a protocol violation. It sends 6 consecutive dominant bits, violating the stuffing rule and forcing all other nodes to also send error flags. On an oscilloscope, this is visible as a sustained differential voltage block of ~2.0V. A Passive Error Flag is transmitted by an Error Passive node as 6 consecutive recessive bits. Since dominant overrides recessive, it does not disrupt the bus if another node is transmitting, showing as 0V differential or standard data activity."
+      },
+      {
+        id: "QA-16",
+        domain: "CAN",
+        difficulty: "Medium",
+        question: "How does the Acknowledge (ACK) slot work in a CAN frame, and what happens if a node receives no ACK?",
+        answer: "The transmitting node outputs a recessive bit (1) during the ACK Slot. Every other active node on the bus that has correctly received the frame up to the CRC field writes a dominant bit (0) onto the bus during this slot. The transmitter reads the bus state during the ACK slot; if it reads a dominant bit, the transmission is acknowledged. If no node writes a dominant bit, the transmitter detects an ACK Error, immediately generates an Error Frame, and schedules retransmission."
+      },
+      {
+        id: "QA-17",
+        domain: "CAN",
+        difficulty: "Easy",
+        question: "What is Single Wire CAN (SWCAN - SAE J2411) and where is it typically deployed?",
+        answer: "Single Wire CAN is a CAN variant that uses a single physical wire instead of differential twisted pair. It operates at lower bit rates (typically 33.3 kbps) and is used for low-speed Body domain systems to reduce wire harness weight and cost. It has a special high-voltage wakeup mode (up to 12V) to activate sleeping ECUs."
+      },
+      {
+        id: "QA-18",
+        domain: "CAN",
+        difficulty: "Hard",
+        question: "Why must the CRC Delimiter and ACK Delimiter in a CAN frame always be recessive?",
+        answer: "The CRC Delimiter and ACK Delimiter are 1-bit recessive fields that serve as mandatory timing separators. If they were dominant, a node experiencing phase drift or propagation delays could overlap its transmissions into adjacent fields without detection. The recessive delimiter guarantees a defined rising/falling edge transition profile, allowing controllers to re-synchronize before evaluating the critical ACK bit and EOF flags."
+      },
+      {
+        id: "QA-19",
+        domain: "CAN",
+        difficulty: "Medium",
+        question: "What is the Interframe Space (IFS) and what does it consist of?",
+        answer: "The Interframe Space is a mandatory separation gap of at least 3 recessive bits (Intermission field) between consecutive data or remote frames. For Error Passive nodes, it also includes an additional 8-bit Suspend Transmission field, during which the node is forbidden from starting a new transmission, allowing other nodes to access the bus."
+      },
+      {
+        id: "QA-20",
+        domain: "CAN",
+        difficulty: "Easy",
+        question: "What physical factors limit the maximum number of ECU nodes that can be connected to a single CAN bus?",
+        answer: "The node count is physically limited by: 1) Electrical load (each node adds input capacitance and leakage current, reducing the total differential impedance), 2) Transceiver output drive capability, and 3) Physical cable length and stub reflections. Standard High-Speed CAN transceivers support up to 32, 64, or 110 nodes on a single physical bus segment before signal integrity degrades."
+      },
+
+      // === CAN FD (15 Qs) ===
+      {
+        id: "QA-21",
+        domain: "CAN FD",
+        difficulty: "Easy",
+        question: "What are the two primary enhancements introduced by CAN Flexible Data-Rate (CAN FD) over Classic CAN?",
+        answer: "1) <strong>Increased Data Payload:</strong> CAN FD supports data payloads up to 64 bytes per frame, compared to Classic CAN's limit of 8 bytes. 2) <strong>Dual Bit Rate:</strong> CAN FD splits the transmission. The arbitration, header, and ACK phases run at standard speeds (e.g., 500 kbps), while the data payload and CRC phases switch to a higher speed clock (e.g., 2 to 5 Mbps), drastically increasing bandwidth efficiency."
+      },
+      {
+        id: "QA-22",
+        domain: "CAN FD",
+        difficulty: "Medium",
+        question: "Explain the purpose and operation of the BRS (Bit Rate Switch) flag in a CAN FD frame.",
+        answer: "The BRS bit in the control field determines whether the data phase of the CAN FD frame runs at a faster bit rate. If BRS is dominant (0), the frame is transmitted at the nominal arbitration bit rate throughout. If BRS is recessive (1), the controller switches its bit clock to the data bit rate at the sample point of the BRS bit, and switches back to the nominal bit rate at the sample point of the CRC delimiter bit."
+      },
+      {
+        id: "QA-23",
+        domain: "CAN FD",
+        difficulty: "Easy",
+        question: "What is the FDF (FD Format) flag and how does it prevent Classic CAN controllers from misinterpreting CAN FD frames?",
+        answer: "The FDF bit is located in the control field of a CAN FD frame, occupying a bit position that is reserved (and expected to be dominant) in Classic CAN. In a CAN FD frame, the FDF bit is transmitted as recessive (1). Because Classic CAN controllers expect a dominant bit in this position, they interpret this recessive bit as a form error and immediately transmit an error frame, unless the Classic controller has been isolated, disabled, or utilizes a CAN FD shielded transceiver."
+      },
+      {
+        id: "QA-24",
+        domain: "CAN FD",
+        difficulty: "Medium",
+        question: "What are the typical nominal (arbitration) and data phase bit rates used in production automotive CAN FD networks?",
+        answer: "In production passenger vehicles, the nominal (arbitration) speed is typically configured at 500 kbps. The fast data phase is typically configured at 2 Mbps or 5 Mbps. Although controllers and transceivers support speeds up to 8 Mbps in laboratory environments, physical wire topology, electromagnetic compatibility (EMC), and ringing restrict production vehicles to 2-5 Mbps."
+      },
+      {
+        id: "QA-25",
+        domain: "CAN FD",
+        difficulty: "Hard",
+        question: "Why does CAN FD utilize dynamic CRC lengths, and what are the specific bit sizes used?",
+        answer: "To maintain high error detection probability across larger payloads, CAN FD uses two different CRC polynomials based on payload size. For frames with payloads &lt;= 16 bytes, a 17-bit CRC is used. For frames with payloads &gt; 16 bytes, a 21-bit CRC is used. This prevents the error detection coverage from degrading as data fields expand up to 64 bytes."
+      },
+      {
+        id: "QA-26",
+        domain: "CAN FD",
+        difficulty: "Hard",
+        question: "What is Transmitter Delay Compensation (TDC) in CAN FD, and why is it necessary?",
+        answer: "In the CAN FD data phase, the bit time can be extremely short (e.g., 200ns at 5 Mbps). Due to the electrical propagation delay through the controller TX output, transceiver, and cabling, the echo of the transmitted bit returning on RX may arrive after the standard sample point has passed. TDC solves this by measuring the loop delay (TX-to-RX) and dynamically shifting the secondary sample point for transmitter bit verification during the data phase."
+      },
+      {
+        id: "QA-27",
+        domain: "CAN FD",
+        difficulty: "Medium",
+        question: "Can standard Classic CAN transceivers be used for CAN FD networks operating at 5 Mbps? Explain why or why not.",
+        answer: "No, standard Classic CAN transceivers cannot be used for high-speed CAN FD data phases. While they physically function, their symmetry and propagation delay tolerances are not tight enough. CAN FD requires specialized transceivers (ISO 11898-2:2016 compliant) designed with extremely low loop delay symmetry deviations (typically &lt; 20ns) to ensure bits are not distorted or cut short during fast 5 Mbps data phases."
+      },
+      {
+        id: "QA-28",
+        domain: "CAN FD",
+        difficulty: "Easy",
+        question: "What is the Error State Indicator (ESI) bit in a CAN FD frame and what information does it convey?",
+        answer: "The ESI bit is a 1-bit field in the CAN FD control header that actively displays the transmitting node's error status. If the ESI bit is dominant (0), the node is in the Error Active state. If the ESI bit is recessive (1), the transmitting node is in the Error Passive state. This allows diagnostic tools and gateways to immediately identify degrading nodes on the bus."
+      },
+      {
+        id: "QA-29",
+        domain: "CAN FD",
+        difficulty: "Hard",
+        question: "Describe the function and structure of the Stuff Count field in the CAN FD CRC segment.",
+        answer: "To protect against synchronization glitches where stuff bits are lost or falsely inserted, CAN FD incorporates a physical Stuff Count field directly preceding the CRC sequence. The Stuff Count consists of a 3-bit Gray code counter (representing the number of stuff bits inserted modulo 8) plus an even parity bit. The receiver recalculates the stuff count and compares it to the received field, detecting corrupt frames that standard CRC algorithms might miss."
+      },
+      {
+        id: "QA-30",
+        domain: "CAN FD",
+        difficulty: "Medium",
+        question: "How does CAN FD map Data Length Code (DLC) values &gt; 8 to byte counts?",
+        answer: "In Classic CAN, DLC values 0-8 map linearly to 0-8 bytes, and DLCs 9-15 remain 8 bytes. In CAN FD, DLC values 0-8 map linearly to 0-8 bytes, but values 9 through 15 are mapped non-linearly to support larger payloads: DLC 9 = 12 bytes, DLC 10 = 16 bytes, DLC 11 = 20 bytes, DLC 12 = 24 bytes, DLC 13 = 32 bytes, DLC 14 = 48 bytes, and DLC 15 = 64 bytes."
+      },
+      {
+        id: "QA-31",
+        domain: "CAN FD",
+        difficulty: "Easy",
+        question: "What is the primary advantage of CAN FD during ECU flashing/software updates in manufacturing?",
+        answer: "ECU flashing requires transferring large binary image files (often megabytes in size). Classic CAN is limited to 8-byte segments and 1 Mbps nominal speeds. By utilizing CAN FD, testers can send 64-byte payloads at 5 Mbps, reducing flashing and end-of-line programming times by 70% to 80%, directly optimizing manufacturing throughput."
+      },
+      {
+        id: "QA-32",
+        domain: "CAN FD",
+        difficulty: "Medium",
+        question: "What physical phenomena prevent CAN FD data phase rates from scaling up to Ethernet speeds (e.g., 100 Mbps)?",
+        answer: "Differential bus signaling relies on termination resistors to passive-recessive discharge states. At very high frequencies, cable capacitance, wiring topology (stubs), transceiver delay tolerances, and electromagnetic interference (EMI) cause signal reflections and ringing. This distorts the signal eye diagram, making reliable bit evaluation impossible beyond approximately 8-10 Mbps on multi-drop topologies."
+      },
+      {
+        id: "QA-33",
+        domain: "CAN FD",
+        difficulty: "Hard",
+        question: "At what exact instant does a CAN FD controller switch its internal clock speed from the nominal rate to the data rate?",
+        answer: "The speed transition from the nominal bit rate to the data bit rate occurs precisely at the Sample Point of the BRS (Bit Rate Switch) bit itself. The switch back to the nominal bit rate occurs precisely at the Sample Point of the CRC Delimiter bit."
+      },
+      {
+        id: "QA-34",
+        domain: "CAN FD",
+        difficulty: "Hard",
+        question: "Why does the CAN FD Stuff Count field utilize Gray Code instead of standard binary?",
+        answer: "Gray code guarantees that only a single bit changes state between consecutive counts. By using Gray code, the protocol minimizes transition hazards and propagation delay mismatches when reading the counter, protecting the critical synchronization sequence from false bit readings on the receiver side."
+      },
+      {
+        id: "QA-35",
+        domain: "CAN FD",
+        difficulty: "Medium",
+        question: "What happens if a Classic CAN node is placed on an active CAN FD bus without any software isolation?",
+        answer: "When a CAN FD node transmits a frame, it sets the FDF bit to recessive. The Classic CAN node sees this bit as a reserved dominant slot, registers a Form Error, and immediately transmits an Active Error Flag (6 dominant bits). This destroys the CAN FD frame. The mixed bus will experience continuous error frames, making communication impossible unless Classic CAN nodes are isolated behind a gateway or configured with transceivers that filter out CAN FD frames."
+      },
+
+      // === CAN-TP PROTOCOL (15 Qs) ===
+      {
+        id: "QA-36",
+        domain: "CAN-TP",
+        difficulty: "Easy",
+        question: "Why is a transport layer protocol like ISO 15765-2 (CAN-TP) required for UDS diagnostics?",
+        answer: "UDS services often require transmitting data payloads much larger than a single CAN frame (e.g., ECU flashing payload of 1024 bytes, or DTC read responses exceeding 8 bytes). Since Classic CAN is physically restricted to 8 data bytes per frame, CAN-TP is necessary to handle segmenting, flow control, sequence tracking, and reassembling larger payloads."
+      },
+      {
+        id: "QA-37",
+        domain: "CAN-TP",
+        difficulty: "Medium",
+        question: "Describe the four CAN-TP frame types and their Protocol Data Unit (PDU) structures.",
+        answer: "1) <strong>Single Frame (SF):</strong> Used for payloads up to 7 bytes (Classic CAN). Byte 0 high nibble is 0x0, low nibble is Data Length. 2) <strong>First Frame (FF):</strong> Sent at the beginning of a segmented transfer. Byte 0-1 high nibble is 0x1, containing a 12-bit total data length. 3) <strong>Consecutive Frame (CF):</strong> Carries segmented data payload. Byte 0 high nibble is 0x2, low nibble is a 4-bit Sequence Number (0-15). 4) <strong>Flow Control (FC):</strong> Controls transmission rates. Byte 0 is 0x3, Byte 1 is Flow Status, Byte 2 is Block Size, and Byte 3 is STmin."
+      },
+      {
+        id: "QA-38",
+        domain: "CAN-TP",
+        difficulty: "Medium",
+        question: "Explain the roles of Block Size (BS) and Separation Time minimum (STmin) in Flow Control frames.",
+        answer: "<strong>Block Size (BS):</strong> The maximum number of Consecutive Frames (CF) the receiver allows the sender to transmit before waiting for the next Flow Control frame. A BS of 0 means the sender can transmit all remaining CFs without another FC. <strong>Separation Time (STmin):</strong> The minimum delay the sender must observe between the end of one CF and the start of the next CF. It protects the receiver from buffer overflow."
+      },
+      {
+        id: "QA-39",
+        domain: "CAN-TP",
+        difficulty: "Hard",
+        question: "How are STmin values encoded in Flow Control frames for milliseconds and microseconds?",
+        answer: "STmin values are encoded in the third byte of the Flow Control frame: 1) Values <code>0x00 to 0x7F</code> represent 0 to 127 milliseconds. 2) Values <code>0xF1 to 0xF9</code> represent 100 to 900 microseconds (specifically, <code>(Value - 0xF0) * 100</code> microseconds). Other values are reserved or default to 127 milliseconds."
+      },
+      {
+        id: "QA-40",
+        domain: "CAN-TP",
+        difficulty: "Easy",
+        question: "What behavior must the sender execute if the receiver sends a Flow Control frame with STmin set to 0?",
+        answer: "If STmin is set to 0x00, the sender is allowed to transmit Consecutive Frames as fast as the physical CAN bus controller and arbitration allow. The sender does not inject any deliberate delays between consecutive frames."
+      },
+      {
+        id: "QA-41",
+        domain: "CAN-TP",
+        difficulty: "Hard",
+        question: "Summarize the primary timing parameters (N_As, N_Ar, N_Bs, N_Cs, N_Br, N_Cr) defined in ISO 15765-2.",
+        answer: "These are protocol layer timeout limits: <code>N_As</code>: Time for sender to transmit a frame at the physical layer. <code>N_Ar</code>: Time for receiver to transmit a frame. <code>N_Bs</code>: Timeout for sender waiting for a Flow Control frame after sending FF. <code>N_Cs</code>: Delay between CFs (STmin). <code>N_Br</code>: Time for receiver to prepare Flow Control frame. <code>N_Cr</code>: Timeout for receiver waiting for the next Consecutive Frame."
+      },
+      {
+        id: "QA-42",
+        domain: "CAN-TP",
+        difficulty: "Medium",
+        question: "What is the standard value of the N_Bs timeout, and what does a timeout indicate?",
+        answer: "The standard timeout limit for N_Bs is 1000 milliseconds. If the sender transmits a First Frame (FF) but does not receive a Flow Control (FC) frame from the target receiver within 1000ms, a timeout error is triggered, the session is aborted, and the network layer reports a transmission failure."
+      },
+      {
+        id: "QA-43",
+        domain: "CAN-TP",
+        difficulty: "Medium",
+        question: "What is the standard value of the N_Cr timeout, and what happens when it expires?",
+        answer: "The standard value for N_Cr is 1000 milliseconds. If the receiver is expecting a Consecutive Frame (CF) but does not receive it from the sender within 1000ms, the receiver triggers an N_Cr timeout, aborts the segmented transfer, discards the partial buffer, and returns to an idle state."
+      },
+      {
+        id: "QA-44",
+        domain: "CAN-TP",
+        difficulty: "Easy",
+        question: "What are the three valid values for the Flow Status (FS) parameter in a Flow Control frame?",
+        answer: "1) <code>FS = 0 (Clear To Send / CTS)</code>: The sender is authorized to transmit Consecutive Frames. 2) <code>FS = 1 (Wait / WT)</code>: The receiver is busy; the sender must suspend transmission and reset its N_Bs timer. 3) <code>FS = 2 (Overflow / OVRFLW)</code>: The receiver buffer is full; the sender must abort transmission immediately."
+      },
+      {
+        id: "QA-45",
+        domain: "CAN-TP",
+        difficulty: "Hard",
+        question: "How is a Single Frame (SF) formatted differently in CAN FD compared to Classic CAN?",
+        answer: "In Classic CAN, a Single Frame payload is at most 7 bytes, and the first byte designates length (0x0F). In CAN FD (which supports up to 64 bytes), a Single Frame can carry up to 62 bytes. If the payload is &lt;= 7 bytes, the Classic format is used. If the payload is between 8 and 62 bytes, the first byte is set to 0x00 (escape code), and the second byte is used to store the 8-bit Data Length."
+      },
+      {
+        id: "QA-46",
+        domain: "CAN-TP",
+        difficulty: "Medium",
+        question: "How does CAN-TP handle functional addressing vs physical addressing?",
+        answer: "<strong>Physical Addressing:</strong> Represents a point-to-point connection (one tester to one specific ECU, e.g., Request ID 0x18DA10F1). Segmented transfers are allowed. <strong>Functional Addressing:</strong> Represents a broadcast (tester to all ECUs, e.g., Request ID 0x18DB33F1). Because multiple ECUs cannot send Flow Control frames simultaneously without bus conflicts, functional addressing is restricted to Single Frame (SF) transmissions only."
+      },
+      {
+        id: "QA-47",
+        domain: "CAN-TP",
+        difficulty: "Medium",
+        question: "What action must a sender take if it receives a Flow Control frame with Flow Status = Wait (1)?",
+        answer: "The sender must stop sending Consecutive Frames, keep the communication active, reset its N_Bs timer, and wait for a subsequent Flow Control frame with Clear To Send (0) status. A receiver can send multiple consecutive 'Wait' frames up to standard limit thresholds."
+      },
+      {
+        id: "QA-48",
+        domain: "CAN-TP",
+        difficulty: "Hard",
+        question: "What is the maximum data length that can be transmitted using the ISO 15765-2 protocol?",
+        answer: "Under the older ISO 15765-2 standard, the First Frame specifies length in a 12-bit field, limiting transmissions to 4,095 bytes. The updated standard introduces an extended length format where the 12-bit length field is set to 0, and an additional 32-bit field is used to declare length, enabling payloads up to 4,294,967,295 bytes (4 GB)."
+      },
+      {
+        id: "QA-49",
+        domain: "CAN-TP",
+        difficulty: "Easy",
+        question: "What happens if a CAN-TP receiver detects a Sequence Number (SN) mismatch in a Consecutive Frame?",
+        answer: "Each Consecutive Frame (CF) contains a 4-bit Sequence Number in the low nibble of the header byte, incremented from 1 to 15, wrapping around to 0. If the receiver detects a missing or out-of-order sequence number (e.g. receiving SN 3 when expecting SN 2), it must immediately abort the transmission, discard the buffer, and report a sequence error to the application layer."
+      },
+      {
+        id: "QA-50",
+        domain: "CAN-TP",
+        difficulty: "Hard",
+        question: "How does a standard CAN-TP network layer handle concurrent diagnostic requests?",
+        answer: "By default, CAN-TP diagnostic connections are half-duplex per diagnostic session. An ECU has separate Rx and Tx buffers. While a tester is transmitting an upload request, the ECU CAN-TP layer must wait until the request is fully received and reassembled before it can initiate a response transmission. Concurrent requests on different physical connections must be routed to isolated protocol channels."
+      },
+
+      // === UDS PROTOCOL (20 Qs) ===
+      {
+        id: "QA-51",
+        domain: "UDS",
+        difficulty: "Easy",
+        question: "What is Unified Diagnostic Services (UDS) and what does ISO 14229 define?",
+        answer: "UDS (Unified Diagnostic Services) is a standardized automotive diagnostic protocol operating at the Application Layer (OSI Layer 7), defined under ISO 14229. It establishes a unified set of diagnostic services (functions like reading DTCs, flashing software, writing configurations) that run on top of physical networks like CAN, LIN, FlexRay, or Ethernet (DoIP)."
+      },
+      {
+        id: "QA-52",
+        domain: "UDS",
+        difficulty: "Medium",
+        question: "What is the difference between a Diagnostic Session (0x10) and Security Access (0x27) in UDS?",
+        answer: "<strong>Diagnostic Session (0x10):</strong> Manages the general operational state of the ECU's diagnostic server (e.g. Default, Extended, or Programming). <strong>Security Access (0x27):</strong> Restricts access to sensitive services within those sessions (e.g., code flashing, calibration writing). An ECU can be in the Extended session but remain 'Locked' until a Seed-Key hand-shake is successfully executed."
+      },
+      {
+        id: "QA-53",
+        domain: "UDS",
+        difficulty: "Easy",
+        question: "Explain the steps of the Seed-Key security unlock sequence (UDS Service 0x27).",
+        answer: "1) The Tester sends a Request Seed frame (e.g., <code>27 01</code>). 2) The ECU returns a positive response containing a seed value (e.g., <code>67 01 AB CD</code>). 3) The Tester runs a proprietary cryptographic algorithm on this seed to calculate a key. 4) The Tester sends this key back to the ECU (e.g., <code>27 02 XX YY</code>). 5) The ECU runs the same algorithm internally. If the tester's key matches, the ECU responds with <code>67 02</code> (Security Unlocked)."
+      },
+      {
+        id: "QA-54",
+        domain: "UDS",
+        difficulty: "Easy",
+        question: "List the standard diagnostic session types defined in UDS (Service 0x10).",
+        answer: "1) <code>0x01 - Default Session</code>: The default boot state. 2) <code>0x02 - Programming Session</code>: Used for ECU software flashing. 3) <code>0x03 - Extended Diagnostic Session</code>: Enables diagnostic functions like writing parameters and starting routines. 4) <code>0x04 - Safety System Diagnostic Session</code>: Reserved for safety-critical component diagnostics."
+      },
+      {
+        id: "QA-55",
+        domain: "UDS",
+        difficulty: "Medium",
+        question: "What is the purpose of Tester Present (Service 0x3E) and what happens when it is missing?",
+        answer: "When an ECU is transitioned into a non-default session (Extended or Programming), it starts a S3Server timer (typically 5000ms). If no diagnostic requests are received before this timer expires, the ECU automatically resets to the Default session and relocks security. Tester Present (0x3E) is a periodic keep-alive message sent by the tester (typically every 2000ms) to reset this timer and keep the session active."
+      },
+      {
+        id: "QA-56",
+        domain: "UDS",
+        difficulty: "Easy",
+        question: "What is the exact frame structure of a UDS Negative Response?",
+        answer: "A UDS Negative Response always consists of exactly 3 bytes: 1) Byte 0: Negative Response SID (always <code>0x7F</code>). 2) Byte 1: The service ID of the failed request (e.g., <code>0x22</code>). 3) Byte 2: The Negative Response Code (NRC) indicating the failure reason (e.g., <code>0x33</code> for Security Access Denied). Total frame: <code>7F 22 33</code>."
+      },
+      {
+        id: "QA-57",
+        domain: "UDS",
+        difficulty: "Medium",
+        question: "Identify five common UDS Negative Response Codes (NRCs) and their meanings.",
+        answer: "1) <code>0x11</code>: ServiceNotSupported (the ECU does not support this SID). 2) <code>0x12</code>: SubfunctionNotSupported (the service exists, but the sub-function is invalid). 3) <code>0x22</code>: ConditionsNotCorrect (rejected because physical conditions, like engine running or speed, are not met). 4) <code>0x31</code>: RequestOutOfRange (DID does not exist or payload size is invalid). 5) <code>0x33</code>: SecurityAccessDenied."
+      },
+      {
+        id: "QA-58",
+        domain: "UDS",
+        difficulty: "Hard",
+        question: "Explain NRC 0x78 (RequestCorrectlyReceived-ResponsePending) and its impact on timing parameters.",
+        answer: "NRC 0x78 is returned by the ECU when a requested service (like routine self-test or memory erase) takes longer to process than the P2Server timeout. Sending NRC 0x78 tells the tester the request was received correctly and is processing. It halts the tester's standard P2 timeout and activates the extended P2*Server timeout limit (typically 5000ms), giving the ECU time to complete the work without triggering a communication failure."
+      },
+      {
+        id: "QA-59",
+        domain: "UDS",
+        difficulty: "Medium",
+        question: "How is a Diagnostic Trouble Code (DTC) structured in UDS?",
+        answer: "A DTC is represented by 3 bytes: 1) High Byte (defines the system domain: Body, Chassis, Powertrain, Network), 2) Middle Byte (defines the specific component/system), 3) Low Byte (defines the failure type: short circuit, open circuit, signal out of range). It is accompanied by a 1-byte DTC Status indicator (which tracks active, pending, or historical status)."
+      },
+      {
+        id: "QA-60",
+        domain: "UDS",
+        difficulty: "Hard",
+        question: "What are the common sub-functions of ReadDTCInformation (Service 0x19)?",
+        answer: "Common sub-functions include: <code>0x01 - reportNumberOfDTCByStatusMask</code> (counts matching DTCs), <code>0x02 - reportDTCByStatusMask</code> (retrieves active/historical DTCs), <code>0x04 - reportDTCSnapshotRecordByDTCNumber</code> (reads frozen sensor data captured when the DTC occurred), and <code>0x06 - reportDTCExtendedDataRecordByDTCNumber</code> (reads occurrence counters and aging status)."
+      },
+      {
+        id: "QA-61",
+        domain: "UDS",
+        difficulty: "Easy",
+        question: "Differentiate between Service 0x22 (RDBI) and Service 0x2E (WDBI).",
+        answer: "<strong>Service 0x22 (Read Data By Identifier):</strong> Used to request data values corresponding to specific Data Identifiers (DIDs) in ECU memory (e.g. Read VIN <code>22 F1 90</code>). <strong>Service 0x2E (Write Data By Identifier):</strong> Used to write configuration data, calibration values, or custom variables to a specific DID location (e.g. Write config <code>2E F0 11 XX YY</code>)."
+      },
+      {
+        id: "QA-62",
+        domain: "UDS",
+        difficulty: "Easy",
+        question: "List the sub-functions of RoutineControl (Service 0x31) and their functions.",
+        answer: "Service 0x31 supports three sub-functions: 1) <code>0x01 - startRoutine</code>: Triggers the execution of an internal ECU routine (e.g. self-test). 2) <code>0x02 - stopRoutine</code>: Aborts a running routine. 3) <code>0x03 - requestRoutineResults</code>: Requests output status data from the executed routine."
+      },
+      {
+        id: "QA-63",
+        domain: "UDS",
+        difficulty: "Hard",
+        question: "Outline the standard sequence of UDS services required to flash/reprogram an ECU.",
+        answer: "1) Enter Extended Session (<code>10 03</code>). 2) Request Security (<code>27 01</code>) and Unlock (<code>27 02</code>). 3) Stop normal communication (<code>28 03 01</code>) and disable DTCs (<code>85 02</code>). 4) Transition to Programming Session (<code>10 02</code>). 5) Erase flash memory via Routine Control (<code>31 01 FF 01</code>). 6) Request Download (<code>34</code>). 7) Transfer flash bytes (<code>36</code>). 8) Exit transfer (<code>37</code>). 9) Verify CRC checksum (<code>31 01 FF 02</code>). 10) Execute ECU Reset (<code>11 01</code>)."
+      },
+      {
+        id: "QA-64",
+        domain: "UDS",
+        difficulty: "Hard",
+        question: "What parameters are sent in a RequestDownload (Service 0x34) request?",
+        answer: "The tester transmits: 1) DataFormatIdentifier (specifies compression and encryption parameters, usually 0x00 for uncompressed/unencrypted), 2) AddressAndLengthFormatIdentifier (defines the byte size of memoryAddress and memorySize parameters), 3) MemoryAddress (target start address in ECU flash memory), and 4) MemorySize (total size of the file to download)."
+      },
+      {
+        id: "QA-65",
+        domain: "UDS",
+        difficulty: "Medium",
+        question: "How do Service 0x36 (TransferData) and Service 0x37 (RequestTransferExit) operate during reprogramming?",
+        answer: "<strong>Service 0x36:</strong> Actually transmits the firmware binary data block-by-block. The first parameter is a blockSequenceCounter (starts at 1, increments and rolls over 0-255). <strong>Service 0x37:</strong> Sent by the tester when all blocks have been transmitted. It signals the ECU that the file transfer is complete, triggering integrity verification."
+      },
+      {
+        id: "QA-66",
+        domain: "UDS",
+        difficulty: "Medium",
+        question: "Explain the difference between a Hard Reset, Soft Reset, and Key Off-On Reset in Service 0x11.",
+        answer: "1) <strong>Hard Reset (0x01):</strong> Simulates a physical power cycle, causing the ECU hardware to perform a complete boot cycle. 2) <strong>Soft Reset (0x03):</strong> Restarts the ECU software application layer without power cycle. 3) <strong>Key Off-On Reset (0x02):</strong> Simulates the ignition cycle, writing parameters to EEPROM and resetting network links."
+      },
+      {
+        id: "QA-67",
+        domain: "UDS",
+        difficulty: "Easy",
+        question: "What is the purpose of UDS Service 0x85 (ControlDTCSetting)?",
+        answer: "During ECU programming or diagnostic calibrations, some communication channels may be disabled or simulated. This would normally cause other ECUs on the bus to throw DTCs. Sending Service 0x85 with sub-function <code>0x02 (off)</code> disables DTC logging in target ECUs, preventing false error records."
+      },
+      {
+        id: "QA-68",
+        domain: "UDS",
+        difficulty: "Medium",
+        question: "Why is UDS Service 0x28 (CommunicationControl) used before executing software updates?",
+        answer: "ECU flashing requires high data throughput. Normal operation sends periodic frame data (like vehicle speed, temperatures) that consume bus bandwidth. Service 0x28 is used with subfunction <code>0x03 (disableRxAndTx)</code> to disable normal application communication while keeping diagnostic communication active, maximizing bandwidth for flashing."
+      },
+      {
+        id: "QA-69",
+        domain: "UDS",
+        difficulty: "Medium",
+        question: "What is functional request vs physical response DTC reading?",
+        answer: "A tester sends a functional request to broadcast ID <code>0x18DB33F1</code> asking all ECUs on the bus to report their DTCs or status. Each individual ECU that matches must respond physically using its own unique physical response ID (e.g. Engine ECU at <code>0x18DAF110</code>, Brake ECU at <code>0x18DAF111</code>) to prevent data overlapping."
+      },
+      {
+        id: "QA-70",
+        domain: "UDS",
+        difficulty: "Easy",
+        question: "How is a positive response SID calculated in UDS?",
+        answer: "The ECU calculates the positive response SID by adding <code>0x40</code> to the request's Service Identifier (SID). For example, a request for Diagnostic Session Control (SID <code>0x10</code>) receives a positive response SID of <code>0x50</code>. Request Read Data (SID <code>0x22</code>) receives response SID <code>0x62</code>."
+      }
+    ];
+
+    // Application State Variables
+    let bookmarkedItems = JSON.parse(localStorage.getItem('bookmarks')) || [];
+    let completedModules = JSON.parse(localStorage.getItem('completedModules')) || [];
+    let completedQuestions = JSON.parse(localStorage.getItem('completedQuestions')) || [];
+
+    // DOM Setup
+    document.addEventListener("DOMContentLoaded", () => {
+      lucide.createIcons();
+      renderUdsServices();
+      renderQA();
+      renderCheatSheets();
+      updateOverallProgress();
+      updateBookmarkBadge();
+      updateProgressIndicators();
+      restoreSavedBookmarksUI();
+
+      // Show back to top button on scroll
+      window.addEventListener('scroll', () => {
+        const topBtn = document.getElementById('back-to-top');
+        if (window.scrollY > 500) {
+          topBtn.style.transform = 'scale(1)';
+        } else {
+          topBtn.style.transform = 'scale(0)';
+        }
+      });
+    });
+
+    // Theme Selector
+    function toggleTheme() {
+      const htmlEl = document.documentElement;
+      const currentTheme = htmlEl.getAttribute('data-theme');
+      const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      htmlEl.setAttribute('data-theme', nextTheme);
+
+      document.getElementById('theme-icon-sun').style.display = nextTheme === 'dark' ? 'block' : 'none';
+      document.getElementById('theme-icon-moon').style.display = nextTheme === 'dark' ? 'none' : 'block';
+    }
+
+    // Toggle Sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById('app-sidebar');
+      sidebar.classList.toggle('open');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar.classList.contains('open')) {
+        overlay.classList.add('active');
+      } else {
+        overlay.classList.remove('active');
+      }
+    }
+
+    function toggleFolder(headerEl) {
+      headerEl.classList.toggle('collapsed');
+      const body = headerEl.nextElementSibling;
+      body.classList.toggle('collapsed');
+    }
+
+    function highlightSidebar(linkEl) {
+      document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+      linkEl.classList.add('active');
+
+      if (window.innerWidth <= 1024) {
+        document.getElementById('app-sidebar').classList.remove('open');
+        document.getElementById('sidebar-overlay').classList.remove('active');
+      }
+    }
+
+    // Jump to section in mobile bottom navigation
+    function jumpToSectionMobile(sectionId) {
+      const el = document.getElementById(sectionId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+
+        // Highlight active tab
+        document.querySelectorAll('.bottom-nav-item').forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+      }
+    }
+
+    // Rendering dynamic sections
+    let activeUdsTab = "0x10";
+    function renderUdsServices() {
+      const tabs = document.getElementById('uds-service-tabs');
+      const keys = Object.keys(UDS_SERVICES_DB);
+      tabs.innerHTML = keys.map(k => `
+        <button class="tab-btn ${k === activeUdsTab ? 'active' : ''}" onclick="selectUdsTab('${k}')">${k}</button>
+      `).join('');
+      renderUdsDetail();
+    }
+
+    function selectUdsTab(key) {
+      activeUdsTab = key;
+      renderUdsServices();
+    }
+
+    function renderUdsDetail() {
+      const data = UDS_SERVICES_DB[activeUdsTab];
+      const container = document.getElementById('uds-service-detail-card');
+      container.innerHTML = `
+        <div class="card-header">
+          <span class="card-tag">UDS Service: ${activeUdsTab}</span>
+          <button class="bookmark-toggle-btn" onclick="toggleBookmark(event, 'uds-${activeUdsTab}', '${data.title}', 'UDS Diagnostics')">
+            <i data-lucide="bookmark"></i>
+          </button>
+        </div>
+        <h3 class="card-title">${data.title}</h3>
+        <div class="card-description">
+          <p style="margin-bottom:0.75rem;"><strong>Purpose:</strong> ${data.purpose}</p>
+          <p style="margin-bottom:0.75rem;"><strong>Request Format:</strong> <code>${data.req}</code></p>
+          <p style="margin-bottom:0.75rem;"><strong>Positive Response:</strong> <code>${data.resp}</code></p>
+          <p style="margin-bottom:0.75rem;"><strong>Automotive Example:</strong> ${data.example}</p>
+          <div style="margin-bottom:0.75rem;">
+            <p style="margin-bottom:0.25rem;"><strong>Trace Log:</strong></p>
+            <pre><code>${data.trace}</code></pre>
+          </div>
+          
+          <div style="background:var(--bg-tertiary); padding:1rem; border-radius:8px; border-left:3px solid var(--accent); margin-top:1rem;">
+            <p style="font-weight:700; color:var(--accent); font-size:0.85rem; text-transform:uppercase; margin-bottom:0.25rem;">Interview Question</p>
+            <p style="font-size:0.95rem; font-style:italic;">${data.q}</p>
+          </div>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function selectOSILayer(key) {
+      const data = OSI_LAYERS_DB[key];
+      if (!data) return;
+
+      document.getElementById('osi-panel-title').innerText = data.title;
+      document.getElementById('osi-panel-content').innerHTML = `
+        <p><strong>Purpose:</strong> ${data.purpose}</p>
+        <br>
+        <p><strong>Protocol Mapping:</strong> ${data.protocol}</p>
+        <br>
+        <div class="trace-block">
+          <p style="margin-bottom:0.25rem;"><strong>Automotive Frame Trace:</strong></p>
+          <pre><code>${data.flow}</code></pre>
+        </div>
+      `;
+
+      document.querySelectorAll('#osi-model .stack-layer').forEach(el => {
+        el.classList.remove('active');
+        if (el.textContent.includes(data.title.split(' ')[0])) {
+          el.classList.add('active');
+        }
+      });
+    }
+
+    // Rendering Cheat Sheets
+    function renderCheatSheets() {
+      const container = document.getElementById('cheat-sheets-container');
+      container.innerHTML = CHEAT_SHEETS_DATA.map(cs => `
+        <div class="cheat-sheet-card">
+          <h3 class="cheat-sheet-title">${cs.title}</h3>
+          <ul class="cheat-sheet-list">
+            ${cs.items.map(item => `
+              <li><strong>${item.label}:</strong> <span>${item.val}</span></li>
+            `).join('')}
+          </ul>
+        </div>
+      `).join('');
+    }
+
+    // Toggle card details
+    function toggleCardExpand(btn) {
+      const card = btn.closest('.expandable-card');
+      card.classList.toggle('expanded');
+      const body = card.querySelector('.card-body');
+      if (card.classList.contains('expanded')) {
+        body.style.maxHeight = body.scrollHeight + "px";
+        btn.querySelector('span').innerText = "Hide Details";
+      } else {
+        body.style.maxHeight = "0";
+        btn.querySelector('span').innerText = "View Details";
+      }
+    }
+
+    // Render Q&A List
+    function renderQA() {
+      const container = document.getElementById('qa-output-container');
+      if (!container) return;
+      
+      container.innerHTML = INTERVIEW_QA_DATABASE.map(q => {
+        const isCompleted = completedQuestions.includes(q.id);
+        const isBookmarked = bookmarkedItems.some(b => b.id === q.id);
+        const domainClass = q.domain.toLowerCase().replace(' ', '-');
+        const difficultyClass = q.difficulty.toLowerCase();
+
+        return `
+          <div class="qa-card" id="qa-card-${q.id}" data-domain="${q.domain}" data-difficulty="${q.difficulty}">
+            <div class="qa-header">
+              <div class="qa-meta">
+                <div class="tc-checkbox ${isCompleted ? 'completed' : ''}" onclick="toggleQAComplete(event, '${q.id}')"></div>
+                <span class="tc-id" style="font-size:0.9rem;">${q.id}</span>
+                <span class="tc-domain-badge ${domainClass}">${q.domain}</span>
+                <span class="qa-difficulty ${difficultyClass}">${q.difficulty}</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.5rem;">
+                <button class="bookmark-toggle-btn ${isBookmarked ? 'active' : ''}" onclick="toggleBookmark(event, '${q.id}', '${q.id}: ${q.question.substring(0, 30)}...', 'Interview Prep')">
+                  <i data-lucide="bookmark" style="width:16px;"></i>
+                </button>
+              </div>
+            </div>
+            <div class="qa-question" onclick="toggleQAAnswer('${q.id}')" style="cursor:pointer; display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
+              <span>${q.question}</span>
+              <i data-lucide="chevron-down" class="qa-chevron" style="width:18px; height:18px; flex-shrink:0; transition: transform 0.2s; color:var(--text-muted);"></i>
+            </div>
+            <div class="qa-answer">
+              ${q.answer}
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function toggleQAAnswer(id) {
+      const card = document.getElementById(`qa-card-${id}`);
+      if (!card) return;
+      card.classList.toggle('revealed');
+      const chevron = card.querySelector('.qa-chevron');
+      if (chevron) {
+        if (card.classList.contains('revealed')) {
+          chevron.style.transform = 'rotate(180deg)';
+        } else {
+          chevron.style.transform = 'rotate(0deg)';
+        }
+      }
+    }
+
+    function toggleQAComplete(event, id) {
+      event.stopPropagation();
+      const checkbox = event.currentTarget;
+      checkbox.classList.toggle('completed');
+
+      if (checkbox.classList.contains('completed')) {
+        if (!completedQuestions.includes(id)) completedQuestions.push(id);
+      } else {
+        completedQuestions = completedQuestions.filter(item => item !== id);
+      }
+      localStorage.setItem('completedQuestions', JSON.stringify(completedQuestions));
+      updateOverallProgress();
+    }
+
+    function filterQA() {
+      const domainFilter = document.getElementById('filter-qa-domain').value;
+      const difficultyFilter = document.getElementById('filter-qa-difficulty').value;
+      const progressFilter = document.getElementById('filter-qa-progress').value;
+      const searchVal = document.getElementById('search-qa').value.toLowerCase();
+
+      document.querySelectorAll('.qa-card').forEach(el => {
+        const id = el.id.replace('qa-card-', '');
+        const domain = el.getAttribute('data-domain');
+        const difficulty = el.getAttribute('data-difficulty');
+        const isCompleted = completedQuestions.includes(id);
+        const isBookmarked = bookmarkedItems.some(b => b.id === id);
+
+        const matchesDomain = domainFilter === "all" || domain === domainFilter;
+        const matchesDifficulty = difficultyFilter === "all" || difficulty === difficultyFilter;
+
+        let matchesProgress = true;
+        if (progressFilter === "completed") matchesProgress = isCompleted;
+        else if (progressFilter === "uncompleted") matchesProgress = !isCompleted;
+        else if (progressFilter === "bookmarked") matchesProgress = isBookmarked;
+
+        const textContent = el.textContent.toLowerCase();
+        const matchesSearch = textContent.includes(searchVal);
+
+        if (matchesDomain && matchesDifficulty && matchesProgress && matchesSearch) {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+    }
+
+    let allRevealed = false;
+    function revealAllQA() {
+      allRevealed = !allRevealed;
+      document.querySelectorAll('.qa-card').forEach(card => {
+        const chevron = card.querySelector('.qa-chevron');
+        if (allRevealed) {
+          card.classList.add('revealed');
+          if (chevron) chevron.style.transform = 'rotate(180deg)';
+        } else {
+          card.classList.remove('revealed');
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+      });
+    }
+
+    function exportQAData() {
+      let output = "AUTO-X: Advanced Automotive Protocol Mastery - Technical Q&A Study Guide\n";
+      output += "=========================================================================\n\n";
+
+      INTERVIEW_QA_DATABASE.forEach(q => {
+        output += `[${q.id}] Domain: ${q.domain} | Difficulty: ${q.difficulty}\n`;
+        output += `Question: ${q.question}\n`;
+        // Strip HTML tags and entities
+        const cleanAns = q.answer.replace(/<[^>]*>/g, '').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        output += `Answer:\n${cleanAns}\n`;
+        output += "-------------------------------------------------------------------------\n\n";
+      });
+
+      const blob = new Blob([output], { type: "text/plain;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "AUTO_X_Interview_Questions_Export.txt");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Global search across sections
+    function handleGlobalSearch() {
+      const query = document.getElementById('global-search').value.toLowerCase() ||
+        document.getElementById('mobile-search').value.toLowerCase();
+
+      if (!query.trim()) {
+        document.querySelectorAll('.section-block').forEach(el => el.style.display = 'block');
+        return;
+      }
+
+      document.querySelectorAll('.section-block').forEach(el => {
+        const title = el.querySelector('.section-title').textContent.toLowerCase();
+        const content = el.textContent.toLowerCase();
+        if (title.includes(query) || content.includes(query)) {
+          el.style.display = 'block';
+        } else {
+          el.style.display = 'none';
+        }
+      });
+    }
+
+    // Bookmark management
+    function toggleBookmark(event, id, label, section) {
+      event.stopPropagation();
+      const btn = event.currentTarget;
+      btn.classList.toggle('active');
+
+      const existingIndex = bookmarkedItems.findIndex(b => b.id === id);
+      if (existingIndex > -1) {
+        bookmarkedItems.splice(existingIndex, 1);
+        btn.classList.remove('active');
+      } else {
+        bookmarkedItems.push({ id, label, section });
+        btn.classList.add('active');
+      }
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarkedItems));
+      updateBookmarkBadge();
+      renderBookmarksDrawerList();
+    }
+
+    function toggleBookmarksDrawer() {
+      document.getElementById('bookmarks-wrapper').classList.toggle('open');
+      renderBookmarksDrawerList();
+    }
+
+    function updateBookmarkBadge() {
+      const badge = document.getElementById('bookmark-badge');
+      if (bookmarkedItems.length > 0) {
+        badge.innerText = bookmarkedItems.length;
+        badge.style.visibility = 'visible';
+      } else {
+        badge.style.visibility = 'hidden';
+      }
+    }
+
+    function renderBookmarksDrawerList() {
+      const container = document.getElementById('bookmark-list-container');
+      if (bookmarkedItems.length === 0) {
+        container.innerHTML = `<p style="color:var(--text-muted); font-size:0.9rem; text-align:center; margin-top:2rem;">No bookmarks saved yet.</p>`;
+        return;
+      }
+      container.innerHTML = bookmarkedItems.map(b => `
+        <div class="bookmark-list-item">
+          <button class="remove-bookmark-btn" onclick="removeBookmarkDirectly('${b.id}')"><i data-lucide="trash-2" style="width:14px; height:14px;"></i></button>
+          <div style="font-size:0.85rem; font-weight:600; padding-right:1.5rem;">${b.label}</div>
+          <div style="font-size:0.75rem; color:var(--text-muted);">Section: ${b.section}</div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function removeBookmarkDirectly(id) {
+      bookmarkedItems = bookmarkedItems.filter(b => b.id !== id);
+      localStorage.setItem('bookmarks', JSON.stringify(bookmarkedItems));
+
+      const btn = document.querySelector(`#tc-card-${id} .bookmark-toggle-btn`) ||
+        document.querySelector(`#qa-card-${id} .bookmark-toggle-btn`) ||
+        document.querySelector(`#${id} .bookmark-toggle-btn`);
+      if (btn) btn.classList.remove('active');
+
+      updateBookmarkBadge();
+      renderBookmarksDrawerList();
+    }
+
+    function restoreSavedBookmarksUI() {
+      bookmarkedItems.forEach(b => {
+        const btn = document.querySelector(`#tc-card-${b.id} .bookmark-toggle-btn`) ||
+          document.querySelector(`#qa-card-${b.id} .bookmark-toggle-btn`) ||
+          document.querySelector(`#${b.id} .bookmark-toggle-btn`);
+        if (btn) btn.classList.add('active');
+      });
+    }
+
+    // Progress Indicators
+    function toggleProgress(event, sectionId) {
+      event.preventDefault();
+      event.stopPropagation();
+      const box = event.currentTarget;
+      box.classList.toggle('checked');
+
+      if (box.classList.contains('checked')) {
+        if (!completedModules.includes(sectionId)) completedModules.push(sectionId);
+      } else {
+        completedModules = completedModules.filter(m => m !== sectionId);
+      }
+      localStorage.setItem('completedModules', JSON.stringify(completedModules));
+      updateOverallProgress();
+    }
+
+    function updateProgressIndicators() {
+      document.querySelectorAll('.sidebar-checkbox').forEach(box => {
+        const href = box.closest('.sidebar-link').getAttribute('href').substring(1);
+        if (completedModules.includes(href)) box.classList.add('checked');
+      });
+    }
+
+    function updateOverallProgress() {
+      const total = 14 + 70; // 14 sections + 70 Q&As
+      const done = completedModules.length + completedQuestions.length;
+      const pct = Math.round((done / total) * 100);
+
+      document.getElementById('overall-progress-bar').style.width = pct + "%";
+      document.getElementById('overall-progress-percentage').innerText = pct + "%";
+    }
+
+
+    // Lab Simulators: 1. CAN Arbitration Simulator
+    let arbBitIndex = 0;
+    let arbIds = [];
+    let arbState = [];
+
+    function startArbitrationSim() {
+      const idA = parseInt(document.getElementById('sim-id-a').value, 16);
+      const idB = parseInt(document.getElementById('sim-id-b').value, 16);
+      const idC = parseInt(document.getElementById('sim-id-c').value, 16);
+
+      if (isNaN(idA) || isNaN(idB) || isNaN(idC)) {
+        alert("Please enter valid Hex identifiers (0x0 to 0x7FF).");
+        return;
+      }
+
+      arbIds = [
+        { name: "Node A", id: idA, bin: idA.toString(2).padStart(11, '0'), active: true },
+        { name: "Node B", id: idB, bin: idB.toString(2).padStart(11, '0'), active: true },
+        { name: "Node C", id: idC, bin: idC.toString(2).padStart(11, '0'), active: true }
+      ];
+
+      arbBitIndex = 0;
+      document.getElementById('arbitration-console').innerHTML = "[System] Arbitration initialized. Step through bits MSB (Bit 10) to LSB (Bit 0).<br>";
+      renderArbitrationBitArena();
+    }
+
+    function renderArbitrationBitArena() {
+      const container = document.getElementById('arbitration-arena');
+
+      let html = `<div style="display:flex; flex-direction:column; gap:0.5rem;">`;
+      arbIds.forEach(node => {
+        html += `<div style="display:flex; align-items:center; gap:1rem;">
+          <strong style="width:70px;">${node.name}:</strong>
+          <span style="font-family:monospace; font-size:1.1rem; color: ${node.active ? 'var(--text-primary)' : 'var(--text-muted)'};">
+        `;
+
+        for (let idx = 0; idx < 11; idx++) {
+          const bitVal = node.bin[idx];
+          const isCurrent = idx === arbBitIndex;
+          const statusClass = bitVal === '0' ? 'dominant' : 'recessive';
+          const activeClass = isCurrent ? 'active-bit' : '';
+
+          html += `<span class="bit-cell ${statusClass} ${activeClass}" style="display:inline-flex; width:30px; height:34px; margin-right:3px;">
+            <span class="bit-val">${bitVal}</span>
+          </span>`;
+        }
+
+        html += `</span>
+          <span class="card-tag" style="background:${node.active ? 'rgba(16,185,129,0.1)' : 'rgba(239,68,68,0.1)'}; color:${node.active ? 'var(--success)' : 'var(--danger)'};">
+            ${node.active ? "Transmitting" : "Lost Arbitration"}
+          </span>
+        </div>`;
+      });
+      html += `</div>`;
+      container.innerHTML = html;
+    }
+
+    function stepArbitrationSim() {
+      if (arbIds.length === 0 || arbBitIndex >= 11) {
+        document.getElementById('arbitration-console').innerHTML += "[System] Simulation complete or not initialized. Reset to start again.<br>";
+        return;
+      }
+
+      // Check dominant bit presence at current bit index
+      let dominantPresent = false;
+      arbIds.forEach(node => {
+        if (node.active && node.bin[arbBitIndex] === '0') {
+          dominantPresent = true;
+        }
+      });
+
+      const consoleLog = document.getElementById('arbitration-console');
+      consoleLog.innerHTML += `[Bit ${10 - arbBitIndex}] Processing... `;
+
+      // Deactivate nodes outputting recessive (1) when dominant (0) is present
+      arbIds.forEach(node => {
+        if (node.active) {
+          if (dominantPresent && node.bin[arbBitIndex] === '1') {
+            node.active = false;
+            consoleLog.innerHTML += `<span style="color:var(--danger);">${node.name} went recessive and lost arbitration.</span> `;
+          }
+        }
+      });
+
+      consoleLog.innerHTML += "<br>";
+
+      // Check if only one node remains
+      const activeNodes = arbIds.filter(n => n.active);
+      if (activeNodes.length === 1) {
+        consoleLog.innerHTML += `<span style="color:var(--success); font-weight:bold;">[System] ${activeNodes[0].name} has won the bus arbitration access!</span><br>`;
+        arbBitIndex = 11; // End
+      } else {
+        arbBitIndex++;
+      }
+
+      renderArbitrationBitArena();
+    }
+
+    function resetArbitrationSim() {
+      arbIds = [];
+      arbBitIndex = 0;
+      document.getElementById('arbitration-arena').innerHTML = "<p style='color:var(--text-muted);'>Configure Hex IDs and start the simulation.</p>";
+      document.getElementById('arbitration-console').innerText = "Console reset.";
+    }
+
+
+    // Lab Simulators: 5. UDS Diagnostic Terminal simulator
+    let virtualEcuSession = "Default";
+    let virtualEcuSecurity = "Locked";
+    let udsSeedVal = 0;
+
+    function sendUDSTerminal() {
+      const input = document.getElementById('uds-terminal-input').value.toUpperCase().replace(/\s+/g, '');
+      const consoleLog = document.getElementById('uds-terminal-console');
+
+      if (!input) return;
+
+      consoleLog.innerHTML += `<div style="color:var(--text-primary); margin-top:0.5rem;">Tester &gt; ${input.match(/.{1,2}/g).join(' ')}</div>`;
+
+      // Simple UDS parser
+      const sid = input.substring(0, 2);
+      let response = "7F " + sid + " 11"; // Default SubfunctionNotSupported
+
+      switch (sid) {
+        case "10": { // Session Control
+          const sub = input.substring(2, 4);
+          if (sub === "01") {
+            virtualEcuSession = "Default";
+            virtualEcuSecurity = "Locked";
+            response = "50 01 00 32 01 F4";
+          } else if (sub === "03") {
+            virtualEcuSession = "Extended";
+            response = "50 03 00 32 01 F4";
+          } else if (sub === "02") {
+            if (virtualEcuSession === "Extended") {
+              virtualEcuSession = "Programming";
+              response = "50 02 00 1E 00 C8";
+            } else {
+              response = "7F 10 22"; // Conditions not correct
+            }
+          }
+          break;
+        }
+        case "22": { // Read DID
+          const did = input.substring(2, 6);
+          if (did === "F190") {
+            response = "62 F1 90 57 41 55 5A 5A 5A 38 5A 31 47 41 30 30 31 38 32"; // VIN string
+          } else {
+            response = "7F 22 31"; // Request out of range
+          }
+          break;
+        }
+        case "27": { // Security Access
+          const sub = input.substring(2, 4);
+          if (sub === "01") {
+            if (virtualEcuSession === "Extended" || virtualEcuSession === "Programming") {
+              udsSeedVal = Math.floor(Math.random() * 0xFFFF);
+              const seedHex = udsSeedVal.toString(16).toUpperCase().padStart(4, '0');
+              response = `67 01 ${seedHex.substring(0, 2)} ${seedHex.substring(2, 4)}`;
+            } else {
+              response = "7F 27 22"; // Conditions not correct
+            }
+          } else if (sub === "02") {
+            const keyInput = parseInt(input.substring(4, 8), 16);
+            const expectedKey = (udsSeedVal ^ 0x5A6D) & 0xFFFF; // Simple algorithm
+            if (keyInput === expectedKey) {
+              virtualEcuSecurity = "Unlocked";
+              response = "67 02";
+            } else {
+              response = "7F 27 35"; // Invalid Key
+            }
+          }
+          break;
+        }
+        case "19": { // Read DTC Information
+          const sub = input.substring(2, 4);
+          if (sub === "01") {
+            response = "59 01 09 01 00 02"; // 2 DTCs matching status mask
+          } else if (sub === "02") {
+            response = "59 02 09 01 02 15 08 03 00 00 0C"; // returns two active DTCs with status bytes
+          } else {
+            response = "7F 19 12"; // Sub-function not supported
+          }
+          break;
+        }
+        case "2E": { // Write DID
+          const did = input.substring(2, 6);
+          if (virtualEcuSecurity === "Unlocked") {
+            response = `6E ${did.substring(0, 2)} ${did.substring(2, 4)}`;
+          } else {
+            response = "7F 2E 33"; // Security access denied
+          }
+          break;
+        }
+        case "3E": { // Tester present
+          response = "7E 00";
+          break;
+        }
+      }
+
+      consoleLog.innerHTML += `<div style="color:#00ff00;">ECU &lt; ${response}</div>`;
+      consoleLog.scrollTop = consoleLog.scrollHeight;
+
+      // Update state display
+      document.getElementById('uds-state-session').innerText = virtualEcuSession;
+      document.getElementById('uds-state-security').innerText = virtualEcuSecurity;
+      document.getElementById('uds-terminal-input').value = "";
+    }
+
+    function setUDSTerminalPreset(preset) {
+      document.getElementById('uds-terminal-input').value = preset;
+    }
+
+
+    // Section Quizzes
+    let quizQuestions = [];
+    let quizIndex = 0;
+    let quizScore = 0;
+
+    function loadQuiz(domain) {
+      quizQuestions = QUIZ_QUESTIONS[domain] || [];
+      if (quizQuestions.length === 0) return;
+
+      quizIndex = 0;
+      quizScore = 0;
+
+      document.getElementById('quiz-start-view').style.display = 'none';
+      document.getElementById('quiz-results-view').style.display = 'none';
+      document.getElementById('quiz-active-view').style.display = 'block';
+
+      renderQuizQuestion();
+    }
+
+    function renderQuizQuestion() {
+      const q = quizQuestions[quizIndex];
+      document.getElementById('quiz-tag').innerText = `Progress`;
+      document.getElementById('quiz-progress').innerText = `${quizIndex + 1} of ${quizQuestions.length}`;
+      document.getElementById('quiz-question').innerText = q.q;
+
+      const container = document.getElementById('quiz-options-container');
+      container.innerHTML = q.o.map((opt, idx) => `
+        <div class="quiz-option" onclick="selectQuizOption(this, ${idx})">
+          <i data-lucide="circle" style="width:16px;"></i>
+          <span>${opt}</span>
+        </div>
+      `).join('');
+
+      document.getElementById('quiz-feedback').innerText = "";
+      document.getElementById('quiz-next-btn').style.display = 'none';
+      lucide.createIcons();
+    }
+
+    function selectQuizOption(el, optIdx) {
+      const q = quizQuestions[quizIndex];
+      const nextBtn = document.getElementById('quiz-next-btn');
+
+      // Prevent multiple clicks
+      if (nextBtn.style.display === 'block') return;
+
+      const allOpts = document.querySelectorAll('.quiz-option');
+      allOpts.forEach((opt, idx) => {
+        if (idx === q.a) {
+          opt.classList.add('correct');
+          opt.querySelector('i').setAttribute('data-lucide', 'check-circle');
+        }
+      });
+
+      if (optIdx === q.a) {
+        quizScore++;
+        document.getElementById('quiz-feedback').innerHTML = `<span style="color:var(--success);">Correct!</span>`;
+      } else {
+        el.classList.add('incorrect');
+        el.querySelector('i').setAttribute('data-lucide', 'x-circle');
+        document.getElementById('quiz-feedback').innerHTML = `<span style="color:var(--danger);">Incorrect.</span>`;
+      }
+
+      lucide.createIcons();
+      nextBtn.style.display = 'block';
+    }
+
+    function nextQuizQuestion() {
+      if (quizIndex < quizQuestions.length - 1) {
+        quizIndex++;
+        renderQuizQuestion();
+      } else {
+        showQuizResults();
+      }
+    }
+
+    function showQuizResults() {
+      document.getElementById('quiz-active-view').style.display = 'none';
+      document.getElementById('quiz-results-view').style.display = 'block';
+      document.getElementById('quiz-final-score').innerText = `Score: ${quizScore} / ${quizQuestions.length}`;
+    }
+
+    function resetQuizView() {
+      document.getElementById('quiz-results-view').style.display = 'none';
+      document.getElementById('quiz-start-view').style.display = 'block';
+    }
+
+
+    // Exporters
+    function exportUserData() {
+      const data = {
+        bookmarks: bookmarkedItems,
+        completedModules: completedModules,
+        completedQuestions: completedQuestions
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "AUTO_X_User_Profile.json");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+  </script>
+</body>
+
+</html>
