@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Master Playwright | Zero to SDET Hero</title>
+  <meta name="description" content="Learn Playwright from scratch and prepare for senior SDET interviews (5+ YOE) with deep dives, architecture explanations, and interactive questions.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== style.css (full, unchanged) ===== */
+    :root {
+        --bg-dark: #0f172a;
+        --text-main: #f8fafc;
+        --text-muted: #94a3b8;
+        --playwright-green: #45ba4b;
+        --playwright-cyan: #2eadd8;
+        --glass-bg: rgba(30, 41, 59, 0.7);
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg-dark);
+        color: var(--text-main);
+        line-height: 1.6;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+    /* Background Blobs for Glassmorphism */
+    .blob {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: -1;
+        opacity: 0.5;
+        animation: float 10s infinite alternate ease-in-out;
+    }
+
+    .blob-1 {
+        width: 400px;
+        height: 400px;
+        background: var(--playwright-green);
+        top: -100px;
+        left: -100px;
+    }
+
+    .blob-2 {
+        width: 500px;
+        height: 500px;
+        background: var(--playwright-cyan);
+        bottom: -200px;
+        right: -100px;
+        animation-delay: -5s;
+    }
+
+    .blob-3 {
+        width: 300px;
+        height: 300px;
+        background: #6366f1;
+        top: 40%;
+        left: 30%;
+        animation-duration: 15s;
+    }
+
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(30px, 50px) scale(1.1); }
+    }
+
+    /* Navigation */
+    .glass-nav {
+        background: rgba(15, 23, 42, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--glass-border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .nav-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-weight: 800;
+        font-size: 1.5rem;
+        letter-spacing: -0.5px;
+    }
+
+    .logo span {
+        background: linear-gradient(90deg, var(--playwright-green), var(--playwright-cyan));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links a {
+        color: var(--text-main);
+        text-decoration: none;
+        margin-right: 1.5rem;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .nav-links a:hover {
+        color: var(--playwright-cyan);
+    }
+
+    .progress-badge {
+        background: rgba(46, 173, 216, 0.2);
+        border: 1px solid var(--playwright-cyan);
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    /* Hero Section */
+    .hero {
+        text-align: center;
+        padding: 8rem 2rem 5rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .glow-text {
+        font-size: 4rem;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 1rem;
+        background: linear-gradient(90deg, var(--playwright-green), var(--playwright-cyan), #fff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 0 20px rgba(46, 173, 216, 0.3));
+    }
+
+    .subtitle {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        margin-bottom: 2.5rem;
+    }
+
+    .hero-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .btn {
+        padding: 0.8rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg, var(--playwright-green), var(--playwright-cyan));
+        color: #fff;
+        border: none;
+        box-shadow: 0 4px 15px rgba(46, 173, 216, 0.4);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(46, 173, 216, 0.6);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-main);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Container & Sections */
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    .section-desc {
+        text-align: center;
+        color: var(--text-muted);
+        margin-bottom: 3rem;
+    }
+
+    /* Glassmorphism Cards */
+    .glass-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 2rem;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: var(--glass-shadow);
+        transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .glass-card:hover {
+        transform: translateY(-5px);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Roadmap Modules */
+    .timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .module-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 1rem;
+    }
+
+    .module-content ul {
+        margin-left: 1.5rem;
+        margin-bottom: 1.5rem;
+        color: var(--text-muted);
+    }
+
+    .module-content li {
+        margin-bottom: 0.5rem;
+    }
+
+    .module-content li strong {
+        color: var(--playwright-cyan);
+    }
+
+    /* Code Blocks */
+    .code-block {
+        background: #1e1e1e;
+        border-radius: 8px;
+        padding: 1rem;
+        overflow-x: auto;
+        border: 1px solid #333;
+    }
+
+    pre {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem;
+        color: #d4d4d4;
+    }
+
+    code {
+        font-family: 'JetBrains Mono', monospace;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 0.1rem 0.3rem;
+        border-radius: 4px;
+        color: var(--playwright-green);
+    }
+
+    /* Checkboxes */
+    .custom-checkbox {
+        position: relative;
+        padding-left: 35px;
+        cursor: pointer;
+        font-size: 22px;
+        user-select: none;
+    }
+
+    .custom-checkbox input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+    }
+
+    .checkmark {
+        position: absolute;
+        top: -5px;
+        left: 0;
+        height: 25px;
+        width: 25px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--glass-border);
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .custom-checkbox:hover input ~ .checkmark {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .custom-checkbox input:checked ~ .checkmark {
+        background-color: var(--playwright-green);
+        border-color: var(--playwright-green);
+        box-shadow: 0 0 10px rgba(69, 186, 75, 0.5);
+    }
+
+    .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+    }
+
+    .custom-checkbox input:checked ~ .checkmark:after {
+        display: block;
+    }
+
+    .custom-checkbox .checkmark:after {
+        left: 9px;
+        top: 5px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+    }
+
+    /* Accordion */
+    .accordion-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .accordion-item {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .accordion-trigger {
+        width: 100%;
+        background: none;
+        border: none;
+        color: var(--text-main);
+        font-family: inherit;
+        font-size: 1.1rem;
+        font-weight: 600;
+        text-align: left;
+        padding: 1.5rem;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: color 0.3s ease;
+    }
+
+    .accordion-trigger:hover {
+        color: var(--playwright-cyan);
+    }
+
+    .accordion-trigger .icon {
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .accordion-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease-out;
+        padding: 0 1.5rem;
+        color: var(--text-muted);
+    }
+
+    .accordion-item.active .accordion-trigger .icon {
+        transform: rotate(45deg);
+        color: var(--playwright-green);
+    }
+
+    .accordion-item.active .accordion-content {
+        max-height: 500px;
+        padding-bottom: 1.5rem;
+    }
+
+    .accordion-content p, .accordion-content ul, .accordion-content ol {
+        margin-bottom: 1rem;
+    }
+
+    .accordion-content ul, .accordion-content ol {
+        margin-left: 1.5rem;
+    }
+
+    /* Footer */
+    footer {
+        text-align: center;
+        padding: 2rem;
+        margin-top: 4rem;
+        color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .glow-text { font-size: 2.5rem; }
+        .hero-actions { flex-direction: column; }
+        .nav-content { flex-direction: column; gap: 1rem; }
+        .blob { display: none; /* performance on mobile */ }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <!-- Navigation -->
+  <nav class="glass-nav">
+    <div class="nav-content">
+      <div class="logo">🎭 <span>Playwright Mastery</span></div>
+      <div class="nav-links">
+        <a href="#roadmap">Roadmap</a>
+        <a href="#interview">Interview Cracker</a>
+        <span class="progress-badge">Progress: <span id="progress-text">0</span>%</span>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Hero -->
+    <header class="hero">
+      <h1 class="glow-text">Master Playwright</h1>
+      <p class="subtitle">From Absolute Beginner to 5-YOE SDET Architect</p>
+      <div class="hero-actions">
+        <a href="#roadmap" class="btn btn-primary">Start Learning</a>
+        <a href="#interview" class="btn btn-secondary">Crush The Interview</a>
+      </div>
+    </header>
+
+    <!-- Roadmap -->
+    <section id="roadmap" class="container">
+      <h2 class="section-title">The SDET Roadmap</h2>
+      <div class="timeline">
+        <!-- Module 1: Basics -->
+        <div class="module glass-card">
+          <div class="module-header">
+            <h3>🟢 Module 1: The Basics</h3>
+            <label class="custom-checkbox">
+              <input type="checkbox" class="progress-check" data-id="mod1">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="module-content">
+            <p>Get up and running with Playwright in minutes.</p>
+            <ul>
+              <li><strong>Setup:</strong> <code>npm init playwright@latest</code> (generates tests, config, GitHub Actions).</li>
+              <li><strong>Locators:</strong> Avoid XPath/CSS when possible. Use user-centric locators: <code>getByRole</code>, <code>getByText</code>, <code>getByTestId</code>.</li>
+              <li><strong>Auto-waiting:</strong> Playwright waits for elements to be attached, visible, and stable before acting. No more `Thread.sleep()`!</li>
+              <li><strong>Assertions:</strong> Built-in web-first assertions (<code>expect(locator).toBeVisible()</code>). It retries until the condition is met.</li>
+            </ul>
+            <div class="code-block">
+              <pre><code>test('basic test', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
+  await expect(page).toHaveTitle(/Playwright/);
+});</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Module 2: Architecture -->
+        <div class="module glass-card">
+          <div class="module-header">
+            <h3>🟡 Module 2: Architecture & Patterns</h3>
+            <label class="custom-checkbox">
+              <input type="checkbox" class="progress-check" data-id="mod2">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="module-content">
+            <p>Scaling up your test automation framework.</p>
+            <ul>
+              <li><strong>Architecture:</strong> Unlike Selenium (HTTP requests), Playwright communicates over the <em>Chrome DevTools Protocol (CDP)</em> using a single WebSocket connection per browser context. This makes it incredibly fast and bi-directional.</li>
+              <li><strong>Page Object Model (POM):</strong> Abstracting UI elements and actions into classes to reduce duplication.</li>
+              <li><strong>Browser Contexts:</strong> Think of it as an "Incognito Window". Tests are isolated in milliseconds without launching a new browser.</li>
+              <li><strong>Fixtures:</strong> The modern alternative to `beforeEach/afterEach`. Inject dependencies cleanly into your tests.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Module 3: Masterclass -->
+        <div class="module glass-card">
+          <div class="module-header">
+            <h3>🔴 Module 3: 5 YOE Masterclass</h3>
+            <label class="custom-checkbox">
+              <input type="checkbox" class="progress-check" data-id="mod3">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="module-content">
+            <p>What sets a Senior SDET apart from the crowd.</p>
+            <ul>
+              <li><strong>Global Auth Setup:</strong> Don't login via UI before every test. Login once, save the storage state (cookies/local storage), and inject it globally via <code>setup</code> project in <code>playwright.config.ts</code>.</li>
+              <li><strong>Network Interception:</strong> Mock backend responses to test frontend resilience. <code>await page.route('**/api/data', route => route.fulfill({json: data}))</code>.</li>
+              <li><strong>Custom Fixtures:</strong> Extend built-in fixtures to automatically log in, set up database state, or provide API clients to tests.</li>
+              <li><strong>Sharding & CI/CD:</strong> Run 1000s of tests in minutes by splitting the test suite across multiple CI machines using <code>--shard=1/4</code>. Merge reports seamlessly.</li>
+              <li><strong>Tracing & Debugging:</strong> Trace Viewer is a game changer. It captures a DOM snapshot of every action, network requests, and console logs.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Additional automation data: extra module (Playwright Automation) -->
+        <div class="module glass-card">
+          <div class="module-header">
+            <h3>⚙️ Module 4: Advanced Automation Patterns</h3>
+            <label class="custom-checkbox">
+              <input type="checkbox" class="progress-check" data-id="mod4">
+              <span class="checkmark"></span>
+            </label>
+          </div>
+          <div class="module-content">
+            <p>Beyond the basics – battle‑tested patterns for large‑scale projects.</p>
+            <ul>
+              <li><strong>Visual Regression:</strong> Use <code>expect(page).toHaveScreenshot()</code> to catch unintended UI changes.</li>
+              <li><strong>Component Testing:</strong> Test UI components in isolation using Playwright's component testing (React, Vue, Svelte).</li>
+              <li><strong>Parallelization:</strong> Run tests on multiple browsers simultaneously with <code>projects</code> in config.</li>
+              <li><strong>Service Workers:</strong> Mock network responses at the browser level for offline/error scenarios.</li>
+              <li><strong>Custom reporters:</strong> Build a JSON/HTML reporter with test metadata for dashboards.</li>
+            </ul>
+            <div class="code-block">
+              <pre><code>// playwright.config.ts – parallel projects
+projects: [
+  { name: 'chromium', use: { ... } },
+  { name: 'firefox', use: { ... } },
+  { name: 'webkit', use: { ... } }
+]</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interview Cracker -->
+    <section id="interview" class="container">
+      <h2 class="section-title">Senior SDET Interview Cracker (5 YOE)</h2>
+      <p class="section-desc">Expect these questions if you claim 5+ years of automation experience. Click to reveal.</p>
+      
+      <div class="accordion-container">
+        <!-- Q1 -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            1. How does Playwright differ fundamentally from Selenium and Cypress?
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p><strong>Selenium</strong> uses the WebDriver protocol (HTTP requests). Every command creates a new HTTP request, leading to overhead and flakiness.</p>
+            <p><strong>Cypress</strong> runs <em>inside</em> the browser loop. It has deep access but is limited to a single tab/origin and struggles with multi-page/multi-tab scenarios.</p>
+            <p><strong>Playwright</strong> uses the <strong>Chrome DevTools Protocol (CDP)</strong> (and equivalent for WebKit/Firefox) over a WebSocket connection. This allows for bi-directional communication, out-of-process execution (no single-origin limit), multi-tab support, and native network interception.</p>
+          </div>
+        </div>
+        <!-- Q2 -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            2. How do you handle Authentication for a suite of 500 tests efficiently?
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p>A senior engineer <strong>never</strong> logs in via the UI for every test. That adds 5-10 seconds per test. Instead:</p>
+            <ol>
+              <li>Create a <code>global.setup.ts</code> or a setup project in the config.</li>
+              <li>Perform the UI or API login once.</li>
+              <li>Save the state: <code>await page.context().storageState({ path: 'auth.json' })</code>.</li>
+              <li>In <code>playwright.config.ts</code>, configure all test projects to use <code>use: { storageState: 'auth.json' }</code>.</li>
+            </ol>
+            <p>For role-based testing (Admin vs User), I create separate storage states and use custom fixtures to inject the correct context based on the test needs.</p>
+          </div>
+        </div>
+        <!-- Q3 -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            3. What are Fixtures and why are they better than beforeAll/beforeEach?
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p>Fixtures establish an isolated environment for each test. Hooks like <code>beforeEach</code> rely on global variables/state mutation, which leads to test pollution.</p>
+            <p>Fixtures provide <strong>Encapsulation</strong> and <strong>Lazy Loading</strong>. If a test doesn't ask for a fixture, the setup code doesn't run. With fixtures, you can encapsulate Page Objects, API clients, or database states directly into the test parameters.</p>
+            <div class="code-block">
+              <pre><code>export const test = base.extend({
+  adminPage: async ({ page }, use) => {
+    await loginAsAdmin(page);
+    await use(new AdminPage(page)); // test runs here
+    await cleanUpAdminData(); // teardown
+  }
+});</code></pre>
+            </div>
+          </div>
+        </div>
+        <!-- Q4 -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            4. How do you deal with flakiness in a large Playwright suite?
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p>Flakiness is usually caused by race conditions or environmental instability. My approach:</p>
+            <ul>
+              <li><strong>Never use hard waits (`waitForTimeout`).</strong> Always use web-first assertions (<code>expect().toBeVisible()</code>) which retry automatically.</li>
+              <li><strong>Wait for API responses:</strong> Instead of waiting for a UI element, wait for the underlying network call: <code>await Promise.all([page.waitForResponse('**/api/data'), page.locator('btn').click()])</code>.</li>
+              <li><strong>Strict Locators:</strong> Ensure locators uniquely identify elements. Playwright throws if a locator is not strict.</li>
+              <li><strong>Trace Viewer:</strong> Enable traces on first retry in CI. If a test fails, the trace viewer shows the exact DOM state, console, and network logs.</li>
+            </ul>
+          </div>
+        </div>
+        <!-- Q5 -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            5. Explain Network Interception and when you would use it.
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p>Network interception allows you to mock API responses, abort requests (like tracking scripts), or modify headers.</p>
+            <p><strong>Use Cases:</strong></p>
+            <ul>
+              <li><strong>Edge cases:</strong> Testing UI behavior when the server returns a 500 error or empty list, without having to actually break the backend.</li>
+              <li><strong>Speed:</strong> Mocking slow 3rd party APIs (like payment gateways).</li>
+              <li><strong>Blocking:</strong> <code>await page.route('**/*.{png,jpg,jpeg}', route => route.abort());</code> to speed up tests by not loading images.</li>
+            </ul>
+          </div>
+        </div>
+        <!-- Q6 -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            6. How do you scale test execution in a CI/CD pipeline? (Sharding)
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p>Playwright supports native <strong>Sharding</strong>. If I have 1000 tests, I don't run them sequentially. I spin up 5 workers in GitHub Actions (or Jenkins).</p>
+            <p>Worker 1 runs: <code>npx playwright test --shard=1/5</code><br>
+            Worker 2 runs: <code>npx playwright test --shard=2/5</code></p>
+            <p>After all jobs complete, I use Playwright's merge-reports tool to combine the HTML reports into a single, unified artifact. This reduces a 1-hour test run to 12 minutes.</p>
+          </div>
+        </div>
+        <!-- Q7 -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            7. How do you integrate API testing within your UI tests?
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p>Playwright provides an <code>APIRequestContext</code> via the <code>request</code> fixture. I use it for fast test setup and teardown.</p>
+            <p>Instead of clicking through the UI to create a user (which takes 10 seconds), I hit the POST API endpoint directly to create the data in 200ms. Then, I only use the UI for the specific action I am testing.</p>
+            <p>You can also use the <code>request</code> fixture to assert database state after a UI action.</p>
+          </div>
+        </div>
+        <!-- Q8 -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            8. Design Patterns: Do you strictly use Page Object Model (POM)?
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p>POM is standard, but at scale, it can lead to massive "God Classes". For 5 YOE, I introduce:</p>
+            <ul>
+              <li><strong>Component Objects:</strong> Instead of a whole page, I model reusable components (e.g., a DatePicker class) that can be imported into multiple Page Objects.</li>
+              <li><strong>Fluent Interfaces:</strong> Returning `this` from methods to allow chaining: <code>loginPage.enterUser().enterPass().submit()</code>.</li>
+              <li><strong>Fixtures for Composition:</strong> Using Playwright fixtures to automatically inject Page Objects into tests, reducing boilerplate instantiations (<code>new LoginPage(page)</code>).</li>
+            </ul>
+          </div>
+        </div>
+        <!-- Additional Q9: advanced automation -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            9. How do you manage test data and environments across different stages?
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p>Use <strong>environment variables</strong> and <strong>configuration files</strong> per environment (dev, staging, prod).</p>
+            <ul>
+              <li>Store base URLs, API keys, and credentials in <code>.env</code> files (never in code).</li>
+              <li>Use Playwright's <code>baseURL</code> in config to keep tests environment-agnostic.</li>
+              <li>For test data, use factory functions or seed a test database via API before the test run.</li>
+              <li>Always clean up after tests using <code>afterEach</code> hooks or fixture teardown to avoid data pollution.</li>
+            </ul>
+          </div>
+        </div>
+        <!-- Q10 -->
+        <div class="accordion-item glass-card">
+          <button class="accordion-trigger">
+            10. What is your strategy for mobile/responsive testing with Playwright?
+            <span class="icon">+</span>
+          </button>
+          <div class="accordion-content">
+            <p>Playwright supports device emulation out of the box. In your config, define projects for different devices:</p>
+            <ul>
+              <li>Use <code>devices['iPhone 12']</code> or custom viewports.</li>
+              <li>Test touch events, orientation changes, and mobile-specific UI.</li>
+              <li>Combine with network throttling to simulate poor network conditions.</li>
+              <li>Run these in parallel with desktop projects using sharding.</li>
+            </ul>
+            <div class="code-block">
+              <pre><code>// playwright.config.ts
+import { devices } from '@playwright/test';
+
+projects: [
+  {
+    name: 'iPhone 12',
+    use: { ...devices['iPhone 12'] }
+  }
+]</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="glass-nav">
+      <p>Designed for SDET Excellence | © 2026</p>
+    </footer>
+  </main>
+
+  <script>
+    // ===== app.js (full, unchanged) =====
+    document.addEventListener('DOMContentLoaded', () => {
+        // Accordion Logic
+        const accordionTriggers = document.querySelectorAll('.accordion-trigger');
+
+        accordionTriggers.forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const parentItem = trigger.parentElement;
+                
+                // Close other open accordions (optional, but good UX)
+                const openItems = document.querySelectorAll('.accordion-item.active');
+                openItems.forEach(item => {
+                    if (item !== parentItem) {
+                        item.classList.remove('active');
+                        item.querySelector('.accordion-content').style.maxHeight = null;
+                    }
+                });
+
+                // Toggle current accordion
+                parentItem.classList.toggle('active');
+                const content = parentItem.querySelector('.accordion-content');
+                
+                if (parentItem.classList.contains('active')) {
+                    content.style.maxHeight = content.scrollHeight + 30 + "px"; // 30px for padding
+                } else {
+                    content.style.maxHeight = null;
+                }
+            });
+        });
+
+        // Progress Tracker Logic
+        const checkboxes = document.querySelectorAll('.progress-check');
+        const progressText = document.getElementById('progress-text');
+        const STORAGE_KEY = 'playwright_mastery_progress';
+
+        // Load saved progress
+        const savedProgress = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+        
+        let checkedCount = 0;
+
+        checkboxes.forEach(checkbox => {
+            const id = checkbox.getAttribute('data-id');
+            
+            if (savedProgress[id]) {
+                checkbox.checked = true;
+                checkedCount++;
+            }
+
+            checkbox.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    savedProgress[id] = true;
+                    checkedCount++;
+                } else {
+                    savedProgress[id] = false;
+                    checkedCount--;
+                }
+                
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(savedProgress));
+                updateProgressDisplay();
+            });
+        });
+
+        function updateProgressDisplay() {
+            const total = checkboxes.length;
+            if(total === 0) return;
+            const percentage = Math.round((checkedCount / total) * 100);
+            
+            progressText.innerText = percentage;
+            
+            // Add a little pop animation when it reaches 100%
+            if (percentage === 100) {
+                progressText.parentElement.style.transform = 'scale(1.1)';
+                progressText.parentElement.style.boxShadow = '0 0 15px rgba(69, 186, 75, 0.8)';
+                progressText.parentElement.style.borderColor = 'var(--playwright-green)';
+                setTimeout(() => {
+                    progressText.parentElement.style.transform = 'scale(1)';
+                }, 300);
+            } else {
+                progressText.parentElement.style.boxShadow = 'none';
+                progressText.parentElement.style.borderColor = 'var(--playwright-cyan)';
+            }
+        }
+
+        // Initialize progress display
+        updateProgressDisplay();
+
+        // Smooth Scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    // Adjust for sticky header
+                    const headerOffset = 80;
+                    const elementPosition = targetElement.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: "smooth"
+                    });
+                }
+            });
+        });
+    });
+  </script>
+</body>
+</html>
