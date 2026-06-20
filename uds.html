@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UDS Protocol — Interview Mastery</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap');
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #10141c;
+    --card: #141920;
+    --border: #1e2535;
+    --accent: #00d4ff;
+    --accent2: #ff6b2b;
+    --accent3: #00ff88;
+    --warn: #ffcc00;
+    --text: #c8d8e8;
+    --muted: #4a5a72;
+    --mono: 'Share Tech Mono', monospace;
+    --sans: 'Barlow', sans-serif;
+    --cond: 'Barlow Condensed', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* GRID BACKGROUND */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* HEADER */
+  header {
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+    position: relative;
+  }
+  .header-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    opacity: 0.8;
+  }
+  header h1 {
+    font-family: var(--cond);
+    font-size: clamp(42px, 7vw, 80px);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -1px;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  header h1 span { color: var(--accent); }
+  .header-sub {
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 14px;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+  .interview-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,107,43,0.12);
+    border: 1px solid rgba(255,107,43,0.4);
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 6px 14px;
+    border-radius: 2px;
+    margin-top: 20px;
+  }
+  .interview-badge::before { content: '⚡'; }
+
+  /* SERVICE NAV */
+  .service-nav {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+  }
+  .svc-btn {
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 10px 18px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    border-radius: 3px;
+    position: relative;
+  }
+  .svc-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .svc-btn.active {
+    border-color: var(--accent);
+    background: rgba(0,212,255,0.08);
+    color: var(--accent);
+  }
+  .svc-btn .sid {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: inherit;
+    margin-bottom: 2px;
+  }
+  .svc-btn.active .sid { color: var(--accent); }
+
+  /* SERVICE PANEL */
+  .service-panel { display: none; animation: fadeIn 0.3s ease; }
+  .service-panel.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SERVICE HEADER */
+  .svc-header {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 24px;
+    align-items: center;
+  }
+  .svc-id-badge {
+    background: var(--accent);
+    color: #000;
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    padding: 12px 20px;
+    border-radius: 4px;
+    text-align: center;
+    min-width: 80px;
+  }
+  .svc-title { font-family: var(--cond); font-size: 32px; font-weight: 900; color: #fff; text-transform: uppercase; }
+  .svc-subtitle { font-size: 14px; color: var(--muted); margin-top: 4px; font-weight: 300; }
+  .svc-iso { font-family: var(--mono); font-size: 11px; color: var(--accent2); letter-spacing: 2px; }
+
+  /* FLOW DIAGRAM */
+  .flow-section { margin-bottom: 28px; }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .flow-diagram {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 24px;
+  }
+  .flow-step {
+    flex: 1;
+    min-width: 130px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 16px 14px;
+    position: relative;
+    text-align: center;
+  }
+  .flow-step:not(:last-child)::after {
+    content: '→';
+    position: absolute;
+    right: -14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 18px;
+    z-index: 2;
+    background: var(--bg);
+    padding: 2px;
+  }
+  .flow-step:not(:last-child) { margin-right: 20px; }
+  .flow-step-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+  .flow-step-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .flow-step-detail {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+    font-family: var(--mono);
+  }
+
+  /* CARDS GRID */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+  .info-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .card-head {
+    padding: 12px 18px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-body { padding: 16px 18px; }
+
+  .card-head.req { background: rgba(0,212,255,0.08); color: var(--accent); border-bottom: 1px solid rgba(0,212,255,0.2); }
+  .card-head.res { background: rgba(0,255,136,0.08); color: var(--accent3); border-bottom: 1px solid rgba(0,255,136,0.2); }
+  .card-head.neg { background: rgba(255,107,43,0.08); color: var(--accent2); border-bottom: 1px solid rgba(255,107,43,0.2); }
+  .card-head.tip { background: rgba(255,204,0,0.08); color: var(--warn); border-bottom: 1px solid rgba(255,204,0,0.2); }
+  .card-head.sub { background: rgba(180,100,255,0.08); color: #b46cff; border-bottom: 1px solid rgba(180,100,255,0.2); }
+
+  /* BYTE TABLE */
+  .byte-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 12px; }
+  .byte-table th {
+    background: rgba(0,212,255,0.05);
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .byte-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(30,37,53,0.6);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .byte-table tr:last-child td { border-bottom: none; }
+  .byte-table .hex { color: var(--accent); font-weight: 700; }
+  .byte-table .desc { color: var(--text); }
+  .byte-table .note { color: var(--muted); font-size: 11px; }
+  .byte-table tr:hover td { background: rgba(0,212,255,0.02); }
+
+  /* LIST ITEMS */
+  .check-list { list-style: none; }
+  .check-list li {
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--text);
+    display: flex;
+    gap: 10px;
+    line-height: 1.5;
+    border-bottom: 1px solid rgba(30,37,53,0.5);
+  }
+  .check-list li:last-child { border-bottom: none; }
+  .check-list li::before { content: '▸'; color: var(--accent); flex-shrink: 0; margin-top: 1px; }
+  .check-list.neg-list li::before { color: var(--accent2); content: '✗'; }
+  .check-list.tip-list li::before { color: var(--warn); content: '★'; }
+
+  /* NRC TABLE */
+  .nrc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+  .nrc-item {
+    background: rgba(255,107,43,0.05);
+    border: 1px solid rgba(255,107,43,0.15);
+    border-radius: 3px;
+    padding: 10px 12px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .nrc-code { font-family: var(--mono); font-size: 13px; color: var(--accent2); font-weight: 700; min-width: 36px; }
+  .nrc-info { }
+  .nrc-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .nrc-desc { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+
+  /* SPECIAL — DTC breakdown for 0x19 */
+  .dtc-structure {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .dtc-byte {
+    flex: 1;
+    min-width: 100px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .dtc-byte-head {
+    background: rgba(0,212,255,0.06);
+    padding: 6px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 1px;
+  }
+  .dtc-byte-body { padding: 8px 10px; font-size: 12px; color: var(--text); line-height: 1.6; }
+
+  .subfn-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .subfn-table th {
+    background: rgba(180,100,255,0.06);
+    color: #b46cff;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .subfn-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(30,37,53,0.5);
+    font-family: var(--mono);
+    font-size: 12px;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  .subfn-table tr:last-child td { border-bottom: none; }
+  .subfn-table .sf { color: #b46cff; font-weight: 700; }
+  .subfn-table .name { color: #fff; }
+  .subfn-table .use { color: var(--muted); }
+  .subfn-table tr:hover td { background: rgba(180,100,255,0.03); }
+
+  /* INTERVIEW Q */
+  .iq-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--warn);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .iq-q {
+    padding: 12px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--warn);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    user-select: none;
+  }
+  .iq-q:hover { background: rgba(255,204,0,0.04); }
+  .iq-q .toggle { color: var(--muted); font-family: var(--mono); font-size: 16px; flex-shrink: 0; }
+  .iq-a {
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.2s;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .iq-a.open { max-height: 400px; padding: 12px 18px; border-top: 1px solid rgba(255,204,0,0.1); }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    margin-bottom: 32px;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent3));
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  /* QUICK REF PILL */
+  .pill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 2px;
+    margin: 2px;
+  }
+  .pill-blue { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
+  .pill-green { background: rgba(0,255,136,0.1); color: var(--accent3); border: 1px solid rgba(0,255,136,0.2); }
+  .pill-orange { background: rgba(255,107,43,0.1); color: var(--accent2); border: 1px solid rgba(255,107,43,0.2); }
+  .pill-yellow { background: rgba(255,204,0,0.1); color: var(--warn); border: 1px solid rgba(255,204,0,0.2); }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+  /* FOOTER */
+  footer {
+    margin-top: 60px;
+    padding: 24px 0;
+    border-top: 1px solid var(--border);
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  @media (max-width: 600px) {
+    .svc-header { grid-template-columns: auto 1fr; }
+    .svc-iso { display: none; }
+    .cards-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="header-tag">// ISO 14229 — Unified Diagnostic Services</div>
+    <h1>UDS <span>Protocol</span><br>Deep Dive</h1>
+    <p class="header-sub">5 Core Services · Complete Request-Response Flow · Interview Ready</p>
+    <div class="interview-badge">INTERVIEW PREP — TOMORROW</div>
+  </header>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
+
+  <div class="service-nav" id="serviceNav">
+    <button class="svc-btn active" onclick="showService(0)" id="btn0">
+      <span class="sid">0x10</span>DiagnosticSession
+    </button>
+    <button class="svc-btn" onclick="showService(1)" id="btn1">
+      <span class="sid">0x11</span>ECUReset
+    </button>
+    <button class="svc-btn" onclick="showService(2)" id="btn2">
+      <span class="sid">0x22</span>ReadDataById
+    </button>
+    <button class="svc-btn" onclick="showService(3)" id="btn3">
+      <span class="sid">0x2E</span>WriteDataById
+    </button>
+    <button class="svc-btn" onclick="showService(4)" id="btn4" style="border-color: rgba(255,107,43,0.4);">
+      <span class="sid" style="color: var(--accent2)">0x19</span>ReadDTCInfo
+    </button>
+  </div>
+
+  <!-- ==================== 0x10 ==================== -->
+  <div class="service-panel active" id="panel0">
+    <div class="svc-header">
+      <div class="svc-id-badge">0x10</div>
+      <div>
+        <div class="svc-title">Diagnostic Session Control</div>
+        <div class="svc-subtitle">Controls which diagnostic session is active on the ECU</div>
+      </div>
+      <div class="svc-iso">ISO 14229-1<br>§ 9.2</div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Complete Flow — Start to Stop</div>
+      <div class="flow-diagram">
+        <div class="flow-step"><div class="flow-step-num">01</div><div class="flow-step-title">Tester Sends Request</div><div class="flow-step-detail">SID 0x10 +<br>SubFunction</div></div>
+        <div class="flow-step"><div class="flow-step-num">02</div><div class="flow-step-title">ECU Validates</div><div class="flow-step-detail">Checks if session<br>transition allowed</div></div>
+        <div class="flow-step"><div class="flow-step-num">03</div><div class="flow-step-title">ECU Switches Session</div><div class="flow-step-detail">Changes internal<br>state machine</div></div>
+        <div class="flow-step"><div class="flow-step-num">04</div><div class="flow-step-title">Positive Response</div><div class="flow-step-detail">0x50 + SubFn +<br>P2/P2* timings</div></div>
+        <div class="flow-step"><div class="flow-step-num">05</div><div class="flow-step-title">S3 Timer Starts</div><div class="flow-step-detail">ECU waits for<br>TesterPresent</div></div>
+        <div class="flow-step"><div class="flow-step-num">06</div><div class="flow-step-title">Session Ends</div><div class="flow-step-detail">S3 timeout or<br>0x10 0x01 sent</div></div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="info-card">
+        <div class="card-head req">→ Request Frame</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x10</td><td class="desc">Service ID</td></tr>
+            <tr><td class="hex">2</td><td class="hex">0x01–0x03</td><td class="desc">SubFunction (session type)</td></tr>
+          </table>
+          <br>
+          <div style="font-family: var(--mono); font-size: 12px; color: var(--muted);">Example: <span style="color: var(--accent)">10 02</span> → Request Extended Session</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head res">← Positive Response</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x50</td><td class="desc">Response SID (0x10+0x40)</td></tr>
+            <tr><td class="hex">2</td><td class="hex">0x01–0x03</td><td class="desc">Echoed SubFunction</td></tr>
+            <tr><td class="hex">3-4</td><td class="hex">P2</td><td class="desc">Server response time (ms)</td></tr>
+            <tr><td class="hex">5-6</td><td class="hex">P2*</td><td class="desc">Extended server response time</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head sub">Session Types</div>
+        <div class="card-body">
+          <ul class="check-list">
+            <li><strong>0x01 — Default Session (DS):</strong> Always active on power-on. Minimal access. Read basic data. No ECU flash.</li>
+            <li><strong>0x02 — Programming Session (PS):</strong> For ECU flashing/reprogramming. Requires security access (0x27) first.</li>
+            <li><strong>0x03 — Extended Diagnostic Session (EDS):</strong> Full diagnostic power — DTC read/clear, I/O control, parameter write.</li>
+            <li><strong>0x04+ — OEM defined:</strong> Honda, GM etc. define custom sessions (e.g. End-of-Line test).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head neg">✗ Negative Response (0x7F 0x10)</div>
+        <div class="card-body">
+          <div class="nrc-grid">
+            <div class="nrc-item"><div class="nrc-code">0x12</div><div class="nrc-info"><div class="nrc-name">SubFunctionNotSupported</div><div class="nrc-desc">Session type not recognized</div></div></div>
+            <div class="nrc-item"><div class="nrc-code">0x22</div><div class="nrc-info"><div class="nrc-name">ConditionsNotCorrect</div><div class="nrc-desc">Engine running, transition not allowed</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Key Timers — Critical for Interview</div>
+      <div class="cards-grid">
+        <div class="info-card">
+          <div class="card-head tip">★ Timer Concepts</div>
+          <div class="card-body">
+            <ul class="check-list tip-list">
+              <li><strong>S3 Timer (typically 5s):</strong> ECU stays in non-default session only if tester sends TesterPresent (0x3E) before this expires. On timeout → back to Default.</li>
+              <li><strong>P2 (default 50ms):</strong> Max time ECU must respond after receiving request.</li>
+              <li><strong>P2* (default 5000ms):</strong> Extended wait when ECU sends NRC 0x78 (Response Pending).</li>
+              <li><strong>P3 (default 5s):</strong> Minimum gap between end of ECU response and next tester request.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Interview Questions — 0x10</div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: What happens if TesterPresent is not sent in Extended Session? <span class="toggle">+</span></div><div class="iq-a">The S3 timer (typically 5 seconds) expires on the ECU side. Once it times out, the ECU automatically transitions back to Default Diagnostic Session (0x01). Any diagnostic services that require Extended Session will then return NRC 0x22 (ConditionsNotCorrect). You must re-send 0x10 0x03 to re-enter the session.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: Why does the positive response for 0x10 include P2 and P2* timings? <span class="toggle">+</span></div><div class="iq-a">The ECU informs the tester of its response timing capabilities in that session. Different sessions may have different P2/P2* values (e.g., Programming Session may have longer P2* since flash operations take time). The tester must use these values to configure its timeout — not rely on default values — to avoid false timeout errors during flash or heavy-computation operations.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: Difference between Default Session and Extended Session? <span class="toggle">+</span></div><div class="iq-a">Default Session: Always active after power-on/reset. Allows basic services like ReadDTCInfo, ReadDataByIdentifier (limited DIDs), TesterPresent. No security-sensitive operations.<br><br>Extended Diagnostic Session: Requires explicit 0x10 0x03. Unlocks DTC clearing, I/O control (0x2F), WriteDataByIdentifier (0x2E), SecurityAccess (0x27), and many OEM-specific services. Requires active keep-alive via TesterPresent.</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== 0x11 ==================== -->
+  <div class="service-panel" id="panel1">
+    <div class="svc-header">
+      <div class="svc-id-badge" style="background: var(--accent2);">0x11</div>
+      <div>
+        <div class="svc-title">ECU Reset</div>
+        <div class="svc-subtitle">Forces ECU to perform a hardware or software reset cycle</div>
+      </div>
+      <div class="svc-iso">ISO 14229-1<br>§ 9.3</div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Complete Flow — Start to Stop</div>
+      <div class="flow-diagram">
+        <div class="flow-step"><div class="flow-step-num">01</div><div class="flow-step-title">Enter Required Session</div><div class="flow-step-detail">Usually Extended<br>or Programming</div></div>
+        <div class="flow-step"><div class="flow-step-num">02</div><div class="flow-step-title">Tester Sends 0x11</div><div class="flow-step-detail">+ SubFunction<br>(reset type)</div></div>
+        <div class="flow-step"><div class="flow-step-num">03</div><div class="flow-step-title">ECU Sends PREC</div><div class="flow-step-detail">NRC 0x78 if<br>work pending</div></div>
+        <div class="flow-step"><div class="flow-step-num">04</div><div class="flow-step-title">Positive Response</div><div class="flow-step-detail">0x51 + SubFn<br>(before reset)</div></div>
+        <div class="flow-step"><div class="flow-step-num">05</div><div class="flow-step-title">ECU Resets</div><div class="flow-step-detail">Hardware pulls<br>reset line or SW</div></div>
+        <div class="flow-step"><div class="flow-step-num">06</div><div class="flow-step-title">ECU Boots Up</div><div class="flow-step-detail">Default Session<br>restored</div></div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="info-card">
+        <div class="card-head req">→ Request Frame</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x11</td><td class="desc">Service ID</td></tr>
+            <tr><td class="hex">2</td><td class="hex">0x01–0x03</td><td class="desc">SubFunction (reset type)</td></tr>
+          </table>
+          <br>
+          <div style="font-family: var(--mono); font-size: 12px; color: var(--muted);">Example: <span style="color: var(--accent)">11 01</span> → Hard Reset</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head res">← Positive Response</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x51</td><td class="desc">Response SID (0x11+0x40)</td></tr>
+            <tr><td class="hex">2</td><td class="hex">0x01–0x03</td><td class="desc">Echoed SubFunction</td></tr>
+          </table>
+          <br>
+          <div style="font-size: 12px; color: var(--muted);">⚠ Response sent <em>before</em> actual reset occurs. Tester must wait for ECU to re-enumerate on bus.</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head sub">Reset Types (SubFunctions)</div>
+        <div class="card-body">
+          <ul class="check-list">
+            <li><strong>0x01 — Hard Reset:</strong> Full power cycle simulation. NVM data preserved. Fastest, most complete. Used after ECU flash.</li>
+            <li><strong>0x02 — Key Off/On Reset:</strong> Simulates ignition key cycle. Application re-initializes from scratch. May trigger wake-up routines.</li>
+            <li><strong>0x03 — Soft Reset:</strong> Software-only restart. No power cycle. Clears RAM, re-runs application init. Faster, less disruptive.</li>
+            <li><strong>0x40–0x5F — OEM Defined:</strong> E.g., reset only bootloader, partial subsystem reset.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head neg">✗ Negative Response (0x7F 0x11)</div>
+        <div class="card-body">
+          <div class="nrc-grid">
+            <div class="nrc-item"><div class="nrc-code">0x12</div><div class="nrc-info"><div class="nrc-name">SubFunctionNotSupported</div><div class="nrc-desc">Reset type not implemented</div></div></div>
+            <div class="nrc-item"><div class="nrc-code">0x22</div><div class="nrc-info"><div class="nrc-name">ConditionsNotCorrect</div><div class="nrc-desc">ECU busy with critical operation</div></div></div>
+            <div class="nrc-item"><div class="nrc-code">0x33</div><div class="nrc-info"><div class="nrc-name">SecurityAccessDenied</div><div class="nrc-desc">Security not unlocked in this session</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Interview Questions — 0x11</div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: Difference between Hard Reset (0x01) and Soft Reset (0x03)? <span class="toggle">+</span></div><div class="iq-a">Hard Reset (0x01): Simulates full power-off/power-on. All volatile memory is cleared. Resets every subsystem. Takes longer to complete. Used after ECU programming to apply new software. NVM (EEPROM/Flash) data is preserved.<br><br>Soft Reset (0x03): Software-controlled restart only. No power cut. RAM cleared, application re-initialized, but hardware peripherals may retain state. Faster. Used for minor configuration resets or watchdog-triggered resets.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: Why is positive response sent BEFORE the actual reset? <span class="toggle">+</span></div><div class="iq-a">Because once the ECU resets, it loses communication context and cannot send any CAN frames. The positive response (0x51) is sent to acknowledge the request was received and accepted, then the ECU resets. The tester must wait for the ECU to re-appear on the bus (typically 2-5 seconds) before sending new UDS requests. If the tester doesn't wait and immediately sends a request, it will get no response.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: In what sequence do you typically use 0x11 after ECU flashing? <span class="toggle">+</span></div><div class="iq-a">Typical post-flash sequence: (1) Complete flashing with 0x34/0x36/0x37, (2) Send 0x31 0x01 (CheckMemory routine) to verify CRC, (3) Send 0x31 0x03 (CheckProgrammingPreConditions), (4) Send 0x11 0x01 (Hard Reset) to apply new firmware, (5) Wait 2–5s for ECU boot, (6) Send 0x10 0x01 to confirm Default Session is active, (7) Read SW version via 0x22 to verify flash success.</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== 0x22 ==================== -->
+  <div class="service-panel" id="panel2">
+    <div class="svc-header">
+      <div class="svc-id-badge" style="background: var(--accent3); color: #000;">0x22</div>
+      <div>
+        <div class="svc-title">Read Data By Identifier</div>
+        <div class="svc-subtitle">Read one or more data parameters from ECU using 2-byte Data Identifiers (DIDs)</div>
+      </div>
+      <div class="svc-iso">ISO 14229-1<br>§ 11.2</div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Complete Flow — Start to Stop</div>
+      <div class="flow-diagram">
+        <div class="flow-step"><div class="flow-step-num">01</div><div class="flow-step-title">Any Session</div><div class="flow-step-detail">Most DIDs readable<br>in Default Session</div></div>
+        <div class="flow-step"><div class="flow-step-num">02</div><div class="flow-step-title">Tester Sends 0x22</div><div class="flow-step-detail">+ 2-byte DID<br>(1 or more)</div></div>
+        <div class="flow-step"><div class="flow-step-num">03</div><div class="flow-step-title">ECU Looks Up DID</div><div class="flow-step-detail">Checks session +<br>security level</div></div>
+        <div class="flow-step"><div class="flow-step-num">04</div><div class="flow-step-title">ECU Reads Data</div><div class="flow-step-detail">From RAM, ROM,<br>or NVM</div></div>
+        <div class="flow-step"><div class="flow-step-num">05</div><div class="flow-step-title">Positive Response</div><div class="flow-step-detail">0x62 + DID +<br>Data bytes</div></div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="info-card">
+        <div class="card-head req">→ Request Frame</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x22</td><td class="desc">Service ID</td></tr>
+            <tr><td class="hex">2</td><td class="hex">0xXX</td><td class="desc">DID High Byte</td></tr>
+            <tr><td class="hex">3</td><td class="hex">0xXX</td><td class="desc">DID Low Byte</td></tr>
+            <tr><td class="hex">…</td><td class="hex">Repeat</td><td class="desc">Additional DIDs (multi-read)</td></tr>
+          </table>
+          <br>
+          <div style="font-family: var(--mono); font-size: 12px; color: var(--muted);">Example: <span style="color:var(--accent)">22 F1 86</span> → Read Active Diagnostic Session</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head res">← Positive Response</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x62</td><td class="desc">Response SID (0x22+0x40)</td></tr>
+            <tr><td class="hex">2-3</td><td class="hex">DID</td><td class="desc">Echoed Data Identifier</td></tr>
+            <tr><td class="hex">4+</td><td class="hex">Data</td><td class="desc">Actual data bytes (variable length)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head sub">Common Standard DIDs (F1xx Range)</div>
+        <div class="card-body">
+          <ul class="check-list">
+            <li><strong>F186:</strong> Active Diagnostic Session</li>
+            <li><strong>F187:</strong> Vehicle Manufacturer Spare Part Number</li>
+            <li><strong>F188:</strong> Vehicle Manufacturer ECU SW Version Number</li>
+            <li><strong>F189:</strong> Vehicle Manufacturer ECU SW Part Number</li>
+            <li><strong>F18A:</strong> System Supplier ECU HW Number</li>
+            <li><strong>F18B:</strong> ECU Manufacturing Date (year/month/day)</li>
+            <li><strong>F18C:</strong> ECU Serial Number</li>
+            <li><strong>F190:</strong> VIN (Vehicle Identification Number — 17 bytes ASCII)</li>
+            <li><strong>F197:</strong> System Name / Engine Type</li>
+          </ul>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head neg">✗ Negative Response (0x7F 0x22)</div>
+        <div class="card-body">
+          <div class="nrc-grid">
+            <div class="nrc-item"><div class="nrc-code">0x31</div><div class="nrc-info"><div class="nrc-name">RequestOutOfRange</div><div class="nrc-desc">DID not supported / not defined</div></div></div>
+            <div class="nrc-item"><div class="nrc-code">0x33</div><div class="nrc-info"><div class="nrc-name">SecurityAccessDenied</div><div class="nrc-desc">DID requires higher security level</div></div></div>
+            <div class="nrc-item"><div class="nrc-code">0x22</div><div class="nrc-info"><div class="nrc-name">ConditionsNotCorrect</div><div class="nrc-desc">DID not available in current session</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Interview Questions — 0x22</div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: Can you read multiple DIDs in one 0x22 request? <span class="toggle">+</span></div><div class="iq-a">Yes. ISO 14229 allows requesting multiple DIDs in a single 0x22 frame by concatenating the 2-byte DIDs: e.g., 22 F1 90 F1 88 reads VIN and SW version together. The response (0x62) will contain each DID followed by its data in the same order. However, the combined response must fit within the transport layer message size (e.g., 4095 bytes in ISO-TP). If the ECU doesn't support multi-DID read, it returns NRC 0x31.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: What is the DID range convention? <span class="toggle">+</span></div><div class="iq-a">ISO 14229 divides the 2-byte (0x0000–0xFFFF) DID range: 0x0000–0x00FF: ISO SAE reserved. 0xF100–0xF1FF: Standard identification DIDs (VIN, SW version, part number etc.). 0xF200–0xF2FF: Periodic DIDs (for 0x2A service). 0xF300–0xFCFF: Dynamically defined DIDs (via 0x2C service). 0xFD00–0xFEFF: OEM-defined. 0xFF00–0xFFFF: System supplier defined. In practice for interviews, F1xx range DIDs are most commonly tested.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: How does 0x22 differ from 0x2A (ReadDataByPeriodicIdentifier)? <span class="toggle">+</span></div><div class="iq-a">0x22 is an on-demand, single poll — tester requests once, ECU responds once. Used for static data or snapshot reads. 0x2A is a subscription model — tester subscribes to a periodic DID with a transmission rate (slow/medium/fast), and the ECU autonomously sends data at that rate without further requests. 0x2A is used for real-time monitoring of dynamic signals like sensor values, temperatures, RPM during diagnostics.</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== 0x2E ==================== -->
+  <div class="service-panel" id="panel3">
+    <div class="svc-header">
+      <div class="svc-id-badge" style="background: #b46cff; color: #000;">0x2E</div>
+      <div>
+        <div class="svc-title">Write Data By Identifier</div>
+        <div class="svc-subtitle">Write data to ECU parameters identified by 2-byte DIDs</div>
+      </div>
+      <div class="svc-iso">ISO 14229-1<br>§ 11.3</div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Complete Flow — Start to Stop</div>
+      <div class="flow-diagram">
+        <div class="flow-step"><div class="flow-step-num">01</div><div class="flow-step-title">Enter Extended Session</div><div class="flow-step-detail">0x10 0x03<br>mandatory</div></div>
+        <div class="flow-step"><div class="flow-step-num">02</div><div class="flow-step-title">Security Unlock</div><div class="flow-step-detail">0x27 seed-key<br>exchange first</div></div>
+        <div class="flow-step"><div class="flow-step-num">03</div><div class="flow-step-title">Tester Sends 0x2E</div><div class="flow-step-detail">+ DID + new<br>data bytes</div></div>
+        <div class="flow-step"><div class="flow-step-num">04</div><div class="flow-step-title">ECU Validates</div><div class="flow-step-detail">Checks DID, length,<br>value range</div></div>
+        <div class="flow-step"><div class="flow-step-num">05</div><div class="flow-step-title">ECU Writes Data</div><div class="flow-step-detail">To NVM/RAM<br>as defined</div></div>
+        <div class="flow-step"><div class="flow-step-num">06</div><div class="flow-step-title">Positive Response</div><div class="flow-step-detail">0x6E + DID<br>(no data echo)</div></div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="info-card">
+        <div class="card-head req">→ Request Frame</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x2E</td><td class="desc">Service ID</td></tr>
+            <tr><td class="hex">2</td><td class="hex">0xXX</td><td class="desc">DID High Byte</td></tr>
+            <tr><td class="hex">3</td><td class="hex">0xXX</td><td class="desc">DID Low Byte</td></tr>
+            <tr><td class="hex">4+</td><td class="hex">Data</td><td class="desc">New data to write (DID-specific length)</td></tr>
+          </table>
+          <br>
+          <div style="font-family: var(--mono); font-size: 12px; color: var(--muted);">Example: <span style="color:var(--accent)">2E F1 90 57 42 41 31...</span> → Write VIN</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head res">← Positive Response</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x6E</td><td class="desc">Response SID (0x2E+0x40)</td></tr>
+            <tr><td class="hex">2-3</td><td class="hex">DID</td><td class="desc">Echoed Data Identifier only</td></tr>
+          </table>
+          <br>
+          <div style="font-size: 12px; color: var(--muted);">Note: Response does NOT echo the written data back. Tester must do a 0x22 read to verify write.</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head sub">Common Use Cases</div>
+        <div class="card-body">
+          <ul class="check-list">
+            <li><strong>Write VIN (F190):</strong> End-of-line programming at factory</li>
+            <li><strong>Write ECU Part Number (F187):</strong> After replacement ECU programming</li>
+            <li><strong>Write Coding Parameters:</strong> OEM-specific DIDs for feature configuration (market variant, language, options)</li>
+            <li><strong>Write Odometer:</strong> Only allowed with security + in specific sessions</li>
+            <li><strong>Calibration Data:</strong> Sensor offsets, trim values</li>
+          </ul>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head neg">✗ Negative Response (0x7F 0x2E)</div>
+        <div class="card-body">
+          <div class="nrc-grid">
+            <div class="nrc-item"><div class="nrc-code">0x31</div><div class="nrc-info"><div class="nrc-name">RequestOutOfRange</div><div class="nrc-desc">DID not writable or value invalid</div></div></div>
+            <div class="nrc-item"><div class="nrc-code">0x33</div><div class="nrc-info"><div class="nrc-name">SecurityAccessDenied</div><div class="nrc-desc">Security not unlocked</div></div></div>
+            <div class="nrc-item"><div class="nrc-code">0x22</div><div class="nrc-info"><div class="nrc-name">ConditionsNotCorrect</div><div class="nrc-desc">Wrong session or preconditions</div></div></div>
+            <div class="nrc-item"><div class="nrc-code">0x13</div><div class="nrc-info"><div class="nrc-name">IncorrectMsgLenOrFormat</div><div class="nrc-desc">Data length mismatch for DID</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Interview Questions — 0x2E</div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: What prerequisite steps are needed before 0x2E can succeed? <span class="toggle">+</span></div><div class="iq-a">Mandatory sequence: (1) Enter Extended Diagnostic Session: 0x10 0x03. (2) Perform Security Access: 0x27 0x01 (send seed request) → receive seed → compute key → 0x27 0x02 send key → receive 0x67 0x02. (3) Now send 0x2E + DID + data. If Security Access is skipped, ECU returns NRC 0x33. If wrong session, NRC 0x22. The security level required depends on OEM specification.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: How do you verify a 0x2E write was successful? <span class="toggle">+</span></div><div class="iq-a">Two steps: (1) Confirm the positive response 0x6E + echoed DID was received (confirms ECU accepted the write request). (2) Perform a 0x22 read of the same DID to verify the new value is now returned. This is especially important for NVM writes because the 0x6E response only means the write was accepted, not necessarily completed to non-volatile memory. Some ECUs require an ECU reset (0x11) for NVM values to be finalized and persistent.</div></div>
+    </div>
+  </div>
+
+  <!-- ==================== 0x19 ==================== -->
+  <div class="service-panel" id="panel4">
+    <div class="svc-header">
+      <div class="svc-id-badge" style="background: linear-gradient(135deg, var(--accent2), #ff4444);">0x19</div>
+      <div>
+        <div class="svc-title">Read DTC Information</div>
+        <div class="svc-subtitle">Read Diagnostic Trouble Codes and their status, snapshot, extended data from ECU memory</div>
+      </div>
+      <div class="svc-iso">ISO 14229-1<br>§ 11.8 ★ KEY</div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// DTC Structure — Understand This First</div>
+      <div class="dtc-structure">
+        <div class="dtc-byte">
+          <div class="dtc-byte-head">BYTE 1 — HIGH</div>
+          <div class="dtc-byte-body">Group ID<br>e.g. <span style="color:var(--accent)">P = 0x00/0x40</span><br>C = 0x80<br>B = 0xC0<br>U = 0x04</div>
+        </div>
+        <div class="dtc-byte">
+          <div class="dtc-byte-head">BYTE 2 — MID</div>
+          <div class="dtc-byte-body">Sub-group<br>e.g. <span style="color:var(--accent)">0x01</span><br>(Fuel/Air metering)</div>
+        </div>
+        <div class="dtc-byte">
+          <div class="dtc-byte-head">BYTE 3 — LOW</div>
+          <div class="dtc-byte-body">Fault code<br>e.g. <span style="color:var(--accent)">0x00</span><br>(specific fault)</div>
+        </div>
+        <div class="dtc-byte">
+          <div class="dtc-byte-head">BYTE 4 — STATUS</div>
+          <div class="dtc-byte-body">8-bit status mask<br><span style="color:var(--accent2)">Bit 0</span>: testFailed<br><span style="color:var(--accent2)">Bit 3</span>: confirmedDTC<br><span style="color:var(--accent2)">Bit 5</span>: testNotComp</div>
+        </div>
+      </div>
+      <div style="font-family: var(--mono); font-size: 12px; color: var(--muted); background: var(--card); border: 1px solid var(--border); padding: 12px 16px; border-radius: 3px; margin-bottom: 20px;">
+        Example DTC: <span style="color:var(--accent)">P0100</span> → Bytes: <span style="color:var(--accent)">00 01 00</span> (Mass Air Flow sensor fault)<br>
+        Full 4 bytes in UDS: <span style="color:var(--accent)">00 01 00 2F</span> → DTC P0100 with status 0x2F (active, confirmed, pending)
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// All SubFunctions — This is What Interviewers Love</div>
+      <table class="subfn-table" style="margin-bottom: 24px;">
+        <tr><th>SubFn</th><th>Name</th><th>What It Returns</th><th>Common Use</th></tr>
+        <tr><td class="sf">0x01</td><td class="name">reportNumberOfDTCByStatusMask</td><td class="use">Count of DTCs matching status mask</td><td class="use">Quick count check</td></tr>
+        <tr><td class="sf">0x02</td><td class="name">reportDTCByStatusMask</td><td class="use">DTC + status for all matching DTCs</td><td class="use">★ Most used in testing</td></tr>
+        <tr><td class="sf">0x03</td><td class="name">reportDTCSnapshotIdentification</td><td class="use">List of DTCs with stored snapshots</td><td class="use">Snapshot inventory</td></tr>
+        <tr><td class="sf">0x04</td><td class="name">reportDTCSnapshotRecordByDTCNumber</td><td class="use">Freeze frame data for specific DTC</td><td class="use">Root cause analysis</td></tr>
+        <tr><td class="sf">0x06</td><td class="name">reportDTCExtDataRecordByDTCNumber</td><td class="use">Extended data (aging counter, occurrence)</td><td class="use">Intermittent faults</td></tr>
+        <tr><td class="sf">0x07</td><td class="name">reportNumberOfDTCBySeverityMaskRecord</td><td class="use">Count by severity level</td><td class="use">Safety analysis</td></tr>
+        <tr><td class="sf">0x08</td><td class="name">reportDTCBySeverityMaskRecord</td><td class="use">DTCs filtered by severity</td><td class="use">Critical DTC list</td></tr>
+        <tr><td class="sf">0x09</td><td class="name">reportSeverityInformationOfDTC</td><td class="use">Severity + functional unit for a DTC</td><td class="use">Severity check</td></tr>
+        <tr><td class="sf">0x0A</td><td class="name">reportSupportedDTC</td><td class="use">All DTCs supported (regardless of status)</td><td class="use">DTC catalogue check</td></tr>
+        <tr><td class="sf">0x0B</td><td class="name">reportFirstTestFailedDTC</td><td class="use">First DTC that failed since last clear</td><td class="use">Failure sequence</td></tr>
+        <tr><td class="sf">0x0C</td><td class="name">reportFirstConfirmedDTC</td><td class="use">First confirmed DTC since last clear</td><td class="use">Root cause DTC</td></tr>
+        <tr><td class="sf">0x0F</td><td class="name">reportMirrorMemoryDTCByStatusMask</td><td class="use">DTCs in mirror memory</td><td class="use">Backup DTC area</td></tr>
+        <tr><td class="sf">0x13</td><td class="name">reportUserDefMemoryDTCByStatusMask</td><td class="use">DTCs from user-defined memory</td><td class="use">OEM custom memory</td></tr>
+        <tr><td class="sf">0x17</td><td class="name">reportDTCWithPermanentStatus</td><td class="use">Permanent DTCs (cannot be cleared by 0x14)</td><td class="use">CARB permanent DTC</td></tr>
+      </table>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Flow for SubFunction 0x02 (Most Common)</div>
+      <div class="flow-diagram">
+        <div class="flow-step"><div class="flow-step-num">01</div><div class="flow-step-title">Enter Session</div><div class="flow-step-detail">Default or<br>Extended OK</div></div>
+        <div class="flow-step"><div class="flow-step-num">02</div><div class="flow-step-title">Send Request</div><div class="flow-step-detail">19 02 + status<br>mask byte</div></div>
+        <div class="flow-step"><div class="flow-step-num">03</div><div class="flow-step-title">ECU Filters DTCs</div><div class="flow-step-detail">AND status mask<br>with each DTC</div></div>
+        <div class="flow-step"><div class="flow-step-num">04</div><div class="flow-step-title">ECU Responds</div><div class="flow-step-detail">0x59 + 0x02 +<br>avail mask</div></div>
+        <div class="flow-step"><div class="flow-step-num">05</div><div class="flow-step-title">DTC Records</div><div class="flow-step-detail">3-byte DTC +<br>status (repeat)</div></div>
+      </div>
+    </div>
+
+    <div class="cards-grid">
+      <div class="info-card">
+        <div class="card-head req">→ Request Frame (0x02)</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x19</td><td class="desc">Service ID</td></tr>
+            <tr><td class="hex">2</td><td class="hex">0x02</td><td class="desc">SubFunction: reportDTCByStatusMask</td></tr>
+            <tr><td class="hex">3</td><td class="hex">0xXX</td><td class="desc">DTCStatusMask (bitfield)</td></tr>
+          </table>
+          <br>
+          <div style="font-family: var(--mono); font-size: 12px; color: var(--muted);">Example: <span style="color:var(--accent)">19 02 09</span> → Read all DTCs with bit0 (testFailed) or bit3 (confirmedDTC) set</div>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head res">← Positive Response (0x02)</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Byte</th><th>Value</th><th>Description</th></tr>
+            <tr><td class="hex">1</td><td class="hex">0x59</td><td class="desc">Response SID (0x19+0x40)</td></tr>
+            <tr><td class="hex">2</td><td class="hex">0x02</td><td class="desc">Echoed SubFunction</td></tr>
+            <tr><td class="hex">3</td><td class="hex">0xXX</td><td class="desc">DTCStatusAvailabilityMask</td></tr>
+            <tr><td class="hex">4-6</td><td class="hex">DTC</td><td class="desc">3-byte DTC code (1st DTC)</td></tr>
+            <tr><td class="hex">7</td><td class="hex">Status</td><td class="desc">Status byte (1st DTC)</td></tr>
+            <tr><td class="hex">…</td><td class="hex">Repeat</td><td class="desc">Next DTC (4 bytes each)</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head sub">DTC Status Mask — 8 Bits Explained</div>
+        <div class="card-body">
+          <table class="byte-table">
+            <tr><th>Bit</th><th>Name</th><th>Meaning</th></tr>
+            <tr><td class="hex">0</td><td>testFailed</td><td class="desc">Current diagnostic test is failing NOW</td></tr>
+            <tr><td class="hex">1</td><td>testFailedThisOpCycle</td><td class="desc">Failed at least once this ignition cycle</td></tr>
+            <tr><td class="hex">2</td><td>pendingDTC</td><td class="desc">Failed once but not yet confirmed</td></tr>
+            <tr><td class="hex">3</td><td>confirmedDTC</td><td class="desc">Failed threshold met — confirmed fault</td></tr>
+            <tr><td class="hex">4</td><td>testNotCompletedSinceLastClear</td><td class="desc">Test not run since last 0x14 clear</td></tr>
+            <tr><td class="hex">5</td><td>testFailedSinceLastClear</td><td class="desc">Has failed since last clear</td></tr>
+            <tr><td class="hex">6</td><td>testNotComplThisOpCycle</td><td class="desc">Test not yet run this cycle</td></tr>
+            <tr><td class="hex">7</td><td>warningIndicatorRequested</td><td class="desc">MIL / warning lamp should be on</td></tr>
+          </table>
+        </div>
+      </div>
+      <div class="info-card">
+        <div class="card-head tip">★ Snapshot Data (0x04) — What Is It?</div>
+        <div class="card-body">
+          <ul class="check-list tip-list">
+            <li>Also called <strong>Freeze Frame</strong>. ECU stores a snapshot of live sensor values at the moment a DTC was set.</li>
+            <li>Contains: engine speed, coolant temp, vehicle speed, battery voltage, injector duty cycle etc. — exactly what was happening when fault occurred.</li>
+            <li>Request: <span style="font-family: var(--mono); color: var(--accent)">19 04 [DTC high] [DTC mid] [DTC low] FF</span> (0xFF = all records).</li>
+            <li>Response: 0x59 04 + DTC + snapshotRecordNumber + dataIdentifier + data values.</li>
+            <li>Critical for root cause analysis — "what was the car doing when this DTC was stored?"</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Extended Data (0x06) — Aging & Occurrence Counters</div>
+      <div class="cards-grid">
+        <div class="info-card">
+          <div class="card-head sub">Extended Data Record Contents</div>
+          <div class="card-body">
+            <ul class="check-list">
+              <li><strong>Occurrence Counter:</strong> How many times this DTC has been set (0–255). Useful for intermittent faults.</li>
+              <li><strong>Aging Counter:</strong> Counts up each ignition cycle without the fault. When it reaches aging threshold (e.g. 40 cycles), DTC is auto-healed. Reset to 0 if fault recurs.</li>
+              <li><strong>Aging Threshold:</strong> OEM-defined max aging cycles — typically 40.</li>
+              <li><strong>FaultDetectionCounter:</strong> Internal debounce counter — goes from 0 to threshold before DTC is confirmed.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-section">
+      <div class="section-label">// Interview Questions — 0x19 (Most Critical)</div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: What is the difference between a pending DTC and a confirmed DTC? <span class="toggle">+</span></div><div class="iq-a">Pending DTC (bit 2 of status = 1): The diagnostic test has detected a fault condition for the first time in the current or recent operating cycle, but has not yet met the OEM-defined confirmation threshold. It could be a transient fault. It is stored as "pending."<br><br>Confirmed DTC (bit 3 = 1): The fault has been detected across multiple drive cycles or has exceeded the debounce/occurrence threshold defined in the ECU. This triggers MIL illumination in emissions-relevant systems. Confirmed DTCs persist in NVM even after ignition off. Pending DTCs may be cleared automatically if the fault doesn't recur.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: What is DTCStatusAvailabilityMask in the 0x59 response? <span class="toggle">+</span></div><div class="iq-a">This byte in the 0x59 response tells the tester which status bits the ECU actually supports. Not all ECUs implement all 8 bits. For example, if bit 7 (warningIndicatorRequested) is 0 in the availability mask, it means the ECU doesn't track that bit and it will always be 0 in any DTC status. Testers must AND the requested status mask with the availability mask to understand what filtering is actually meaningful. If you request with mask 0xFF but availability mask is 0x2F, bits 6 and 7 are meaningless for filtering.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: What is the difference between 0x19 0x02 and 0x19 0x0A? <span class="toggle">+</span></div><div class="iq-a">0x19 0x02 (reportDTCByStatusMask): Returns only DTCs whose current status matches the provided mask. You can filter for active faults (mask 0x01), confirmed faults (0x08), or pending (0x04). DTCs that don't match the mask are excluded from the response. If no DTCs match, response is 0x59 0x02 + availMask with no DTC records.<br><br>0x19 0x0A (reportSupportedDTC): Returns ALL DTCs the ECU can potentially set, regardless of their current status — even DTCs that have never been triggered. Used for DTC catalogue validation and to verify the ECU supports all required DTCs per OEM specification.</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: How do you clear DTCs and what is the relationship to 0x19? <span class="toggle">+</span></div><div class="iq-a">DTCs are cleared using service 0x14 (ClearDiagnosticInformation), not 0x19. The flow is: (1) Read DTCs with 0x19 to document them, (2) Send 0x14 + DTC group mask (e.g. 0x14 FF FF FF clears all DTCs), (3) Receive 0x54 positive response, (4) Re-read with 0x19 0x02 to confirm DTCs are cleared. Note: Permanent DTCs (reportable via 0x19 0x17) cannot be cleared by 0x14 — they can only be cleared by the ECU's own internal monitor running successfully for the required number of drive cycles (CARB/OBD requirement).</div></div>
+      <div class="iq-block"><div class="iq-q" onclick="toggleIQ(this)">Q: Explain DTC aging with a practical example? <span class="toggle">+</span></div><div class="iq-a">Scenario: A wheel speed sensor fault is set (DTC confirmed). After repair, the fault no longer occurs. The aging counter in extended data (0x19 0x06) increments by 1 every ignition cycle where the test runs and passes. OEM threshold = 40 cycles. After 40 fault-free cycles, the ECU automatically removes the confirmed DTC from memory — it has "aged out." If the fault recurs on cycle 25, the aging counter resets to 0 and must restart the count. This mechanism prevents the ECU from retaining stale DTCs forever, and distinguishes genuinely repaired faults from ignored ones.</div></div>
+    </div>
+  </div>
+
+  <footer>// UDS Protocol — ISO 14229-1 — KPIT Technologies — Interview Edition //</footer>
+</div>
+
+<script>
+  function showService(idx) {
+    document.querySelectorAll('.service-panel').forEach((p, i) => {
+      p.classList.toggle('active', i === idx);
+    });
+    document.querySelectorAll('.svc-btn').forEach((b, i) => {
+      b.classList.toggle('active', i === idx);
+    });
+    document.getElementById('progressFill').style.width = ((idx + 1) * 20) + '%';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function toggleIQ(el) {
+    const ans = el.nextElementSibling;
+    const toggle = el.querySelector('.toggle');
+    ans.classList.toggle('open');
+    toggle.textContent = ans.classList.contains('open') ? '−' : '+';
+  }
+</script>
+</body>
+</html>

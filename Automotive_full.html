@@ -1,0 +1,2451 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Automotive Embedded Systems &amp; Software Testing Handbook</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code&display=swap"
+        rel="stylesheet" />
+
+    <!-- Highlight.js (light theme swapped dynamically) -->
+    <link id="theme-style" rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+
+    <style>
+        /* ===== CSS ===== */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-sidebar: rgba(248, 250, 252, 0.85);
+            --bg-hover: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent-primary: #2563eb;
+            --accent-hover: #1d4ed8;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --font-sans: 'Inter', system-ui, sans-serif;
+            --font-mono: 'Fira Code', monospace;
+        }
+
+        .dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-sidebar: rgba(30, 41, 59, 0.85);
+            --bg-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --accent-primary: #3b82f6;
+            --accent-hover: #60a5fa;
+            --border-color: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 320px;
+            background-color: var(--bg-sidebar);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            letter-spacing: -0.025em;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 4px;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            padding: 10px 16px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: var(--bg-hover);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .sidebar-nav a.active {
+            background-color: var(--accent-primary);
+            color: #ffffff;
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-icon {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            padding: 8px 0;
+            transition: color 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            color: var(--text-primary);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            position: relative;
+        }
+
+        .mobile-header {
+            display: none;
+            padding: 16px 24px;
+            background-color: var(--bg-sidebar);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .mobile-header button {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .content-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 48px 32px;
+            width: 100%;
+        }
+
+        .markdown-body {
+            font-size: 1.05rem;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .markdown-body h1,
+        .markdown-body h2,
+        .markdown-body h3,
+        .markdown-body h4 {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-top: 2em;
+            margin-bottom: 0.75em;
+            line-height: 1.3;
+        }
+
+        .markdown-body h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            margin-top: 0;
+            background: linear-gradient(to right, var(--accent-primary), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .markdown-body h2 {
+            font-size: 1.8rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.3em;
+        }
+
+        .markdown-body h3 {
+            font-size: 1.4rem;
+        }
+
+        .markdown-body p,
+        .markdown-body ul,
+        .markdown-body ol {
+            margin-bottom: 1.25em;
+            color: var(--text-secondary);
+        }
+
+        .markdown-body li {
+            margin-bottom: 0.5em;
+        }
+
+        .markdown-body a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .markdown-body a:hover {
+            text-decoration: underline;
+        }
+
+        .markdown-body blockquote {
+            border-left: 4px solid var(--accent-primary);
+            background-color: var(--bg-secondary);
+            padding: 16px 20px;
+            margin: 1.5em 0;
+            border-radius: 0 8px 8px 0;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2em 0;
+            background-color: var(--bg-primary);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .markdown-body th,
+        .markdown-body td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .markdown-body th {
+            background-color: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .markdown-body pre {
+            background-color: #1e293b;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 1.5em 0;
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .markdown-body code {
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+        }
+
+        .markdown-body p code,
+        .markdown-body li code {
+            background-color: var(--bg-secondary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn-nav {
+            padding: 12px 24px;
+            background-color: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-sans);
+        }
+
+        .btn-nav:hover {
+            background-color: var(--bg-hover);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .spinner-container {
+            display: flex;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .initial-load h1 {
+            margin-top: 0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                box-shadow: var(--shadow-md);
+            }
+
+            .sidebar.open {
+                transform: translateX(320px);
+            }
+
+            .mobile-header {
+                display: flex;
+            }
+
+            .content-wrapper {
+                padding: 24px 16px;
+            }
+        }
+
+        /* mermaid diagrams inside markdown */
+        .markdown-body .mermaid {
+            background: var(--bg-secondary);
+            padding: 16px;
+            border-radius: 8px;
+            margin: 1.5em 0;
+            text-align: center;
+        }
+
+        /* ensure mermaid svg uses text color */
+        .markdown-body .mermaid svg {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body class="light-mode">
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Automotive Handbook</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <ul id="toc-list"></ul>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="btn-icon">
+                    <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                    </svg>
+                    <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" style="display:none;">
+                        <circle cx="12" cy="12" r="5" />
+                        <line x1="12" y1="1" x2="12" y2="3" />
+                        <line x1="12" y1="21" x2="12" y2="23" />
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+                        <line x1="1" y1="12" x2="3" y2="12" />
+                        <line x1="21" y1="12" x2="23" y2="12" />
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                    </svg>
+                    <span id="theme-text">Dark Mode</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="mobile-header">
+                <button id="mobile-menu-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+                <h3>Handbook</h3>
+            </header>
+
+            <div class="content-wrapper">
+                <div id="loading-spinner" class="spinner-container" style="display:none;">
+                    <div class="spinner"></div>
+                </div>
+                <article id="markdown-content" class="markdown-body">
+                    <div class="initial-load">
+                        <h1>Welcome to the Automotive Handbook</h1>
+                        <p>Select a chapter from the sidebar to begin.</p>
+                    </div>
+                </article>
+                <div class="pagination" id="pagination" style="display:none;">
+                    <button id="prev-btn" class="btn-nav">← Previous</button>
+                    <button id="next-btn" class="btn-nav">Next →</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js">
+    </script>
+
+    <script>
+        // ============================================================
+        // EMBEDDED CHAPTER CONTENT (all markdown from every file)
+        // ============================================================
+        const chapterContent = {
+
+            "README.md": `# Automotive Embedded Systems & Software Testing Handbook
+
+        Welcome to the **Comprehensive Automotive Embedded Systems & Software Testing Handbook**. This handbook is crafted as a professional training manual from absolute basics to advanced concepts. It is suitable for freshers, engineers, testers, validation engineers, integration engineers, and automotive software developers preparing for interviews and real-world projects.
+
+        ## Table of Contents
+
+        1. [Automotive Industry Fundamentals](01_Industry_Fundamentals.md)
+        2. [Automotive Communication Protocols](02_Communication_Protocols.md)
+        3. [Diagnostics](03_Diagnostics.md)
+        4. [Heavy Duty Vehicle Protocols](04_Heavy_Duty_Protocols.md)
+        5. [Software Development Life Cycle & Standards](05_SDLC_and_Standards.md)
+        6. [Automotive Testing](06_Automotive_Testing.md)
+        7. [AUTOSAR](07_AUTOSAR.md)
+        8. [Advanced Driver Assistance Systems (ADAS)](08_ADAS.md)
+        9. [Automotive Infotainment](09_Infotainment.md)
+        10. [Connectivity Technologies](10_Connectivity.md)
+        11. [Navigation Systems](11_Navigation.md)
+        12. [Radio Technologies](12_Radio_Technologies.md)
+        13. [Automotive Cybersecurity](13_Cybersecurity.md)
+        14. [Over-The-Air (OTA) Updates](14_OTA_Updates.md)
+        15. [Tools Used in Automotive Industry](15_Tools.md)
+        16. [Automotive Interview Preparation](16_Interview_Prep.md)
+        17. [Real-Time Projects](17_Real_Time_Projects.md)
+        18. [Industry Reference Standards](18_Reference_Standards.md)
+
+        ---
+
+        ## Acronyms & Glossary
+
+        | Acronym | Full Form | Description |
+        |---|---|---|
+        | **ADAS** | Advanced Driver Assistance Systems | Systems developed to automate/adapt/enhance vehicle systems for safety and better driving. |
+        | **AUTOSAR** | Automotive Open System Architecture | A standardized automotive software architecture. |
+        | **BSW** | Basic Software | Standardized software layer in AUTOSAR. |
+        | **CAN** | Controller Area Network | A robust vehicle bus standard designed to allow microcontrollers and devices to communicate. |
+        | **DoIP** | Diagnostics over Internet Protocol | Diagnostic protocol running over Automotive Ethernet. |
+        | **DTC** | Diagnostic Trouble Code | Codes used to diagnose malfunctions in a vehicle. |
+        | **ECU** | Electronic Control Unit | Any embedded system in automotive electronics that controls one or more of the electrical systems or subsystems in a vehicle. |
+        | **E/E** | Electrical/Electronic | Refers to the electrical and electronic architecture of a vehicle. |
+        | **LIN** | Local Interconnect Network | A serial network protocol used for communication between components in vehicles. |
+        | **MCAL** | Microcontroller Abstraction Layer | The lowest software layer of the Basic Software in AUTOSAR. |
+        | **OBD-II** | On-Board Diagnostics II | A standard that provides access to state of health information for various vehicle sub-systems. |
+        | **OTA** | Over-The-Air | Delivery of software updates wirelessly. |
+        | **RTE** | Runtime Environment | AUTOSAR layer that provides communication services to the application software. |
+        | **SDV** | Software Defined Vehicle | A vehicle whose features and functions are primarily enabled through software. |
+        | **SOME/IP** | Scalable service-Oriented MiddlewarE over IP | An automotive middleware solution that can be used for control messages. |
+        | **SWC** | Software Component | An application software block in AUTOSAR. |
+        | **UDS** | Unified Diagnostic Services | A diagnostic communication protocol in the automotive electronic control unit environment (ISO 14229). |
+        | **V2X** | Vehicle-to-Everything | Communication between a vehicle and any entity that may affect, or may be affected by, the vehicle. |
+
+        ---
+
+        *This handbook is a living document meant to provide deep dives into both theoretical understanding and practical validation of automotive software.*`,
+
+            "01_Industry_Fundamentals.md": `# SECTION 1: Automotive Industry Fundamentals
+
+        This section provides the foundational knowledge required to understand the modern automotive landscape, vehicle architectures, and the lifecycle of automotive embedded systems.
+
+        ---
+
+        ## 1. Automotive Industry Overview
+
+        ### Theory
+        The automotive industry has evolved from purely mechanical systems to highly complex, software-driven embedded systems. Modern vehicles contain tens to over a hundred Electronic Control Units (ECUs) communicating over various networks to provide functionality ranging from engine control to advanced driver assistance systems (ADAS).
+
+        ### Working Principle
+        Automotive engineering relies on integrating mechanical systems (chassis, powertrain) with electrical/electronic (E/E) systems. The shift towards "CASE" (Connected, Autonomous, Shared, Electric) is transforming the industry into a software-first domain.
+
+        ### Industry Use Cases
+        - **Electric Vehicles (EVs):** Battery Management Systems (BMS) replacing internal combustion engine controllers.
+        - **Autonomous Driving:** AI-driven sensor fusion for self-driving cars.
+
+        ### Interview Questions & Answers
+        **Q: What is the significance of CASE in the modern automotive industry?**
+        > A: CASE stands for Connected, Autonomous, Shared, and Electric. It represents the four major megatrends disrupting the traditional automotive industry, pushing the focus from mechanical engineering to software, telematics, battery tech, and AI.
+
+        ---
+
+        ## 2. Vehicle Architecture & E/E Architecture
+
+        ### Theory
+        Vehicle Architecture encompasses the physical layout, whereas Electrical/Electronic (E/E) Architecture defines how ECUs, sensors, actuators, and wiring harnesses are interconnected.
+
+        ### Architecture Evolution
+        1. **Decentralized (Distributed) Architecture:** 100+ individual ECUs, each doing a specific task (e.g., door module). High wiring weight.
+        2. **Domain-Centralized Architecture:** ECUs grouped by domains (e.g., Infotainment, Powertrain, ADAS) connected to a central Domain Controller.
+        3. **Zonal Architecture:** ECUs grouped by physical location in the car (Zones) connected to a central high-performance vehicle computer. Drastically reduces wiring harness weight.
+
+        ### Diagrams
+        \`\`\`mermaid
+        graph TD
+            subgraph Zonal Architecture
+                VC[Central Vehicle Computer]
+                Z1[Zone Controller - Front Left]
+                Z2[Zone Controller - Front Right]
+                Z3[Zone Controller - Rear]
+
+                VC --- Z1
+                VC --- Z2
+                VC --- Z3
+
+                Z1 --- S1[Radar]
+                Z1 --- A1[Headlight]
+            end
+        \`\`\`
+
+        ### Best Practices
+        - Reduce wiring weight by migrating from distributed to zonal architecture.
+        - Centralize compute power to enable easier Over-The-Air (OTA) updates.
+
+        ---
+
+        ## 3. Automotive Domains
+
+        Vehicles are typically divided into functional domains:
+        1. **Powertrain:** Engine, transmission, battery (EV), motor control.
+        2. **Chassis & Safety:** Steering, braking, suspension, airbags, ABS.
+        3. **Body & Comfort:** Lighting, HVAC, windows, doors, seats.
+        4. **Infotainment:** Head unit, displays, audio, navigation.
+        5. **ADAS (Advanced Driver Assistance Systems):** Cameras, radar, LiDAR, parking assist.
+
+        ### Test Scenarios
+        - **Test Case:** Verify cross-domain communication.
+        - **Action:** Press the AC button (Body domain) and monitor engine idle speed adjustment (Powertrain domain).
+        - **Expected Result:** Powertrain ECU compensates for compressor load within 500ms.
+
+        ---
+
+        ## 4. ECU Fundamentals
+
+        ### Theory
+        An Electronic Control Unit (ECU) is an embedded system that controls one or more of the electrical systems or subsystems in a vehicle.
+
+        ### Architecture
+        An ECU consists of:
+        - **Microcontroller (MCU):** The brain (e.g., Infineon Aurix, NXP S32).
+        - **Power Supply:** Converts vehicle battery voltage (12V/24V) to MCU voltage (5V/3.3V/1.8V).
+        - **Transceivers:** Hardware chips to interface with CAN/LIN/Ethernet buses.
+        - **Inputs/Outputs (I/O):** ADC for analog sensors, PWM for motor control.
+
+        ### Working Principle
+        1. **Sense:** Reads sensor data (e.g., wheel speed).
+        2. **Compute:** Processes data using control algorithms (e.g., ABS logic).
+        3. **Actuate:** Sends command to actuators (e.g., brake caliper valves).
+
+        ### Debugging Techniques
+        - **Issue:** ECU does not wake up.
+        - **Debugging:** Check power and ground pins using a multimeter. Verify the wake-up signal (e.g., KL15 ignition line or CAN Wake-up pulse) using an oscilloscope.
+
+        ---
+
+        ## 5. Sensors and Actuators
+
+        ### Theory
+        - **Sensors:** Convert physical parameters (temperature, speed, pressure) into electrical signals.
+        - **Actuators:** Convert electrical signals into physical actions (movement, light, heat).
+
+        ### Real-world Examples
+        - **Sensor:** Oxygen (O2) sensor in the exhaust, Hall effect sensor for wheel speed.
+        - **Actuator:** Fuel injector solenoid, electronic throttle valve motor.
+
+        ### Practical Exercises
+        - **Exercise:** Simulate a Temperature Sensor using a variable resistor (potentiometer) connected to an Arduino/Raspberry Pi ADC pin. Write a script to convert the voltage back to a temperature value based on a lookup table.
+
+        ---
+
+        ## 6. Automotive Networks Overview
+
+        ### Theory
+        Because a car has multiple ECUs, they need to talk to each other. Wiring them point-to-point would result in miles of heavy copper wire. Instead, they are connected via network buses.
+
+        ### Types of Networks
+        - **CAN/CAN-FD:** Medium speed, highly reliable, used for Powertrain/Chassis.
+        - **LIN:** Low speed, low cost, used for Body/Comfort (e.g., seat motors, mirrors).
+        - **FlexRay:** High speed, deterministic, used for X-by-wire (Steering-by-wire).
+        - **Automotive Ethernet:** Very high speed, used for ADAS, Cameras, Infotainment.
+
+        ### Interview Questions & Answers
+        **Q: Why do we use different communication protocols in a vehicle instead of just one?**
+        > A: Different systems have different requirements. ADAS needs high bandwidth (Ethernet), Engine control needs high reliability and real-time response (CAN/FlexRay), and simple window switches need low cost (LIN). Using a mix optimizes both cost and performance.
+
+        ---
+
+        ## 7. SDV (Software Defined Vehicle)
+
+        ### Theory
+        SDV represents a paradigm shift where the vehicle's features and functions are primarily driven by software rather than hardware. Instead of buying a car and having its features locked forever, SDVs can receive new features post-purchase via software updates (OTA).
+
+        ### Architecture
+        - Decouples hardware from software.
+        - Uses hypervisors to run multiple operating systems (e.g., Android Automotive and an RTOS) on a single high-performance System-on-Chip (SoC).
+        - Uses Service-Oriented Architecture (SOA).
+
+        ### Industry Use Cases
+        - Tesla's Autopilot updates.
+        - Unlocking heated seats or battery range via software subscriptions.
+
+        ---
+
+        ## 8. Vehicle Lifecycle & Development Process
+
+        ### Theory
+        The automotive development process spans several years from concept to production, heavily governed by standards to ensure safety.
+
+        ### Stages
+        1. **Concept & Requirements:** Defining what the car will do.
+        2. **System Design:** Creating the E/E architecture.
+        3. **Implementation:** Coding the software (often using AUTOSAR) and designing hardware.
+        4. **Verification & Validation (V&V):** Testing at unit, integration, HIL (Hardware-in-the-Loop), and vehicle levels.
+        5. **SOP (Start of Production):** Mass manufacturing begins.
+        6. **Post-Production:** Maintenance, OTA updates, recalls.
+
+        ### Message Flow (Process Flow)
+        \`\`\`mermaid
+        sequenceDiagram
+            participant OEM (Car Maker)
+            participant Tier 1 (Supplier)
+            participant Tier 2 (Component)
+
+            OEM->>Tier 1: High Level Requirements (ECU specification)
+            Tier 1->>Tier 2: Hardware/Chip Requirements
+            Tier 2-->>Tier 1: Deliver Microcontrollers/Transceivers
+            Tier 1->>Tier 1: Develop Software & Build ECU
+            Tier 1-->>OEM: Deliver ECU Sample
+            OEM->>OEM: Vehicle Level Testing (HIL/SIL)
+            OEM->>OEM: Start of Production (SOP)
+        \`\`\`
+
+        ### Best Practices
+        - Maintain a **Traceability Matrix**: Every requirement must be linked to a specific design element, a line of code, and a test case. This is critical for ISO 26262 compliance.
+
+        ---
+
+        ## Chapter Summary
+        - Modern cars are essentially "computers on wheels."
+        - The industry is shifting from distributed ECUs to Zonal Architectures and Software-Defined Vehicles (SDVs).
+        - A mix of communication protocols (CAN, LIN, Ethernet) is necessary to balance cost, speed, and safety.
+        - The development lifecycle is rigorous, relying heavily on V&V and traceability.`,
+
+            "02_Communication_Protocols.md": `# SECTION 2: Automotive Communication Protocols
+
+        Modern vehicles require robust, high-speed, and fault-tolerant communication networks. This section covers the primary automotive network protocols in detail.
+
+        ---
+
+        ## 1. Controller Area Network (CAN) Protocol
+
+        ### Theory
+        CAN is a multi-master, message broadcast system that specifies a maximum signaling rate of 1 megabit per second (Mbps). Unlike standard networks such as USB or Ethernet, CAN does not send large blocks of data point-to-point. Instead, many short messages like temperature or RPM are broadcast to the entire network.
+
+        ### Working Principle
+        CAN uses differential signaling over a twisted pair of wires (CAN High and CAN Low).
+        - **Dominant state (Logical 0):** Voltage difference between CAN High and CAN Low is > 0.9V (typically 2V).
+        - **Recessive state (Logical 1):** Voltage difference is ~0V (both lines at ~2.5V).
+
+        ### CAN Frame Structure
+        A Standard CAN 2.0A frame consists of:
+        1. **Start of Frame (SOF):** 1 dominant bit.
+        2. **Arbitration ID:** 11 bits (Standard) or 29 bits (Extended). Determines priority.
+        3. **RTR (Remote Transmission Request):** 1 bit. Indicates if data is being requested or transmitted.
+        4. **Control Field (IDE, r0, DLC):** 6 bits. DLC (Data Length Code) specifies data bytes (0-8).
+        5. **Data Field:** 0 to 8 bytes.
+        6. **CRC Field:** 15-bit Cyclic Redundancy Check + 1-bit delimiter.
+        7. **ACK Field:** 1-bit ACK slot + 1-bit delimiter. (Recessive sent by Tx, overwritten to Dominant by Rx).
+        8. **End of Frame (EOF):** 7 recessive bits.
+
+        ### Arbitration (Message Priority)
+        CAN uses CSMA/CD+AMP (Carrier Sense Multiple Access with Collision Detection and Arbitration on Message Priority).
+        - If multiple nodes transmit simultaneously, they compare bits on the bus.
+        - **A dominant bit (0) overwrites a recessive bit (1).**
+        - The node transmitting a recessive bit that reads a dominant bit on the bus loses arbitration and stops transmitting.
+        - *Lower ID = Higher Priority.*
+
+        ### Bit Stuffing
+        To maintain synchronization, if 5 consecutive bits of the same polarity are transmitted, a bit of the opposite polarity is inserted (stuffed). The receiver removes it (destuffing).
+
+        ### Error Handling
+        CAN is highly fault-tolerant. ECUs track errors using TEC (Transmit Error Counter) and REC (Receive Error Counter).
+        - **Error Active:** TEC/REC < 127. Node can send active error frames (6 dominant bits).
+        - **Error Passive:** TEC/REC > 127. Node sends passive error frames (6 recessive bits).
+        - **Bus Off:** TEC > 255. Node disconnects from the bus.
+
+        ### CAN FD (Flexible Data-Rate)
+        CAN FD improves upon classic CAN by:
+        1. Increasing data payload from 8 bytes to **64 bytes**.
+        2. Allowing dual bit-rates: Arbitration phase (e.g., 500 kbps) and Data phase (e.g., 2 Mbps or 5 Mbps).
+
+        ### Bus Load Calculation
+        \`Bus Load (%) = (Total bits transmitted per second / Baud rate) * 100\`
+
+        ### CANoe, CANalyzer & Vector Tools
+        - **CANalyzer:** Used for network analysis, monitoring, and logging.
+        - **CANoe:** Comprehensive tool for development, simulation, and testing. It allows simulating missing ECUs (Restbus simulation) using CAPL (CAN Access Programming Language).
+
+        ### Practical Examples & Test Scenarios
+        - **Test Scenario:** Verify CAN arbitration.
+        - **Action:** Force ECU A (ID 0x100) and ECU B (ID 0x200) to transmit simultaneously.
+        - **Expected Result:** ECU A wins arbitration. ECU B retries after ECU A finishes.
+
+        ### Interview Questions & Answers
+        **Q: What happens if an ECU loses arbitration?**
+        > A: The ECU stops transmitting, switches to receive mode to read the higher-priority message, and automatically retries transmission once the bus is idle.
+
+        **Q: Explain Bit Stuffing and its exception.**
+        > A: Bit stuffing inserts an opposite bit after 5 consecutive identical bits for synchronization. It applies from SOF to the CRC sequence. It is *not* applied in the CRC Delimiter, ACK field, or EOF.
+
+        ---
+
+        ## 2. Local Interconnect Network (LIN)
+
+        ### Theory
+        LIN is a single-wire, serial network protocol used for low-cost, low-speed applications (up to 19.2 kbps) where the bandwidth and fault tolerance of CAN are not required.
+
+        ### Architecture & Scheduling
+        - **Master-Slave Architecture:** One Master, up to 15 Slaves.
+        - **Deterministic:** The Master dictates when slaves can transmit using a Schedule Table. No collisions occur.
+
+        ### LIN Frame Structure
+        1. **Header (Sent by Master):** Sync Break, Sync Byte (0x55), Protected Identifier (PID).
+        2. **Response (Sent by Slave):** Data (2, 4, or 8 bytes), Checksum.
+
+        ### Diagnostics over LIN
+        The Master acts as a gateway. It receives diagnostic requests over CAN, packages them into LIN diagnostic frames (Node Configuration and Identification - NAD), and sends them to the slave.
+
+        ---
+
+        ## 3. FlexRay
+
+        ### Theory
+        FlexRay is a high-speed (up to 10 Mbps), deterministic, fault-tolerant protocol designed for safety-critical systems like Steer-by-Wire or Brake-by-Wire.
+
+        ### Working Principle
+        It uses a combination of Time-Division Multiple Access (TDMA) for deterministic communication (Static Segment) and flexible access for event-driven data (Dynamic Segment). It supports dual-channel topology for redundancy.
+
+        ---
+
+        ## 4. Automotive Ethernet
+
+        ### Fundamentals
+        Traditional Ethernet was not suited for cars due to electromagnetic interference (EMI) and lack of determinism. Automotive Ethernet (e.g., 100BASE-T1, 1000BASE-T1) uses a single unshielded twisted pair (UTP) capable of high speeds while meeting EMI requirements.
+
+        ### Key Protocols
+        1. **SOME/IP (Scalable service-Oriented MiddlewarE over IP):**
+           - A middleware that allows applications to communicate via Remote Procedure Calls (RPC) and Publish/Subscribe mechanisms over Ethernet.
+           - Enables Service-Oriented Architecture (SOA).
+        2. **DoIP (Diagnostics over IP):**
+           - Transports UDS diagnostic data over TCP/IP, allowing for massive data transfer speeds required for OTA flashing.
+        3. **TSN (Time-Sensitive Networking):**
+           - A set of IEEE standards ensuring deterministic, low-latency data delivery over Ethernet (crucial for ADAS).
+        4. **VLAN (Virtual Local Area Network):**
+           - Logically segments the network to prioritize traffic (e.g., safety data gets a higher priority VLAN than infotainment).
+
+        ### Message Flow (SOME/IP Publish/Subscribe)
+        \`\`\`mermaid
+        sequenceDiagram
+            participant Subscriber (ECU A)
+            participant Publisher (ECU B)
+
+            Subscriber->>Publisher: SOME/IP-SD: Subscribe Eventgroup Request
+            Publisher-->>Subscriber: SOME/IP-SD: Subscribe Eventgroup ACK
+            Note over Publisher,Subscriber: When event occurs...
+            Publisher->>Subscriber: SOME/IP: Publish Event Data
+        \`\`\`
+
+        ---
+
+        ## 5. MOST Protocol
+
+        ### Theory
+        Media Oriented Systems Transport (MOST) was a high-speed multimedia network technology optimized by the automotive industry for audio, video, and control data.
+        - Ring topology using fiber optics (MOST25, MOST150).
+        - Highly deterministic for audio/video synchronization.
+        - *Industry Trend:* MOST is currently being phased out in favor of Automotive Ethernet.
+
+        ---
+
+        ## Chapter Summary
+        - **CAN/CAN FD:** Backbone of the vehicle, high reliability, priority-based.
+        - **LIN:** Low-cost, master-slave, used for simple sensors/actuators.
+        - **Automotive Ethernet:** The future of automotive networks, supporting high-bandwidth domains like ADAS and Infotainment, utilizing SOA via SOME/IP.`,
+
+            "03_Diagnostics.md": `# SECTION 3: Diagnostics
+
+        Automotive Diagnostics enable technicians, engineers, and manufacturing plants to query the health of a vehicle, read sensor data, execute specific routines, and update firmware.
+
+        ---
+
+        ## 1. Unified Diagnostic Services (UDS) - ISO 14229
+
+        ### Theory
+        UDS is the industry standard for automotive diagnostics. It operates on a Client-Server architecture. The Client (Tester/Diagnostic Tool) sends a Request, and the Server (ECU) sends a Response. UDS is independent of the physical bus; it can run on CAN, LIN, Ethernet, or FlexRay.
+
+        ### UDS Frame Structure
+        A typical UDS request contains:
+        - **Service ID (SID):** 1 byte indicating the requested action (e.g., 0x10 for Session Control).
+        - **Sub-Function or Data Identifier (DID):** Indicates specifically what to do.
+
+        Responses:
+        - **Positive Response:** \`Requested SID + 0x40\`. (e.g., Request \`0x10\` -> Response \`0x50\`).
+        - **Negative Response Code (NRC):** \`0x7F + Requested SID + NRC\`. (e.g., \`0x7F 0x10 0x13\` means Negative Response to 0x10 due to incorrect message length).
+
+        ### Important UDS Services
+
+        #### 1. Diagnostic Session Control (0x10)
+        Changes the state of the ECU.
+        - \`0x01\`: Default Session (standard state).
+        - \`0x02\`: Programming Session (used for flashing).
+        - \`0x03\`: Extended Diagnostic Session (grants access to advanced routines).
+
+        #### 2. Security Access (0x27)
+        Unlocks secure features (e.g., flashing, writing sensitive data). Uses a Seed-Key mechanism.
+        - Tester requests Seed (\`0x27 0x01\`).
+        - ECU sends a random Seed.
+        - Tester calculates Key using a secret algorithm and sends it back (\`0x27 0x02 <Key>\`).
+        - If Key matches, ECU unlocks.
+
+        #### 3. Read Data By Identifier (0x22) / Write Data By Identifier (0x2E)
+        Reads or writes specific data points (DIDs) like VIN, software version, or sensor values.
+
+        #### 4. Routine Control (0x31)
+        Starts, stops, or requests the results of an internal ECU routine (e.g., Erase Memory, Calibrate Sensor).
+
+        #### 5. ECU Reset (0x11)
+        Restarts the ECU (Hard Reset, Key Off On Reset, Soft Reset).
+
+        #### 6. Read DTC Information (0x19)
+        Retrieves Diagnostic Trouble Codes (DTCs).
+
+        #### 7. Clear Diagnostic Information (0x14)
+        Erases stored DTCs.
+
+        ### Communication Flow (Flashing an ECU)
+        \`\`\`mermaid
+        sequenceDiagram
+            participant Tester
+            participant ECU
+
+            Tester->>ECU: 10 03 (Extended Session)
+            ECU-->>Tester: 50 03 (Positive Response)
+
+            Tester->>ECU: 27 01 (Request Seed)
+            ECU-->>Tester: 67 01 [Seed Bytes]
+
+            Note over Tester: Calculate Key
+            Tester->>ECU: 27 02 [Key Bytes]
+            ECU-->>Tester: 67 02 (Unlocked)
+
+            Tester->>ECU: 10 02 (Programming Session)
+            ECU-->>Tester: 50 02
+
+            Tester->>ECU: 31 01 FF 00 (Routine: Erase Flash)
+            ECU-->>Tester: 71 01 FF 00 (Erased)
+
+            Tester->>ECU: 34 (Request Download)
+            ECU-->>Tester: 74 (Granted)
+
+            Note over Tester,ECU: Transfer Data (0x36) block by block...
+
+            Tester->>ECU: 11 01 (Hard Reset)
+            ECU-->>Tester: 51 01
+        \`\`\`
+
+        ---
+
+        ## 2. Diagnostic Trouble Codes (DTCs)
+
+        ### Theory
+        A DTC is a code stored by the ECU when it detects a fault. The format is standardized (e.g., P0113).
+        - **P (Powertrain), B (Body), C (Chassis), U (Network)**
+        - Includes a Status Byte to indicate if the fault is active, historical, or pending.
+        - **Freeze Frame Data:** Snapshot of environmental variables (RPM, Temperature) taken at the exact moment the fault occurred.
+
+        ---
+
+        ## 3. On-Board Diagnostics (OBD-II)
+
+        ### Theory
+        OBD-II is an emissions-focused diagnostic standard mandated by law. It provides a standardized hardware port (J1962 connector) and a standardized set of diagnostic services (ISO 15031) accessible by any generic scan tool.
+        - Uses SIDs from \`0x01\` to \`0x0A\` (often called Modes).
+        - Mode 01: Request Current Powertrain Data.
+        - Mode 03: Request Emission-related DTCs.
+        - Mode 04: Clear/Reset Emission-related Diagnostic Info.
+
+        ---
+
+        ## 4. DoIP (Diagnostics over Internet Protocol)
+
+        ### Theory
+        As vehicle software grows into gigabytes, flashing over CAN (500 kbps) becomes unacceptably slow. DoIP (ISO 13400) maps UDS over TCP/IP, allowing flashing speeds over 100 Mbps.
+        - Utilizes Vehicle Identification Requests to find cars on the network.
+        - Requires Routing Activation before sending UDS payloads.
+
+        ---
+
+        ## 5. Diagnostic Tools
+
+        ### CANoe Diagnostics
+        Vector CANoe integrates a diagnostic console. It reads ODX/CDD (diagnostic database) files to translate raw hex bytes (\`22 F1 90\`) into human-readable text (\`Read VIN\`).
+
+        ### DTS Monaco & ODIS
+        - **DTS Monaco:** An engineering tool used widely for development and validation of diagnostics.
+        - **ODIS:** The dealership-level diagnostic tool used by Volkswagen Group.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: What is the difference between UDS and OBD?**
+        > A: OBD is legally mandated and focuses strictly on emissions-related systems. It uses a generic protocol accessible by any scan tool. UDS is an OEM-specific, comprehensive protocol used for deep engineering diagnostics, flashing, and testing across all ECUs in the vehicle.
+
+        **Q: Explain the Seed & Key algorithm process (Service 0x27).**
+        > A: The tester requests a seed (0x27 0x01). The ECU generates a random number (seed) and sends it. The tester applies a secret, OEM-defined cryptographic algorithm to the seed to generate a key. The tester sends the key (0x27 0x02). The ECU performs the same calculation internally; if the keys match, the ECU unlocks secure features.
+
+        **Q: What is NRC 0x78?**
+        > A: Negative Response Code 0x78 means "Response Pending." The ECU received the request but needs more time to process it (e.g., writing to slow flash memory). The tester should reset its timeout timer and wait for the final response.
+
+        ---
+
+        ## Chapter Summary
+        - **UDS (ISO 14229)** is the cornerstone of vehicle diagnostics, enabling reading data, clearing faults, and flashing software.
+        - **OBD-II** is the emissions-standard counterpart.
+        - Understanding the Client-Server model, session management, and security access is vital for any automotive software engineer.`,
+
+            "04_Heavy_Duty_Protocols.md": `# SECTION 4: Heavy Duty Vehicle Protocols
+
+        While passenger cars rely heavily on standard CAN, LIN, and Ethernet, heavy-duty commercial vehicles (trucks, buses, agricultural equipment) have unique requirements demanding specialized protocols. The most prominent is SAE J1939.
+
+        ---
+
+        ## 1. SAE J1939 Protocol
+
+        ### Theory
+        J1939 is the standard communication network for heavy-duty vehicles. It is built on top of the physical layer of CAN 2.0B (which uses a 29-bit extended identifier) but operates at a standard baud rate of 250 kbps (and newer variants at 500 kbps). Unlike standard CAN which is largely proprietary per OEM, J1939 standardizes the messages so a trailer from one manufacturer can talk to a tractor from another.
+
+        ### Architecture & 29-Bit Identifier
+        The 29-bit CAN ID in J1939 is structured logically:
+        - **Priority (3 bits):** Determines message priority (0 is highest).
+        - **Reserved / Data Page (2 bits):** Extends the number of available messages.
+        - **PDU Format (PF - 8 bits):** Determines if the message is peer-to-peer or broadcast.
+        - **PDU Specific (PS - 8 bits):** Destination Address or Group Extension.
+        - **Source Address (SA - 8 bits):** The address of the ECU sending the message.
+
+        ### PGN (Parameter Group Number)
+        A PGN identifies a specific message containing a group of parameters. It is formed by combining the Data Page, PDU Format, and PDU Specific fields.
+        *Example:* PGN 61444 (Electronic Engine Controller 1) contains parameters like Engine Speed and Engine Torque.
+
+        ### SPN (Suspect Parameter Number)
+        An SPN is a specific parameter inside a PGN.
+        *Example:* Inside PGN 61444, SPN 190 represents Engine Speed.
+
+        ### Address Claiming
+        Since ECUs from different manufacturers are plugged into the same network, they must claim a unique Source Address (SA) on startup to avoid conflicts.
+        1. ECU broadcasts an "Address Claim" message containing its unique 64-bit NAME.
+        2. If another ECU has the same address, the one with the lower 64-bit NAME wins.
+        3. The loser must calculate a new address and try again.
+
+        ### Transport Protocols (TP & BAM)
+        Standard CAN only holds 8 bytes of data. J1939 standardizes how to send larger messages (up to 1785 bytes) using two methods:
+        - **BAM (Broadcast Announce Message):** Sent to a global address. The sender announces the total size, then blasts the data packets onto the bus. No acknowledgment is expected.
+        - **CMDT (Connection Mode Data Transfer):** Point-to-point communication. Handshaking is used (RTS/CTS - Request To Send / Clear To Send). Highly reliable.
+
+        ### Diagnostic Messages (DM)
+        J1939 handles diagnostics differently than UDS. It broadcasts active faults using standardized DM messages.
+        - **DM1:** Active Diagnostic Trouble Codes. Broadcast continuously if a fault is active.
+        - **DM2:** Previously Active (Historical) DTCs.
+        - **DM3:** Request to Clear Active DTCs.
+
+        ---
+
+        ## 2. NMEA 2000
+
+        ### Theory
+        NMEA 2000 is a plug-and-play communications standard used for connecting marine sensors and display units within ships and boats.
+
+        ### Working Principle
+        It is highly derived from SAE J1939. It uses the same CAN 2.0B 29-bit identifier structure and PGN/SPN concepts but runs at a baud rate of 250 kbps. It standardizes marine-specific data such as GPS coordinates, wind speed, depth, and engine metrics.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: How does J1939 differ from standard automotive CAN?**
+        > A: Standard automotive CAN uses 11-bit or 29-bit IDs but the data mapping is proprietary to the OEM. J1939 exclusively uses 29-bit CAN, but standardizes the entire dictionary. A specific PGN/SPN always means the exact same thing (e.g., Engine RPM) regardless of whether the truck is a Volvo, Scania, or Freightliner.
+
+        **Q: What is the purpose of BAM in J1939?**
+        > A: BAM (Broadcast Announce Message) is used to transmit messages larger than 8 bytes to all nodes on the network without requiring a connection or acknowledgment.
+
+        **Q: If two ECUs try to claim Address 0x10 at the same time, who wins?**
+        > A: J1939 resolves this by comparing the 64-bit NAME field in their Address Claim messages. The ECU with the numerically lower 64-bit NAME wins the address.
+
+        ---
+
+        ## Chapter Summary
+        - **J1939** brings order and standardization to the heavy-duty and commercial vehicle industry.
+        - The protocol relies heavily on **PGNs** (Message IDs) and **SPNs** (Specific signals within a message).
+        - **Address Claiming** enables true plug-and-play functionality across different manufacturers.
+        - **NMEA 2000** adapts these exact concepts for the marine industry.`,
+
+            "05_SDLC_and_Standards.md": `# SECTION 5: Software Development Life Cycle & Standards
+
+        Automotive software is safety-critical; a failure can result in loss of life. Therefore, the development processes and standards are among the most rigorous in the software industry.
+
+        ---
+
+        ## 1. Software Development Life Cycle (SDLC)
+
+        ### Theory
+        SDLC is a structured process utilized to design, develop, and test high-quality software. It encompasses requirements gathering, design, coding, testing, and maintenance.
+
+        ### Verification and Validation (V&V)
+        - **Verification:** "Are we building the product right?" Ensuring the software meets the specified design and requirements (e.g., code reviews, static analysis, unit testing).
+        - **Validation:** "Are we building the right product?" Ensuring the final product fulfills the user's intended use in the real world (e.g., vehicle road testing).
+
+        ---
+
+        ## 2. Development Methodologies
+
+        ### The V-Model
+        The V-Model (Validation and Verification model) is the traditional backbone of automotive software development. It visually represents the relationship between each development phase and its corresponding testing phase.
+
+        \`\`\`mermaid
+        graph TD
+            Req[System Requirements] --> Arch[System Architecture]
+            Arch --> SWReq[Software Requirements]
+            SWReq --> SWDesign[Software Design]
+            SWDesign --> Code[Implementation/Coding]
+
+            Code --> Unit[Unit Testing]
+            Unit -.-> SWDesign
+            Unit --> Int[Integration Testing]
+            Int -.-> SWReq
+            Int --> Sys[System Testing]
+            Sys -.-> Arch
+            Sys --> Acc[Acceptance Testing]
+            Acc -.-> Req
+        \`\`\`
+
+        ### Agile Methodology
+        While the V-Model provides rigor, Agile provides flexibility. Modern automotive development (especially for SDVs and Infotainment) uses a hybrid approach: Agile for development iterations, mapped to V-Model milestones for compliance.
+
+        #### Agile Concepts
+        - **Scrum:** A framework where teams work in short, time-boxed iterations (Sprints).
+        - **Sprint Planning:** Defining what will be built in the next 2-4 weeks.
+        - **Daily Standups:** 15-minute sync meetings (What I did, What I will do, Blockers).
+        - **Retrospectives:** Reviewing what went well and what didn't after a sprint.
+        - **User Stories:** Requirements written from an end-user perspective ("As a driver, I want adaptive cruise control so I don't have to manage my speed on the highway").
+
+        #### Tooling
+        - **Jira:** Tool for issue tracking, bug tracking, and Agile project management.
+        - **Confluence:** Wiki-style tool for documentation and collaboration.
+
+        ---
+
+        ## 3. Industry Standards & Compliance
+
+        ### ASPICE (Automotive SPICE)
+        Automotive Software Process Improvement and Capability dEtermination.
+        - **Theory:** A framework to assess the maturity of a supplier's software development process. OEMs use it to ensure suppliers have reliable processes.
+        - **Capability Levels:** Ranges from Level 0 (Incomplete) to Level 5 (Optimizing). Most OEMs demand at least Level 2 or 3.
+        - **Key Concept - Traceability:** ASPICE demands strict bidirectional traceability. A requirement must link to a design, which links to code, which links to a test case, which links to a test result.
+
+        ### ISO 26262 & Functional Safety (FuSa)
+        - **Theory:** An international standard for the functional safety of electrical and electronic systems in production automobiles. It aims to mitigate risks due to system failures.
+        - **ASIL (Automotive Safety Integrity Level):** A risk classification scheme based on Severity, Exposure, and Controllability.
+          - **ASIL A:** Lowest risk (e.g., rear lights).
+          - **ASIL D:** Highest risk (e.g., electronic power steering, airbags).
+        - **Implication:** Software targeting ASIL D requires extremely rigorous testing, redundant architectures, and strict coding guidelines (like MISRA C).
+
+        ### ISO 21434 (Cybersecurity)
+        - **Theory:** Standardizes the cybersecurity engineering processes in automotive development.
+        - **Concept:** Requires Threat Analysis and Risk Assessment (TARA) to identify vulnerabilities and mandates secure coding practices, encryption, and secure OTA updates.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: What is the main difference between Verification and Validation?**
+        > A: Verification checks if the software conforms to its design specifications (e.g., running unit tests on a function). Validation checks if the software meets the actual customer needs in the real world (e.g., testing the feature in a moving car).
+
+        **Q: Explain what ASIL is and how it impacts software development.**
+        > A: ASIL stands for Automotive Safety Integrity Level, ranging from A to D. The higher the ASIL, the more critical the system is to human safety. A higher ASIL dictates stricter development processes, more comprehensive testing, and often redundant hardware and software architectures.
+
+        **Q: How do you achieve Traceability in a project?**
+        > A: By using Application Lifecycle Management (ALM) tools. Every requirement is given a unique ID. During design, design artifacts reference the requirement ID. During testing, test cases link to the requirement ID. This proves that every requirement has been designed and tested.
+
+        ---
+
+        ## Chapter Summary
+        - The **V-Model** ensures rigorous validation at every step, essential for safety-critical systems.
+        - **Agile** brings speed and adaptability, particularly useful in non-safety-critical domains like Infotainment.
+        - **ASPICE** ensures process maturity.
+        - **ISO 26262** and **ISO 21434** dictate the technical rigor required for Functional Safety and Cybersecurity, respectively.`,
+
+            "06_Automotive_Testing.md": `# SECTION 6: Automotive Testing
+
+        Testing in the automotive domain is comprehensive and multi-layered, ensuring that software bugs do not lead to catastrophic real-world failures.
+
+        ---
+
+        ## 1. Types of Testing
+
+        ### Manual vs. Automated Testing
+        - **Manual Testing:** Engineers physically interact with the ECU or vehicle, pressing buttons, and observing behaviors. Essential for HMI (Human-Machine Interface) and usability.
+        - **Automated Testing:** Scripts (often written in Python or CAPL) simulate inputs and verify outputs. Essential for regression testing.
+
+        ### Test Levels (Mapped to the V-Model)
+        - **White Box Testing:** Testing internal structures or workings of an application. Done by developers at the Unit level.
+        - **Black Box Testing:** Testing functionality without looking at the internal code. Done by QA engineers.
+        - **Integration Testing:** Combining individual software modules and testing them as a group.
+        - **System Testing:** Testing the complete, integrated system to evaluate compliance with requirements.
+        - **ECU Testing (HIL):** Hardware-in-the-Loop testing. The actual ECU hardware is connected to a simulator that pretends to be the rest of the car.
+        - **Vehicle Testing:** Testing the fully assembled vehicle on a test track or public roads.
+
+        ### Functional Testing Types
+        - **Smoke Testing:** A quick test to ensure the basic, most critical functions work before proceeding to deeper testing (e.g., Does the ECU turn on?).
+        - **Sanity Testing:** Focused testing on a specific component that has just been changed or fixed.
+        - **Regression Testing:** Re-running old tests to ensure a new code change hasn't broken existing functionality.
+        - **API Testing:** Testing the interfaces between software components (especially important in Service-Oriented Architectures like SOME/IP).
+        - **Acceptance Testing:** Final validation by the customer or product owner.
+
+        ---
+
+        ## 2. Test Case Creation
+
+        ### Theory
+        A test case is a set of conditions under which a tester determines whether an application, software system, or one of its features is working as it was originally established for it to do.
+
+        ### Test Case Design Techniques
+        1. **Equivalence Partitioning:** Dividing test data into partitions that can be considered equivalent. If one value in a partition works, all should work.
+           - *Example:* Speed limit warning activates between 100-120 km/h. Partitions: <100, 100-120, >120.
+        2. **Boundary Value Analysis (BVA):** Testing the boundaries between partitions, as errors most frequently occur here.
+           - *Example:* Test speeds 99, 100, 101, 119, 120, 121.
+        3. **Positive Test Cases:** Testing with valid data to verify normal operation.
+        4. **Negative Test Cases:** Testing with invalid data or error states to verify fault handling (e.g., Short circuiting a sensor).
+
+        ### Test Case Template
+        A standard automotive test case includes:
+        - **Test Case ID:** Unique identifier (e.g., TC_ADAS_ACC_001).
+        - **Requirement ID:** Link to traceability matrix (e.g., REQ-1045).
+        - **Test Objective:** Brief description.
+        - **Pre-conditions:** Initial state required (e.g., Engine ON, Vehicle Speed = 0).
+        - **Test Steps:** Step-by-step actions.
+        - **Expected Result:** What should happen.
+        - **Actual Result:** Filled during execution.
+        - **Status:** Pass/Fail/Blocked.
+
+        ---
+
+        ## 3. Defect Lifecycle
+
+        When a test fails, a defect (bug) is logged in a tool like Jira. The lifecycle typically follows:
+        1. **New:** Bug logged by tester.
+        2. **Assigned:** Triaged and assigned to a developer.
+        3. **In Progress:** Developer is working on a fix.
+        4. **Fixed/Resolved:** Code updated and merged.
+        5. **Ready for Test:** Deployed to a test environment.
+        6. **Verified (Closed):** Tester confirms the bug is gone. (If not, status goes back to **Reopened**).
+
+        ---
+
+        ## Practical Exercises
+
+        **Exercise:** Write a Test Case for a Power Window Anti-Pinch feature.
+        - **Requirement:** The window must stop and reverse direction by 10cm if an obstacle exerts >50N of force while closing.
+        - **Pre-conditions:** Ignition ON, Window Open, Obstacle simulation rig setup.
+        - **Step 1:** Press 'Window Up' button.
+        - **Step 2:** Apply 51N of force to the rising window glass.
+        - **Expected Result:** Window immediately stops moving up, reverses direction, and lowers by exactly 10cm.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: What is Hardware-in-the-Loop (HIL) testing?**
+        > A: HIL testing involves connecting real electronic control units (ECUs) to a simulator. The simulator provides electrical signals that mimic sensors and reads the ECU's actuator commands in real-time, allowing engineers to test the ECU's behavior as if it were in a real car.
+
+        **Q: Explain the difference between Regression Testing and Smoke Testing.**
+        > A: Smoke testing is a shallow, broad test done immediately after a new build to ensure the software is stable enough for deeper testing. Regression testing is comprehensive testing of all previously working features to ensure the latest changes didn't break them.
+
+        ---
+
+        ## Chapter Summary
+        - Automotive testing spans from code-level **White Box** testing to full **Vehicle** testing.
+        - Designing tests requires methodologies like **BVA** and **Equivalence Partitioning** to maximize coverage without infinite test cases.
+        - **Traceability** between requirements, test cases, and defects is crucial for safety compliance.`,
+
+            "07_AUTOSAR.md": `# SECTION 7: AUTOSAR
+
+        AUTOSAR (AUTomotive Open System ARchitecture) is a global partnership of vehicle manufacturers, suppliers, and tool developers. Its goal is to create a standardized software architecture for automotive ECUs.
+
+        ---
+
+        ## 1. AUTOSAR Overview
+
+        ### Theory
+        Before AUTOSAR, OEM and Tier 1 supplier software was highly proprietary. If an OEM wanted to switch the microcontroller in an ECU from NXP to Infineon, they had to rewrite almost all the software. AUTOSAR solves this by decoupling the application software from the underlying hardware.
+
+        ### Benefits
+        - **Hardware Independence:** Write application code once, run it on any microcontroller.
+        - **Reusability:** Software Components (SWCs) can be reused across different projects and vehicle platforms.
+        - **Standardization:** Standardized interfaces between different software layers.
+
+        ---
+
+        ## 2. Classic AUTOSAR Architecture
+
+        Classic AUTOSAR is designed for deeply embedded microcontrollers (usually OSEK-based RTOS) handling real-time, safety-critical tasks.
+
+        The architecture is divided into three main layers:
+
+        ### A. Application Layer
+        - Contains **Software Components (SWCs)**.
+        - This is where the actual vehicle logic lives (e.g., ABS control algorithm, Wiper control logic).
+        - SWCs communicate with each other and the layers below exclusively via the RTE.
+
+        ### B. Runtime Environment (RTE)
+        - The "middleware" or "glue" layer.
+        - It provides a communication abstraction to the SWCs. An SWC doesn't know if the data it requests is coming from another SWC on the same ECU or from an entirely different ECU over CAN; the RTE handles the routing.
+
+        ### C. Basic Software (BSW)
+        The BSW is further divided into layers:
+        1. **Services Layer:** Highest BSW layer. Provides OS, network management, diagnostic services (UDS), and memory management.
+        2. **ECU Abstraction Layer:** Makes higher layers independent of ECU hardware layout. Contains abstractions for external devices (like an external watchdog or CAN transceiver).
+        3. **Microcontroller Abstraction Layer (MCAL):** The lowest layer. Contains drivers directly interacting with the microcontroller registers (ADC, PWM, SPI, CAN drivers). This is the *only* hardware-dependent layer.
+
+        ### Architecture Diagram
+        \`\`\`mermaid
+        graph TD
+            subgraph Application Layer
+                SWC1[SWC 1: Wiper Logic]
+                SWC2[SWC 2: Sensor Reader]
+            end
+
+            RTE[Runtime Environment - RTE]
+
+            subgraph Basic Software BSW
+                Serv[Services Layer - OS, Diag, Comm]
+                ECUA[ECU Abstraction Layer]
+                MCAL[MCAL - Drivers, ADC, CAN, SPI]
+            end
+
+            HW[Hardware / Microcontroller]
+
+            SWC1 --> RTE
+            SWC2 --> RTE
+            RTE --> Serv
+            Serv --> ECUA
+            ECUA --> MCAL
+            MCAL --> HW
+        \`\`\`
+
+        ---
+
+        ## 3. Adaptive AUTOSAR
+
+        ### Theory
+        As vehicles moved towards autonomous driving and heavy infotainment, Classic AUTOSAR (running on small microcontrollers) wasn't enough. Adaptive AUTOSAR was created for high-performance computing platforms (like POSIX-based OS, e.g., Linux, QNX).
+
+        ### Key Differences
+        - **Language:** Classic uses C. Adaptive heavily uses C++.
+        - **Communication:** Classic uses signal-based communication (CAN/LIN). Adaptive uses Service-Oriented Architecture (SOA) primarily over SOME/IP and Ethernet.
+        - **Updates:** Adaptive is designed natively for Over-The-Air (OTA) updates and dynamic software loading.
+
+        ---
+
+        ## 4. Key Artifacts in AUTOSAR
+
+        ### ARXML (AUTOSAR XML)
+        AUTOSAR configuration is entirely XML-driven. Everything from network signals to SWC interfaces is defined in \`.arxml\` files.
+
+        ### ECU Extract
+        When an OEM designs a vehicle, they create a System Description (ARXML). They then extract only the information relevant to a specific ECU and send this "ECU Extract" to the Tier 1 supplier. The supplier uses this extract to configure the BSW and RTE.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: What is the main purpose of the MCAL layer?**
+        > A: The Microcontroller Abstraction Layer (MCAL) contains the hardware-specific drivers. Its purpose is to abstract the underlying microcontroller hardware, presenting a standardized API to the upper BSW layers. If the hardware changes, only the MCAL needs to be rewritten.
+
+        **Q: How do two SWCs communicate in AUTOSAR?**
+        > A: SWCs communicate exclusively through the Runtime Environment (RTE). They use standardized ports (Sender-Receiver or Client-Server). The RTE handles the routing, whether it's local memory copying (same ECU) or routing through the COM stack to the CAN bus (different ECUs).
+
+        **Q: Explain the difference between Classic and Adaptive AUTOSAR.**
+        > A: Classic AUTOSAR is for real-time, safety-critical deeply embedded systems running on microcontrollers (mostly C). Adaptive AUTOSAR is for high-performance computing, supporting dynamic updates, Service-Oriented Architectures, and POSIX operating systems (mostly C++).
+
+        ---
+
+        ## Chapter Summary
+        - **AUTOSAR** decouples software from hardware.
+        - **MCAL** talks to the chip, **RTE** acts as the middleware router, and **SWCs** hold the application logic.
+        - **Classic AUTOSAR** is for small, real-time tasks; **Adaptive AUTOSAR** is for heavy compute and OTA capability.`,
+
+            "08_ADAS.md": `# SECTION 8: Advanced Driver Assistance Systems (ADAS)
+
+        ADAS represents the technological bridge between traditional human-driven cars and fully autonomous vehicles. It relies on a suite of sensors to perceive the environment and actuators to assist the driver.
+
+        ---
+
+        ## 1. ADAS Fundamentals & Sensors
+
+        An ADAS system operates on a continuous "Sense-Think-Act" loop.
+
+        ### The Sensor Suite
+        1. **Camera Systems:**
+           - Excellent for color and pattern recognition.
+           - Used for Lane Departure Warning (seeing lane lines) and Traffic Sign Recognition (reading signs).
+           - *Weakness:* Poor performance in bad weather, glare, or darkness.
+        2. **Radar (Radio Detection and Ranging):**
+           - Emits radio waves and measures the time it takes for the echo to return.
+           - Excellent at determining distance and relative speed (using the Doppler effect).
+           - Used for Adaptive Cruise Control (ACC) and Blind Spot Monitoring.
+           - *Weakness:* Low resolution; cannot tell what an object is (e.g., a person vs. a mailbox).
+        3. **LiDAR (Light Detection and Ranging):**
+           - Uses pulsed laser light to create a highly accurate, high-resolution 3D point cloud of the environment.
+           - *Weakness:* Currently very expensive and can be degraded by heavy rain or snow.
+        4. **Ultrasonic Sensors:**
+           - Emits high-frequency sound waves.
+           - Used for very close-range detection (e.g., Parking Assist).
+
+        ### Sensor Fusion
+        No single sensor is perfect. **Sensor Fusion** is the algorithmic process of combining data from multiple sensors (e.g., Camera + Radar) to create a single, highly reliable model of the environment.
+        - *Example:* The camera sees an object that looks like a car. The radar confirms a large metallic object moving at 60 km/h at that exact location. The system now has high confidence that a car is ahead.
+
+        ---
+
+        ## 2. Key ADAS Features
+
+        ### ACC (Adaptive Cruise Control)
+        Maintains a set speed but automatically slows down to maintain a safe following distance if the car ahead slows down. Uses Long-Range Radar.
+
+        ### AEB (Autonomous Emergency Braking)
+        Monitors the road ahead. If an imminent collision is detected and the driver does not react, the system automatically applies maximum braking force. Uses Radar + Camera fusion.
+
+        ### LDW (Lane Departure Warning) & LKA (Lane Keeping Assist)
+        - **LDW:** Warns the driver (via beep or steering wheel vibration) if the car drifts out of its lane.
+        - **LKA:** actively steers the vehicle back into the center of the lane.
+
+        ### TSR (Traffic Sign Recognition)
+        Uses the forward-facing camera to read speed limit signs and displays them on the dashboard.
+
+        ### Parking Assist
+        Ranges from simple beeping (ultrasonic sensors) to fully automated parking where the car controls steering, throttle, and braking to parallel park itself.
+
+        ---
+
+        ## 3. SAE Levels of Driving Automation
+
+        The Society of Automotive Engineers (SAE) defines 6 levels of automation:
+        - **Level 0 (No Automation):** The driver performs all driving tasks.
+        - **Level 1 (Driver Assistance):** The vehicle controls *either* steering (LKA) OR speed (ACC).
+        - **Level 2 (Partial Automation):** The vehicle controls *both* steering and speed (LKA + ACC simultaneously). The driver MUST remain engaged and monitor the environment.
+        - **Level 3 (Conditional Automation):** The vehicle drives itself under specific conditions (e.g., highway traffic jams). The driver can look away but must be ready to take over when prompted.
+        - **Level 4 (High Automation):** The vehicle is fully autonomous in specific geofenced areas or conditions. No driver attention required.
+        - **Level 5 (Full Automation):** The vehicle can drive itself anywhere, in any condition a human could. No steering wheel required.
+
+        ---
+
+        ## 4. ADAS Validation
+
+        ADAS validation is extremely complex because the real world is infinitely variable.
+
+        ### Validation Methods
+        1. **Model-in-the-Loop (MIL) / Software-in-the-Loop (SIL):** Testing the algorithms in simulation environments (e.g., Carla, IPG CarMaker).
+        2. **Hardware-in-the-Loop (HIL):** Testing the physical ADAS ECU by feeding it recorded or simulated video/radar data.
+        3. **Vehicle-in-the-Loop (VIL):** The real car is driven on a test track, but the sensors are fed a simulated virtual world.
+        4. **Real-World Testing:** Driving millions of miles on public roads to capture "edge cases."
+
+        ### Test Scenarios
+        - **Scenario:** AEB Pedestrian Crossing.
+        - **Pre-conditions:** Vehicle traveling at 40 km/h. Dummy pedestrian rig ready to cross.
+        - **Action:** Pedestrian dummy moves across the vehicle's path.
+        - **Expected Result:** Radar/Camera detects dummy. AEB applies full brakes. Vehicle comes to a complete stop at least 1 meter before the dummy.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: Explain Sensor Fusion and why it is necessary.**
+        > A: Sensor Fusion is combining data from different types of sensors (e.g., radar and camera) to compensate for the weaknesses of each individual sensor. A camera struggles in the dark, and a radar cannot identify objects. Fusing them provides a robust, reliable view of the environment required for safety-critical decisions like AEB.
+
+        **Q: What is the difference between SAE Level 2 and Level 3?**
+        > A: In Level 2, the driver is legally responsible and must monitor the environment at all times, even if the car is steering and braking. In Level 3, the car is legally driving itself; the driver is allowed to look away (e.g., watch a movie) but must be prepared to take over within a few seconds if the system requests intervention.
+
+        ---
+
+        ## Chapter Summary
+        - ADAS relies on a suite of sensors: **Cameras, Radar, LiDAR, and Ultrasonics**.
+        - **Sensor Fusion** combines this data for reliable decision-making.
+        - Features range from **Level 1 to Level 5**, dictating the level of human involvement.
+        - Validation requires extensive simulation (SIL/HIL) due to the infinite variables of the real world.`,
+
+            "09_Infotainment.md": `# SECTION 9: Automotive Infotainment
+
+        The In-Vehicle Infotainment (IVI) system is the most visible piece of software to the consumer. It provides entertainment, navigation, vehicle settings, and smartphone integration.
+
+        ---
+
+        ## 1. Infotainment Architecture
+
+        Modern IVI systems are highly complex computers, often built on high-performance System-on-Chips (SoCs) like Qualcomm Snapdragon.
+
+        ### Components
+        - **Head Unit:** The central touch display in the dashboard.
+        - **Instrument Cluster:** The display behind the steering wheel showing speed, RPM, and critical warnings.
+        - **Hypervisor:** Software that allows multiple operating systems to run on the same chip. For example, a safety-critical RTOS (like QNX) runs the Instrument Cluster, while Android runs the Head Unit. If Android crashes, the speedometer continues to work flawlessly.
+
+        ---
+
+        ## 2. Operating Systems
+
+        ### Android Automotive OS (AAOS)
+        Not to be confused with Android Auto.
+        - **Theory:** AAOS is a full, standalone operating system built by Google that runs directly on the vehicle's hardware.
+        - **Features:** Integrates deeply with the car. The driver can use Google Assistant to say "Turn on the AC" or "Open the sunroof" because AAOS has access to the vehicle's CAN/Ethernet buses via a Vehicle HAL (Hardware Abstraction Layer).
+
+        ### QNX / Linux
+        - **QNX:** A highly reliable, POSIX-compliant Real-Time Operating System (RTOS) used heavily in digital clusters and as the foundational OS for many infotainment systems.
+        - **Automotive Grade Linux (AGL):** An open-source collaborative project developing a Linux-based platform for automotive applications.
+
+        ---
+
+        ## 3. Smartphone Integration (Projection)
+
+        These systems "project" the phone's interface onto the car's screen. The phone does all the computing.
+
+        ### Apple CarPlay
+        - Connects via USB or Wireless (Wi-Fi).
+        - Uses the H.264 video codec to stream the UI to the Head Unit.
+        - Audio is routed via specific protocols.
+
+        ### Android Auto
+        - Similar architecture to CarPlay. The Android phone projects a driver-optimized UI to the car's screen.
+        - Crucial testing aspects involve connection stability, audio routing (media vs. navigation voice), and touch latency.
+
+        ---
+
+        ## 4. Human-Machine Interface (HMI)
+
+        HMI encompasses how the user interacts with the system.
+        - **Input:** Touch screens, rotary knobs, steering wheel controls, voice commands.
+        - **Output:** Screens, audio, haptic feedback.
+        - **Design:** HMI design must minimize driver distraction. Testing involves checking touch target sizes, contrast, and response times.
+
+        ---
+
+        ## 5. Audio and Multimedia Systems
+
+        ### Audio Architecture
+        - Infotainment systems must manage complex audio routing.
+        - **Priority Rules:** If the driver is listening to FM Radio, and a Navigation Prompt occurs, the FM Radio must "duck" (lower its volume) while the Navigation speaks. If a Phone Call comes in, it takes highest priority.
+        - **Chimes:** Safety chimes (e.g., Seatbelt warning, Park Assist beeps) are often generated by the Instrument Cluster or a dedicated audio DSP to ensure they never fail, even if the Head Unit crashes.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: What is the difference between Android Auto and Android Automotive?**
+        > A: Android Auto is a projection technology; the phone does the processing and sends a video stream to the car's dumb screen. Android Automotive is a full, standalone operating system running natively on the vehicle's hardware, capable of controlling vehicle functions like HVAC and seating.
+
+        **Q: Why do OEMs use a Hypervisor in modern infotainment architectures?**
+        > A: To isolate safety-critical systems from non-critical systems. A hypervisor allows a highly stable, certified OS (like QNX) to run the digital speedometer alongside a complex, less stable OS (like Android) for media. If Android crashes or is hacked, the hypervisor ensures the speedometer and warning lights remain fully functional.
+
+        ---
+
+        ## Chapter Summary
+        - IVI systems are shifting towards full operating systems like **Android Automotive OS**.
+        - **Hypervisors** are essential for mixed-criticality systems (combining Clusters and Head Units on one chip).
+        - Smartphone projection (**CarPlay / Android Auto**) is standard and requires rigorous Wi-Fi/USB validation.
+        - **Audio routing** and prioritization is a complex, heavily tested aspect of infotainment.`,
+
+            "10_Connectivity.md": `# SECTION 10: Connectivity Technologies
+
+        Modern vehicles are highly connected nodes on the "Internet of Things." This connectivity is essential for infotainment, telematics, and V2X communication.
+
+        ---
+
+        ## 1. Bluetooth
+
+        ### Theory
+        Bluetooth is a short-range wireless technology standard used primarily for exchanging data between mobile devices and the vehicle's head unit.
+
+        ### Bluetooth Profiles
+        Profiles dictate what kind of data is being transmitted.
+        - **HFP (Hands-Free Profile):** Used for making and receiving phone calls. Routes audio to the car's speakers and mic.
+        - **A2DP (Advanced Audio Distribution Profile):** Used for streaming high-quality stereo audio (e.g., Spotify music). Unidirectional (Phone to Car).
+        - **AVRCP (Audio/Video Remote Control Profile):** Used alongside A2DP to send commands (Play, Pause, Next Track) from the car to the phone, and to retrieve track metadata (Song Title, Artist).
+        - **PBAP (Phone Book Access Profile):** Allows the car to download the user's contacts and call history.
+        - **MAP (Message Access Profile):** Allows the car to read SMS/WhatsApp messages aloud and send replies.
+
+        ### Pairing Process
+        1. **Inquiry:** Car broadcasts its presence.
+        2. **Paging:** Phone connects.
+        3. **Authentication:** Using a PIN or Secure Simple Pairing (SSP).
+        4. **Encryption Key Generation:** Secures the link.
+        5. **Profile Connection:** Connecting HFP, A2DP, etc.
+
+        ---
+
+        ## 2. Wi-Fi
+
+        - Used for Wireless Apple CarPlay / Android Auto.
+        - Used for creating In-Car Wi-Fi Hotspots for passengers.
+        - Operates on 2.4 GHz and 5 GHz bands. 5 GHz is heavily used for projection due to its high bandwidth.
+
+        ---
+
+        ## 3. NFC (Near Field Communication)
+
+        - Extremely short-range (a few centimeters).
+        - Used for "Digital Key" technology. Tapping a smartphone on the door handle unlocks the car and authenticates the driver to start the engine.
+
+        ---
+
+        ## 4. USB
+
+        - Used for wired smartphone projection, charging, and media playback from flash drives.
+        - Testing involves USB role swapping (Host vs. Device) and power delivery verification.
+
+        ---
+
+        ## 5. Telematics & Cellular (4G/5G)
+
+        ### Theory
+        A Telematics Control Unit (TCU) connects the car to the internet.
+        - **eSIM:** Embedded SIM cards soldered onto the TCU board. Allows the OEM to switch carriers remotely without physical SIM swapping.
+        - **Functions:** E-Call (Emergency calling in a crash), Stolen Vehicle Tracking, Remote Start via smartphone app, and Over-The-Air (OTA) updates.
+        - **5G:** Brings ultra-low latency, crucial for V2X and autonomous driving.
+
+        ---
+
+        ## 6. V2X (Vehicle-to-Everything)
+
+        V2X allows vehicles to communicate with their surroundings to improve safety and traffic flow.
+        - **V2V (Vehicle-to-Vehicle):** Cars tell each other their speed and heading. *Example:* A car 5 vehicles ahead slams on its brakes; your car receives the warning instantly before you can even see it.
+        - **V2I (Vehicle-to-Infrastructure):** Communication with traffic lights. *Example:* Recommending an optimal speed to hit a "green light wave."
+        - **V2P (Vehicle-to-Pedestrian):** Warning drivers of pedestrians with connected smartphones.
+        - **V2N (Vehicle-to-Network):** Communicating with cloud servers for traffic routing.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: Explain the difference between A2DP and AVRCP.**
+        > A: A2DP is responsible solely for streaming the actual audio data from the phone to the car. AVRCP is the control protocol; it allows the car's steering wheel buttons to tell the phone to skip a track, and allows the phone to send the album art and song title to the car's display.
+
+        **Q: What is a TCU and why is an eSIM used instead of a standard plastic SIM?**
+        > A: A TCU (Telematics Control Unit) is the ECU responsible for cellular connectivity. An eSIM is used because it is physically soldered, making it resistant to automotive vibrations and extreme temperatures. Furthermore, it allows OEMs to provision and change cellular carriers globally via software.
+
+        ---
+
+        ## Chapter Summary
+        - **Bluetooth** is the core of phone-car integration, relying on specific profiles like **HFP** and **A2DP**.
+        - **Telematics** using **4G/5G eSIMs** powers remote features and OTA updates.
+        - **V2X** is the future of collaborative road safety, heavily relying on the low latency of 5G networks.`,
+
+            "11_Navigation.md": `# SECTION 11: Navigation Systems
+
+        Automotive navigation systems do more than just provide directions; they are becoming crucial sensors for ADAS systems (providing map data for predictive speed control).
+
+        ---
+
+        ## 1. GNSS Fundamentals
+
+        ### Theory
+        GNSS stands for Global Navigation Satellite System. GPS (USA) is the most famous, but a modern automotive receiver uses multiple constellations simultaneously for better accuracy and reliability:
+        - **GPS:** USA
+        - **GLONASS:** Russia
+        - **Galileo:** European Union
+        - **BeiDou:** China
+
+        ### Working Principle (Trilateration)
+        1. Satellites constantly broadcast their exact position and an ultra-precise timestamp.
+        2. The vehicle's receiver captures these signals.
+        3. By calculating the time delay (how long the signal took to reach the car), the receiver knows its exact distance from that satellite.
+        4. With distances from at least 4 satellites, the receiver calculates a 3D position (Latitude, Longitude, Altitude).
+
+        ---
+
+        ## 2. Dead Reckoning
+
+        ### Theory
+        GNSS signals cannot penetrate tunnels, parking garages, or dense urban canyons (tall skyscrapers). If a car enters a 2-mile tunnel, the GPS signal is lost. **Dead Reckoning (DR)** is the solution.
+
+        ### Working Principle
+        When GPS is lost, the navigation system uses internal vehicle sensors to calculate its position relative to its last known GPS coordinate.
+        - **Wheel Speed Sensors:** Tell the system how fast the car is moving and the distance traveled.
+        - **Steering Angle Sensor / Gyroscope:** Tell the system if the car is turning.
+        By combining distance and direction, the system accurately updates the car's position on the map even without a sky view.
+
+        ---
+
+        ## 3. Map Matching
+
+        ### Theory
+        GNSS has an inherent error margin (typically 3-10 meters). Without correction, the car's icon might appear to be driving through buildings next to the road.
+
+        ### Working Principle
+        Map Matching is an algorithm that snaps the calculated GNSS coordinate to the nearest logical road segment on the digital map database. It uses the car's heading to determine which road it is on when approaching an intersection.
+
+        ---
+
+        ## 4. Route Guidance
+
+        Route calculation uses graph theory algorithms (like Dijkstra's or A* search) to find the optimal path. Modern systems use cloud-connected routing to factor in real-time traffic data, road closures, and (for EVs) charging station availability.
+
+        ---
+
+        ## 5. Navigation Testing & Validation
+
+        ### GNSS Simulators
+        You cannot practically test a car driving in Tokyo while sitting in a lab in Detroit. Testing is done using a GNSS Simulator (e.g., Spirent).
+        - The simulator generates RF (Radio Frequency) signals identical to real satellites.
+        - It "spoofs" the receiver into believing it is driving a specific route anywhere in the world.
+
+        ### Test Scenarios
+        - **Scenario:** Dead Reckoning in a Tunnel.
+        - **Pre-conditions:** GNSS simulator running a route that enters a tunnel.
+        - **Action:** Simulator cuts off satellite RF signals at the tunnel entrance. Feed simulated wheel speed and steering data to the ECU.
+        - **Expected Result:** The navigation cursor continues smoothly along the tunnel on the map without jumping or stalling.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: How does a car's navigation system keep updating your position while driving through a long underground tunnel where there is no GPS signal?**
+        > A: It uses a technique called Dead Reckoning. The system takes the last known valid GPS coordinate and continuously calculates the new position using the vehicle's wheel speed sensors (for distance) and the gyroscope/steering angle sensor (for direction).
+
+        **Q: Why does an automotive navigation unit need a gyroscope?**
+        > A: While GPS provides location, it is slow to update heading changes. A gyroscope instantly detects the vehicle's rotation (yaw). This is crucial for Dead Reckoning and Map Matching, especially in complex intersections or roundabouts where precise heading data is needed immediately.
+
+        ---
+
+        ## Chapter Summary
+        - Automotive Navigation relies on **GNSS (GPS, Galileo, etc.)** using trilateration.
+        - **Dead Reckoning** ensures continuous navigation without a clear view of the sky by fusing wheel speed and gyroscope data.
+        - Validation heavily utilizes **GNSS Simulators** to recreate global routes inside a laboratory environment.`,
+
+            "12_Radio_Technologies.md": `# SECTION 12: Radio Technologies
+
+        While internet streaming is prevalent, terrestrial broadcast radio remains a core feature of automotive infotainment, mandated in many regions for emergency broadcasts.
+
+        ---
+
+        ## 1. RF (Radio Frequency) Basics
+
+        - **Theory:** Information (audio) is transmitted through the air by modifying (modulating) a carrier radio wave.
+        - **Wavelength & Antenna:** The size of the physical antenna on a car is dictated by the wavelength of the frequency it is trying to receive.
+        - **Propagation:** Lower frequencies (AM) travel further and can bend over the horizon. Higher frequencies (FM) are limited to line-of-sight.
+
+        ---
+
+        ## 2. Analog Radio
+
+        ### AM Radio (Amplitude Modulation)
+        - **Frequency Range:** 530 kHz – 1700 kHz.
+        - **Working Principle:** The amplitude (strength) of the carrier wave is varied to represent the audio signal.
+        - **Characteristics:** Long range, but highly susceptible to electrical interference (e.g., from power lines or the car's own electric motors).
+
+        ### FM Radio (Frequency Modulation)
+        - **Frequency Range:** 87.5 MHz – 108.0 MHz.
+        - **Working Principle:** The frequency of the carrier wave is varied to represent the audio signal while the amplitude remains constant.
+        - **Characteristics:** High fidelity, stereo sound, less susceptible to noise, but shorter range than AM.
+        - **RDS (Radio Data System):** A subcarrier on the FM signal that sends small amounts of digital data (e.g., Station Name, Song Title, Alternative Frequencies for seamless switching as you drive between towers).
+
+        ---
+
+        ## 3. Digital Radio
+
+        Digital radio transmits audio as a binary stream of 1s and 0s, resulting in CD-quality sound and the ability to send images and text alongside the audio.
+
+        ### DAB (Digital Audio Broadcasting)
+        - **Standard:** Used primarily in Europe and Australia.
+        - **Working Principle:** Uses OFDM (Orthogonal Frequency-Division Multiplexing). Multiple stations are bundled together into a single "Ensemble" or "Multiplex".
+
+        ### HD Radio
+        - **Standard:** Used primarily in North America.
+        - **Working Principle:** It is an IBOC (In-Band On-Channel) technology. It transmits the digital signal directly alongside the traditional analog FM/AM signal on the exact same frequency. If the digital signal drops, the radio seamlessly blends back into the analog audio.
+
+        ---
+
+        ## 4. Radio Testing
+
+        Testing an automotive radio requires specialized hardware because you cannot rely on local broadcast stations (which vary by location and time of day).
+
+        ### RF Generators
+        Testers use programmable RF signal generators (like Rohde & Schwarz or Averna) to create synthetic AM, FM, DAB, or HD Radio signals. These generators connect directly to the car's antenna port via a coaxial cable.
+
+        ### Test Scenarios
+        1. **Seek / Scan:** Ensure the radio stops only on valid frequencies with sufficient signal strength.
+        2. **Audio Quality (SINAD):** Inject a pure 1 kHz tone. Measure the audio output to ensure the Signal-to-Noise ratio meets specifications.
+        3. **Seamless Blending (HD Radio):**
+           - *Action:* Gradually decrease the RF power of the digital HD signal on the generator.
+           - *Expected Result:* The audio should blend smoothly from Digital to Analog without a noticeable volume jump or silence.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: Explain how RDS (Radio Data System) works and its benefit to the driver.**
+        > A: RDS is a digital subcarrier added to a traditional analog FM broadcast. It provides metadata like the station name and song title. Its biggest benefit is AF (Alternative Frequencies). If you are listening to a national network and drive out of range of your current tower, the RDS tells the radio the frequency of the next closest tower, and the radio retunes automatically without driver intervention.
+
+        **Q: What is the main difference between DAB and HD Radio implementations?**
+        > A: DAB uses dedicated frequency blocks to broadcast a multiplex of several stations, entirely separate from the analog FM band. HD Radio uses the IBOC (In-Band On-Channel) method, placing the digital signal on the exact same frequency as the existing analog FM station.
+
+        ---
+
+        ## Chapter Summary
+        - **AM/FM** rely on modulating amplitude or frequency. FM utilizes **RDS** for metadata.
+        - **Digital Radio (DAB, HD Radio)** provides superior audio quality and data services.
+        - Validation requires **RF Signal Generators** to simulate real-world propagation and blending scenarios.`,
+
+            "13_Cybersecurity.md": `# SECTION 13: Automotive Cybersecurity (ISO 21434)
+
+        As vehicles become more connected (V2X, OTA, Bluetooth), their attack surface grows exponentially. A hacked car is a lethal weapon. Automotive Cybersecurity is governed by the rigorous ISO 21434 standard.
+
+        ---
+
+        ## 1. Threat Analysis and Risk Assessment (TARA)
+
+        ### Theory
+        Before writing any code, engineers must perform a TARA. This involves mapping out the entire vehicle architecture, identifying assets (e.g., Brakes, Steering, User Data), identifying potential threats (e.g., Spoofing CAN messages, hacking Bluetooth), and assigning a risk level based on the impact (safety vs. privacy) and feasibility of the attack.
+
+        ---
+
+        ## 2. Core Security Concepts
+
+        ### Secure Boot
+        Ensures that the software running on the ECU is authentic and hasn't been tampered with.
+        - **Working Principle:**
+          1. The MCU contains a small, immutable piece of boot ROM.
+          2. Upon power-up, this ROM calculates a cryptographic hash of the operating system/bootloader.
+          3. It verifies this hash against a digital signature stored in memory using a public key.
+          4. If the signature matches, the code boots. If a hacker alters even one line of code, the hash changes, the verification fails, and the ECU refuses to boot.
+
+        ### Secure Flashing
+        Prevents unauthorized parties from installing malware via the OBD-II port.
+        - Utilizes UDS Service 0x27 (Security Access) to unlock the ECU.
+        - The firmware file itself is encrypted and digitally signed. The ECU decrypts and verifies the signature before writing to flash memory.
+
+        ### Message Authentication (SecOC)
+        In standard CAN, anyone who can tap the wires can send a message commanding the brakes to engage.
+        - **SecOC (Secure Onboard Communication):** An AUTOSAR module that appends a MAC (Message Authentication Code) to critical CAN/Ethernet frames.
+        - A hacker cannot spoof the message because they do not possess the secret cryptographic keys stored securely in the transmitting and receiving ECUs (often inside an HSM - Hardware Security Module).
+
+        ### Encryption vs. Authentication
+        - **Encryption:** Scrambling data so eavesdroppers can't read it (e.g., encrypting a credit card number sent via Infotainment).
+        - **Authentication:** Proving *who* sent the data and that it wasn't modified. For steering/braking commands, encryption is too slow. SecOC uses authentication; the data is readable by anyone, but only the true sender could have generated the correct MAC.
+
+        ---
+
+        ## 3. Network Security
+
+        ### IDS/IPS (Intrusion Detection/Prevention Systems)
+        - **IDS:** Monitors the vehicle network for anomalous behavior (e.g., an ECU suddenly sending 1000 messages a second instead of 10) and logs the event to a central backend.
+        - **IPS:** Goes a step further and actively drops the malicious packets or shuts down the compromised network port.
+
+        ### Gateway / Firewall
+        The Central Gateway ECU sits between the OBD port, the Infotainment domain, and the safety-critical domains (Powertrain/Chassis). It acts as a firewall, physically preventing a hacker who breached the Infotainment Wi-Fi from sending messages to the brakes.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: Explain how Secure Boot protects a vehicle.**
+        > A: Secure Boot establishes a chain of trust. When the ECU turns on, the hardware boot ROM verifies the digital signature of the bootloader using cryptographic keys. The bootloader then verifies the signature of the OS, and the OS verifies the applications. If a hacker modifies the firmware, the signature verification fails, and the ECU halts the boot process, preventing the execution of malicious code.
+
+        **Q: Why do we use Authentication (SecOC) for CAN messages instead of encrypting the entire message?**
+        > A: Encrypting and decrypting data takes heavy processing power and adds latency. Safety-critical messages like braking or steering commands require microsecond latency. SecOC appends a lightweight MAC (Message Authentication Code) to the plaintext message. This proves the message hasn't been tampered with and comes from a legitimate ECU, without the latency overhead of full encryption.
+
+        **Q: What is a Hardware Security Module (HSM)?**
+        > A: An HSM is a dedicated, physically isolated cryptographic processor inside the main microcontroller. It stores secret keys securely so that even if the main OS is compromised by a hacker, they cannot extract the cryptographic keys.
+
+        ---
+
+        ## Chapter Summary
+        - **ISO 21434** dictates automotive cybersecurity practices, starting with **TARA**.
+        - **Secure Boot** prevents unauthorized firmware execution.
+        - **SecOC** prevents spoofing on internal vehicle networks (CAN/Ethernet).
+        - **Gateways and IDS/IPS** provide a defense-in-depth network architecture.`,
+
+            "14_OTA_Updates.md": `# SECTION 14: Over-The-Air (OTA) Updates
+
+        OTA technology allows OEMs to fix bugs, patch security vulnerabilities, and add new features to vehicles after they have been sold, drastically reducing warranty recall costs and creating new revenue streams (subscriptions).
+
+        ---
+
+        ## 1. Types of OTA
+
+        ### FOTA (Firmware Over-The-Air)
+        - Updates the low-level firmware of deeply embedded ECUs (e.g., Engine Control, Brake Control).
+        - Highly critical. A failed FOTA update can "brick" the ECU, rendering the car undrivable.
+
+        ### SOTA (Software Over-The-Air)
+        - Updates higher-level application software, usually in the Infotainment or Telematics domain (e.g., updating the Navigation Maps or adding a new Spotify app).
+        - Less critical than FOTA.
+
+        ---
+
+        ## 2. The OTA Update Process
+
+        A standard OTA process involves a cloud backend and an in-vehicle OTA Client (usually running on the Telematics Unit or Central Gateway).
+
+        ### Message Flow
+        \`\`\`mermaid
+        sequenceDiagram
+            participant Cloud as OEM Cloud Server
+            participant TCU as Telematics Unit (OTA Master)
+            participant ECU as Target ECU
+
+            Cloud->>TCU: Update Available Notification
+            TCU-->>Cloud: Accept & Download
+            Note over TCU: Download encrypted package over 4G/5G
+            TCU->>TCU: Decrypt & Verify Signature
+            TCU->>Driver: Prompts Driver "Install Now? Takes 30 mins."
+            Driver->>TCU: Clicks "Yes"
+            Note over TCU,ECU: Vehicle put into Safe State (Engine Off)
+            TCU->>ECU: UDS 0x10 0x02 (Programming Session)
+            TCU->>ECU: UDS 0x34 / 0x36 / 0x37 (Transfer Data)
+            ECU-->>TCU: Flash Complete
+            TCU->>Cloud: Update Successful
+        \`\`\`
+
+        ---
+
+        ## 3. Rollback Mechanisms (A/B Partitioning)
+
+        The biggest risk in OTA is an update failing halfway through (e.g., car battery dies), leaving the ECU corrupted. **A/B Partitioning (Dual Bank Memory)** solves this.
+
+        ### Working Principle
+        - The ECU flash memory is divided into two identical banks: Bank A and Bank B.
+        - Currently, the ECU is running from Bank A.
+        - During the OTA update, the new software is downloaded and written to Bank B in the background while the car is driving.
+        - Once the write to Bank B is verified (Checksum/Signature check), a boot flag is flipped.
+        - The next time the car restarts, it boots from Bank B.
+        - **Rollback:** If Bank B crashes upon boot, the bootloader automatically flips the flag back and reboots into the safe, older software on Bank A.
+
+        ---
+
+        ## 4. OTA Validation
+
+        Testing OTA requires simulating the entire cloud-to-car pipeline.
+
+        ### Test Scenarios
+        1. **Power Interruption:** Start an OTA update. Cut power to the ECU at 50%. Restore power. *Expected Result:* The system should either resume the download or trigger an A/B rollback to the previous version. The car must remain drivable.
+        2. **Corrupted Payload:** Inject a single flipped bit into the OTA payload. *Expected Result:* The signature verification must fail, and the update is rejected before flashing begins.
+        3. **Safe State Check:** Attempt to start an update while the vehicle is driving at 100 km/h. *Expected Result:* Update rejected. System prompts driver to Park and apply the parking brake.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: What is A/B partitioning and why is it essential for FOTA?**
+        > A: A/B partitioning divides ECU flash memory into two banks. It allows new firmware to be flashed to the inactive bank in the background. Its primary benefit is providing a seamless, instant switch to the new software upon reboot, and providing a fail-safe rollback mechanism to the old software if the new software fails to boot. This prevents "bricking" the ECU.
+
+        **Q: What is the difference between FOTA and SOTA?**
+        > A: FOTA updates the core firmware of microcontrollers (like engine or braking ECUs) and requires strict safety protocols (like vehicle parked, engine off). SOTA updates application-level software (like infotainment apps or maps) and can often occur transparently in the background.
+
+        ---
+
+        ## Chapter Summary
+        - **OTA Updates** eliminate the need for physical dealership visits for software patches.
+        - The process heavily utilizes **UDS over DoIP/CAN** for the final flashing step.
+        - **A/B Partitioning** is the industry standard for ensuring safe, brick-proof updates via automatic rollback mechanisms.`,
+
+            "15_Tools.md": `# SECTION 15: Tools Used in the Automotive Industry
+
+        Automotive engineers rely on specialized hardware and software tools to design, simulate, and test complex vehicular networks.
+
+        ---
+
+        ## 1. Network Simulation & Analysis Tools
+
+        ### Vector CANoe
+        The industry standard for development, testing, and analysis of entire ECU networks (CAN, LIN, Ethernet, FlexRay).
+        - **Core Feature:** "Restbus Simulation." If you are developing a radio ECU, CANoe can simulate the Engine, Brakes, and Body controllers so the radio thinks it's in a real car.
+        - **CAPL (CAN Access Programming Language):** A C-like scripting language used within CANoe to write automated test scripts and simulation logic.
+
+        ### Vector CANalyzer
+        The "lite" version of CANoe. Used primarily for analyzing and logging data traffic on the bus. It cannot do full network simulation.
+
+        ### Intrepid Vehicle Spy
+        A strong competitor to CANoe. Often preferred for its lower cost and ease of use in specific diagnostic and data logging scenarios.
+
+        ---
+
+        ## 2. Measurement & Calibration Tools
+
+        ### ETAS INCA
+        Used heavily in Powertrain engineering. It allows engineers to read and modify the internal memory of an ECU in real-time while the engine is running to tune performance (Calibration) using protocols like XCP/CCP.
+
+        ### dSPACE ControlDesk
+        Used for managing Hardware-in-the-Loop (HIL) simulations. Provides graphical dashboards to control the HIL simulator and monitor virtual sensor/actuator data.
+
+        ---
+
+        ## 3. Model-Based Design
+
+        ### MATLAB & Simulink
+        Instead of writing C code by hand, engineers design control logic (like ABS algorithms) using block diagrams in Simulink. The tool then automatically generates MISRA-compliant C code from the model.
+
+        ---
+
+        ## 4. Software Development & DevOps
+
+        ### Git & SVN
+        Version control systems for source code.
+        - **Git:** Distributed (every developer has a full copy of the repository).
+        - **SVN:** Centralized (heavily used in legacy automotive projects for binary files).
+
+        ### Jenkins
+        A Continuous Integration/Continuous Deployment (CI/CD) server. Every time a developer pushes code to Git, Jenkins automatically compiles it, runs unit tests, and generates a report.
+
+        ### Jira & Confluence (Atlassian)
+        - **Jira:** Issue and bug tracking, Agile sprint management.
+        - **Confluence:** Engineering wiki and documentation.
+
+        ---
+
+        ## 5. Diagnostic & IT Tools
+
+        ### Wireshark
+        An open-source network protocol analyzer. Indispensable for debugging Automotive Ethernet (SOME/IP, DoIP) traffic.
+
+        ### DTS Monaco
+        A comprehensive engineering diagnostic tool. Used to execute UDS diagnostic services, read DTCs, and perform flash programming during the development phase.
+
+        ---
+
+        ## Interview Questions & Answers
+
+        **Q: What is Restbus Simulation and which tool is primarily used for it?**
+        > A: Restbus Simulation is the process of simulating the missing parts of a vehicle network. If you only have one physical ECU on a test bench, a tool like Vector CANoe simulates the rest of the bus (the "Restbus") so the physical ECU receives the messages it expects and functions normally.
+
+        **Q: How does Model-Based Design (MBD) differ from traditional coding?**
+        > A: In traditional coding, an engineer writes C/C++ code manually based on requirements. In MBD (using MATLAB/Simulink), the engineer creates a visual, mathematical model of the system. The behavior can be simulated and verified visually. Once verified, a tool automatically generates the C code, drastically reducing human syntax errors.
+
+        ---
+
+        ## Chapter Summary
+        - **Vector CANoe/CANalyzer** dominate network simulation and analysis.
+        - **MATLAB/Simulink** are standard for Model-Based Design and auto-code generation.
+        - **ETAS INCA** is used for real-time engine calibration.
+        - **Jenkins and Git** form the backbone of modern automotive DevOps pipelines.`,
+
+            "16_Interview_Prep.md": `# SECTION 16: Automotive Interview Preparation
+
+        This section compiles the most frequently asked, scenario-based, and technical questions encountered in automotive engineering interviews.
+
+        ---
+
+        ## 1. CAN Protocol Questions
+
+        **Q: What is the dominant and recessive state in CAN?**
+        > A: Dominant is logical 0, where the voltage difference between CAN High and CAN Low is roughly 2V. Recessive is logical 1, where both lines rest at 2.5V (difference is 0V). A dominant bit always overwrites a recessive bit on the bus.
+
+        **Q: How does CAN Arbitration work?**
+        > A: When two nodes transmit simultaneously, they read the bus back. If a node transmits a recessive bit (1) but reads a dominant bit (0), it knows a higher-priority message is transmitting. It immediately stops transmitting and becomes a receiver. Lower ID = Higher Priority.
+
+        **Q: What is Bit Stuffing?**
+        > A: If 5 consecutive bits of the same polarity are transmitted, the controller automatically inserts a bit of the opposite polarity. This ensures the receiver maintains synchronization.
+
+        ## 2. UDS & Diagnostics Questions
+
+        **Q: Differentiate between UDS Service 0x10 and 0x11.**
+        > A: 0x10 is Diagnostic Session Control (changing the ECU state to Programming or Extended session). 0x11 is ECU Reset (commanding the ECU to physically reboot).
+
+        **Q: Explain the Flashing Sequence (OTA/OBD).**
+        > A: 1. Enter Extended Session (10 03). 2. Unlock Security via Seed/Key (27 01/02). 3. Enter Programming Session (10 02). 4. Request Download (34). 5. Transfer Data blocks (36). 6. Request Transfer Exit (37). 7. Hard Reset (11 01).
+
+        **Q: What happens if you get an NRC 0x22 during flashing?**
+        > A: NRC 0x22 means "Conditions Not Correct." It likely means the vehicle is not in a safe state to flash (e.g., the engine is running, or the vehicle is moving).
+
+        ## 3. ADAS Questions
+
+        **Q: Compare Radar and LiDAR.**
+        > A: Radar uses radio waves; it is cheap, works perfectly in fog/rain, and excels at measuring relative speed (Doppler effect) but has poor resolution. LiDAR uses light (lasers); it generates a highly precise 3D map of the environment but is expensive and performs poorly in heavy rain or snow.
+
+        **Q: What is Sensor Fusion?**
+        > A: Combining inputs from multiple sensors (Camera + Radar) to create a single, highly confident environmental model. It mitigates the weaknesses of individual sensors.
+
+        ## 4. AUTOSAR Questions
+
+        **Q: Explain the difference between BSW, RTE, and SWC.**
+        > A: SWC (Software Component) contains the application logic. BSW (Basic Software) contains the OS, network drivers, and hardware abstractions. RTE (Runtime Environment) is the middleware that routes communication between SWCs and the BSW, ensuring the SWC is hardware-independent.
+
+        **Q: What is an ARXML file?**
+        > A: AUTOSAR XML. It is the configuration file format used to define everything in an AUTOSAR project, from the interfaces of an SWC to the baud rate of the CAN bus.
+
+        ## 5. Testing & Agile Questions
+
+        **Q: How do you design test cases for an Adaptive Cruise Control system?**
+        > A: Use Boundary Value Analysis. Test at the minimum activation speed (e.g., 30 km/h), the maximum (150 km/h), and just outside those bounds (29 km/h, 151 km/h). Test positive cases (car ahead slows down) and negative cases (radar sensor gets covered in mud).
+
+        **Q: What is a Traceability Matrix?**
+        > A: A document/tool feature that maps every requirement to its corresponding design element, code commit, and test case. It proves that every requirement has been implemented and tested, which is mandatory for ISO 26262 compliance.
+
+        ## 6. Scenario-Based & Debugging Scenarios
+
+        **Scenario 1: ECU is not transmitting on the CAN bus.**
+        > **Debugging Steps:**
+        > 1. Check physical layer: Use a multimeter to verify 12V power and Ground.
+        > 2. Check CAN termination: Verify 60 ohms across CAN High and CAN Low.
+        > 3. Check Wakeup: Scope the CAN lines or KL15 (Ignition) to ensure the ECU is receiving a wakeup pulse.
+        > 4. Check Software: Ensure the ECU isn't in "Bus Off" state due to excessive error frames.
+
+        **Scenario 2: The Infotainment system crashes when connecting a specific Bluetooth phone.**
+        > **Debugging Steps:**
+        > 1. Replicate the issue with logging enabled (e.g., capture an HCI snoop log from the phone and a dlt-log from the head unit).
+        > 2. Analyze the PBAP (Phonebook) sync. Is the phone sending a contact with a corrupted character or an extremely large profile picture that is causing a buffer overflow in the head unit?
+        > 3. Verify the Bluetooth stack versions.
+
+        ---
+
+        *Tip: For interviews, always structure your answers using the STAR method (Situation, Task, Action, Result) when asked about past project experience.*`,
+
+            "17_Real_Time_Projects.md": `# SECTION 17: Real-Time Projects
+
+        This section outlines end-to-end practical projects that engineers can build or simulate to gain hands-on experience in automotive testing and validation.
+
+        ---
+
+        ## Project 1: CAN Network Validation
+
+        **Objective:** Validate the communication between a simulated Engine Control Unit and a Dashboard Display.
+        **Tools Required:** Vector CANoe, CAN hardware interface (VN1610).
+        **Execution:**
+        1. Create a DBC file defining two nodes (Engine, Dashboard).
+        2. Define a message \`EngineData\` (ID 0x100) containing \`RPM\` (0-8000) and \`Temperature\` (0-150C).
+        3. Write a CAPL script in CANoe to simulate the Engine node ramping up RPM from 0 to 4000.
+        4. Create an Interactive Generator (IG) block to inject error frames and observe the Dashboard's reaction.
+        5. **Validation:** Ensure the Dashboard node correctly displays the RPM and logs an error if the \`EngineData\` message times out (Cycle time > 100ms).
+
+        ---
+
+        ## Project 2: UDS Diagnostics Validation
+
+        **Objective:** Implement and test a UDS Security Access (0x27) and Flash Erase (0x31) routine.
+        **Tools Required:** CANoe Diagnostics Feature Set or CANalyzer.
+        **Execution:**
+        1. Setup a simulated ECU in CANoe.
+        2. Send \`10 03\` to enter Extended Session. Verify positive response \`50 03\`.
+        3. Send \`27 01\` to request a seed.
+        4. Write a CAPL test module that calculates the correct Key and sends \`27 02 <Key>\`.
+        5. Send a Routine Control request \`31 01 FF 00\` (Erase Memory).
+        6. **Validation:** Create a negative test case by sending the wrong Key and verifying the ECU responds with NRC 0x35 (Invalid Key).
+
+        ---
+
+        ## Project 3: Infotainment Bluetooth Testing
+
+        **Objective:** Validate A2DP streaming and AVRCP controls.
+        **Tools Required:** Android/iOS smartphone, Automotive Head Unit (or emulator), Bluetooth Sniffer (Ellisys).
+        **Execution:**
+        1. Pair the smartphone to the Head Unit.
+        2. Start streaming music via Spotify (A2DP).
+        3. Press the physical "Next Track" button on the steering wheel (AVRCP).
+        4. **Validation:** Capture the Bluetooth air traffic. Verify that the AVRCP 'Next' command was sent from the Head Unit, acknowledged by the phone, and that the A2DP stream updated to the new song within 500ms.
+
+        ---
+
+        ## Project 4: ADAS Autonomous Emergency Braking (AEB) Validation
+
+        **Objective:** Test AEB logic in a virtual environment.
+        **Tools Required:** IPG CarMaker or Carla Simulator.
+        **Execution:**
+        1. Create a test track in the simulator.
+        2. Script a target vehicle (Ego car) driving at 60 km/h.
+        3. Script a dummy vehicle 50 meters ahead that suddenly brakes at 1g deceleration.
+        4. **Validation:** Monitor the Ego car's simulated Radar data. Ensure the AEB algorithm triggers a warning at Time-To-Collision (TTC) = 2.5s, and applies full autonomous braking at TTC = 1.0s, preventing a collision.
+
+        ---
+
+        ## Project 5: OTA Update Validation
+
+        **Objective:** Validate the A/B partition rollback mechanism.
+        **Tools Required:** Raspberry Pi (simulating a TCU), OTA Server script (Python).
+        **Execution:**
+        1. Partition the Raspberry Pi SD card into Boot, Bank A, and Bank B.
+        2. Run a simple "Version 1" script on Bank A.
+        3. Push an OTA update ("Version 2") from the Python server to the Pi over Wi-Fi.
+        4. The Pi writes Version 2 to Bank B and reboots.
+        5. **Validation 1 (Positive):** Pi boots from Bank B and reports Version 2.
+        6. **Validation 2 (Negative):** Push a corrupted "Version 3". The Pi attempts to boot, fails the checksum, and automatically reboots back into Bank B (Version 2).
+
+        ---
+
+        ## Project 6: Automotive Ethernet & SOME/IP
+
+        **Objective:** Validate service discovery over Ethernet.
+        **Tools Required:** Wireshark, Python (Scapy).
+        **Execution:**
+        1. Write a Python script to simulate a Camera ECU publishing a video stream availability using SOME/IP-SD.
+        2. Write a second script (Display ECU) that subscribes to this service.
+        3. **Validation:** Run Wireshark. Filter by \`someip\`. Verify the Subscribe Request and Subscribe ACK packets are correctly formatted and acknowledged.`,
+
+            "18_Reference_Standards.md": `# SECTION 18: Industry Reference Standards
+
+        A quick-reference guide to the most critical standards governing automotive software and hardware engineering.
+
+        ---
+
+        ## 1. ISO (International Organization for Standardization)
+
+        - **ISO 11898 (Road vehicles — Controller area network):**
+          - The foundational standard for the CAN bus. Specifies the data link layer and physical signaling.
+
+        - **ISO 14229 (Unified Diagnostic Services - UDS):**
+          - Standardizes the diagnostic services (SIDs) and responses used across all ECUs in modern vehicles regardless of the underlying physical bus.
+
+        - **ISO 15765 (Diagnostics on CAN - DoCAN):**
+          - Defines the transport protocol (ISO-TP) required to send diagnostic messages larger than 8 bytes over a standard CAN bus.
+
+        - **ISO 26262 (Road vehicles — Functional safety):**
+          - The bible of automotive safety. Defines ASIL (Automotive Safety Integrity Levels) and mandates rigorous engineering processes to prevent unreasonable risk due to hazards caused by malfunctioning behavior of E/E systems.
+
+        - **ISO 21434 (Road vehicles — Cybersecurity engineering):**
+          - Standardizes the engineering requirements for cybersecurity risk management. Mandates TARA (Threat Analysis and Risk Assessment).
+
+        - **ISO 13400 (Diagnostics over Internet Protocol - DoIP):**
+          - Facilitates diagnostic communication over vehicle Ethernet, crucial for high-speed OTA updates.
+
+        ---
+
+        ## 2. SAE (Society of Automotive Engineers)
+
+        - **SAE J1939:**
+          - The standard communication protocol for heavy-duty commercial vehicles, defining the use of 29-bit CAN IDs, PGNs, and SPNs.
+
+        - **SAE J3016 (Levels of Driving Automation):**
+          - The globally recognized standard defining the 6 levels of autonomous driving (from Level 0: No Automation to Level 5: Full Automation).
+
+        - **SAE J1962 (OBD-II Connector):**
+          - Defines the physical 16-pin OBD-II diagnostic connector found under the dashboard of all passenger vehicles.
+
+        ---
+
+        ## 3. Consortia and Process Standards
+
+        - **AUTOSAR (Automotive Open System Architecture):**
+          - A global development partnership standardizing the software architecture for automotive ECUs to allow hardware-independence and software component reuse.
+
+        - **ASPICE (Automotive Software Process Improvement and Capability dEtermination):**
+          - A framework used to evaluate and improve the software development processes of automotive suppliers. It heavily emphasizes traceability from requirements down to testing.
+
+        ---
+
+        *End of Handbook.*`
+        };
+
+        // ============================================================
+        // APP LOGIC
+        // ============================================================
+        const chapters = [
+            { title: "Introduction", file: "README.md" },
+            { title: "1. Industry Fundamentals", file: "01_Industry_Fundamentals.md" },
+            { title: "2. Communication Protocols", file: "02_Communication_Protocols.md" },
+            { title: "3. Diagnostics", file: "03_Diagnostics.md" },
+            { title: "4. Heavy Duty Protocols", file: "04_Heavy_Duty_Protocols.md" },
+            { title: "5. SDLC & Standards", file: "05_SDLC_and_Standards.md" },
+            { title: "6. Automotive Testing", file: "06_Automotive_Testing.md" },
+            { title: "7. AUTOSAR", file: "07_AUTOSAR.md" },
+            { title: "8. ADAS", file: "08_ADAS.md" },
+            { title: "9. Infotainment", file: "09_Infotainment.md" },
+            { title: "10. Connectivity", file: "10_Connectivity.md" },
+            { title: "11. Navigation", file: "11_Navigation.md" },
+            { title: "12. Radio Technologies", file: "12_Radio_Technologies.md" },
+            { title: "13. Cybersecurity", file: "13_Cybersecurity.md" },
+            { title: "14. OTA Updates", file: "14_OTA_Updates.md" },
+            { title: "15. Tools Used", file: "15_Tools.md" },
+            { title: "16. Interview Prep", file: "16_Interview_Prep.md" },
+            { title: "17. Real-Time Projects", file: "17_Real_Time_Projects.md" },
+            { title: "18. Reference Standards", file: "18_Reference_Standards.md" }
+        ];
+
+        let currentIndex = -1;
+
+        const tocList = document.getElementById('toc-list');
+        const contentArea = document.getElementById('markdown-content');
+        const spinner = document.getElementById('loading-spinner');
+        const pagination = document.getElementById('pagination');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Configure marked.js
+        marked.setOptions({
+            highlight: function (code, lang) {
+                if (lang === 'mermaid') {
+                    return `<div class="mermaid">${code}</div>`;
+                }
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            },
+            langPrefix: 'hljs language-',
+        });
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: document.body.classList.contains('dark-mode') ? 'dark' : 'default',
+            securityLevel: 'loose'
+        });
+
+        // Build Sidebar
+        function buildSidebar() {
+            chapters.forEach((chapter, index) => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = `#${chapter.file}`;
+                a.textContent = chapter.title;
+                a.dataset.index = index;
+
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    loadChapter(index);
+                    document.getElementById('sidebar').classList.remove('open');
+                });
+
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+        }
+
+        // Load Chapter from embedded content
+        async function loadChapter(index) {
+            if (index < 0 || index >= chapters.length) return;
+
+            currentIndex = index;
+            const chapter = chapters[index];
+
+            // Update active state
+            document.querySelectorAll('.sidebar-nav a').forEach(el => el.classList.remove('active'));
+            const activeLink = document.querySelector(`.sidebar-nav a[data-index="${index}"]`);
+            if (activeLink) activeLink.classList.add('active');
+
+            history.pushState(null, null, `#${chapter.file}`);
+
+            contentArea.style.opacity = 0;
+            setTimeout(() => {
+                spinner.style.display = 'flex';
+                contentArea.innerHTML = '';
+            }, 200);
+
+            try {
+                const markdown = chapterContent[chapter.file];
+                if (!markdown) throw new Error('Content not found for ' + chapter.file);
+
+                const html = marked.parse(markdown);
+
+                setTimeout(() => {
+                    spinner.style.display = 'none';
+                    contentArea.innerHTML = html;
+
+                    // Render mermaid diagrams
+                    mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+
+                    contentArea.style.opacity = 1;
+                    updatePagination();
+                    document.querySelector('.main-content').scrollTop = 0;
+                }, 300);
+
+            } catch (error) {
+                spinner.style.display = 'none';
+                contentArea.innerHTML = `
+                    <div class="markdown-body">
+                        <h1>Error Loading Chapter</h1>
+                        <p>Could not load <code>${chapter.file}</code>.</p>
+                        <p>Please check that the content is embedded correctly.</p>
+                    </div>
+                `;
+                contentArea.style.opacity = 1;
+            }
+        }
+
+        function updatePagination() {
+            pagination.style.display = 'flex';
+
+            if (currentIndex > 0) {
+                prevBtn.style.visibility = 'visible';
+                prevBtn.textContent = `← ${chapters[currentIndex - 1].title}`;
+            } else {
+                prevBtn.style.visibility = 'hidden';
+            }
+
+            if (currentIndex < chapters.length - 1) {
+                nextBtn.style.visibility = 'visible';
+                nextBtn.textContent = `${chapters[currentIndex + 1].title} →`;
+            } else {
+                nextBtn.style.visibility = 'hidden';
+            }
+        }
+
+        prevBtn.addEventListener('click', () => loadChapter(currentIndex - 1));
+        nextBtn.addEventListener('click', () => loadChapter(currentIndex + 1));
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        // Theme Toggle
+        const themeBtn = document.getElementById('theme-toggle');
+        const iconSun = document.getElementById('icon-sun');
+        const iconMoon = document.getElementById('icon-moon');
+        const themeText = document.getElementById('theme-text');
+
+        function toggleTheme() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            document.body.classList.toggle('light-mode', !isDark);
+
+            if (isDark) {
+                iconMoon.style.display = 'none';
+                iconSun.style.display = 'block';
+                themeText.textContent = 'Light Mode';
+                document.getElementById('theme-style').href =
+                    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css';
+                mermaid.initialize({ theme: 'dark' });
+            } else {
+                iconMoon.style.display = 'block';
+                iconSun.style.display = 'none';
+                themeText.textContent = 'Dark Mode';
+                document.getElementById('theme-style').href =
+                    'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css';
+                mermaid.initialize({ theme: 'default' });
+            }
+
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+            if (currentIndex >= 0) {
+                loadChapter(currentIndex);
+            }
+        }
+
+        themeBtn.addEventListener('click', toggleTheme);
+
+        // Init
+        function init() {
+            buildSidebar();
+
+            if (localStorage.getItem('theme') === 'dark') {
+                toggleTheme();
+            }
+
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const index = chapters.findIndex(c => c.file === hash);
+                if (index !== -1) {
+                    loadChapter(index);
+                    return;
+                }
+            }
+
+            loadChapter(0);
+        }
+
+        init();
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoKB v2 — Technical Knowledge Base</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --accent:#00D4AA;--accent2:#3B82F6;--accent3:#A78BFA;--accent4:#FB7185;--accent5:#34D399;--accent6:#F472B6;
+  --bg:#080C18;--bg-card:#0F1626;--bg-card2:#151F35;--bg-card3:#1C2844;
+  --border:#1E2D45;--border2:#253550;
+  --text:#E2EAF8;--text2:#7A90B5;--text3:#3D5070;
+  --green:#10B981;--amber:#F59E0B;--red:#EF4444;--purple:#A78BFA;
+  --blue:#60A5FA;--coral:#FB7185;--mint:#34D399;--violet:#F472B6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:radial-gradient(circle at top, rgba(0,212,170,.08), transparent 32%), linear-gradient(180deg,#07101f 0%,#080c18 42%,#111a2e 100%);color:var(--text);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+
+/* ── SIDEBAR ── */
+#sidebar{position:fixed;top:0;left:0;height:100vh;width:270px;background:var(--bg-card);border-right:1px solid var(--border);z-index:50;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#sidebar.open{transform:translateX(0)}
+#overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:40;opacity:0;pointer-events:none;transition:opacity .3s}
+#overlay.show{opacity:1;pointer-events:all}
+
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;border-radius:8px;margin:1px 8px;transition:all .15s;color:var(--text2);font-size:12.5px;font-weight:500;position:relative}
+.nav-item:hover{background:var(--bg-card2);color:var(--text)}
+.nav-item.active{background:rgba(0,212,170,.1);color:var(--accent);border-left:2px solid var(--accent);border-radius:0 8px 8px 0;margin-left:0;padding-left:22px}
+.nav-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+
+/* ── TOPBAR ── */
+#topbar{position:sticky;top:0;z-index:30;background:rgba(8,12,24,.93);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+
+/* ── CARDS ── */
+.topic-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;transition:border-color .2s,box-shadow .2s;break-inside:avoid;margin-bottom:18px}
+.topic-card:hover{border-color:var(--border2);box-shadow:0 4px 32px rgba(0,0,0,.5)}
+.topic-card.highlighted{border-color:var(--accent)!important;box-shadow:0 0 0 1px rgba(0,212,170,.2),0 8px 40px rgba(0,0,0,.5)!important}
+
+/* ── MASONRY ── */
+.masonry{column-count:3;column-gap:18px}
+@media(max-width:1280px){.masonry{column-count:2}}
+@media(max-width:768px){.masonry{column-count:1}}
+.list-view{column-count:1!important}
+
+/* ── SECTION BLOCK ── */
+.sec-block{background:var(--bg-card2);border-radius:9px;border:1px solid var(--border);overflow:hidden;margin-bottom:8px}
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;cursor:pointer;font-size:12.5px;font-weight:600;user-select:none;color:var(--text)}
+.sec-hdr:hover{background:rgba(255,255,255,.025)}
+.sec-body{padding:12px 13px;border-top:1px solid var(--border)}
+.chevron{transition:transform .2s}
+.chevron.open{transform:rotate(180deg)}
+
+/* ── CODE BLOCK ── */
+.code-block{background:#04080F;border:1px solid var(--border);border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:14px;overflow-x:auto;color:#8FBCBB;line-height:1.75;position:relative;white-space:pre}
+.kw{color:#81A1C1}.fn{color:#88C0D0}.cm{color:#4C566A;font-style:italic}.st{color:#A3BE8C}.nm{color:#B48EAD}.op{color:#ECEFF4}
+.copy-btn{position:absolute;top:8px;right:8px;background:var(--bg-card2);border:1px solid var(--border);border-radius:6px;padding:3px 9px;font-size:10.5px;cursor:pointer;color:var(--text2);transition:all .15s;display:flex;align-items:center;gap:4px;font-family:'DM Sans',sans-serif}
+.copy-btn:hover{border-color:var(--accent);color:var(--accent)}
+.copy-btn.ok{color:var(--green);border-color:var(--green)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:99px;font-size:10.5px;font-weight:600;letter-spacing:.03em}
+.b-teal{background:rgba(0,212,170,.12);color:var(--accent)}
+.b-blue{background:rgba(96,165,250,.12);color:var(--blue)}
+.b-amber{background:rgba(245,158,11,.12);color:#FCD34D}
+.b-red{background:rgba(239,68,68,.12);color:#F87171}
+.b-green{background:rgba(16,185,129,.12);color:#34D399}
+.b-purple{background:rgba(167,139,250,.12);color:var(--purple)}
+.b-coral{background:rgba(251,113,133,.12);color:#FB7185}
+.b-mint{background:rgba(52,211,153,.12);color:#34D399}
+.b-violet{background:rgba(244,114,182,.12);color:#F472B6}
+.b-gray{background:rgba(100,116,139,.12);color:#94A3B8}
+.color-swatch{width:32px;height:32px;border-radius:12px;border:1px solid var(--border);box-shadow:0 1px 8px rgba(0,0,0,.18)}
+
+/* ── TABLE ── */
+.data-table{width:100%;border-collapse:collapse;font-size:11.5px}
+.data-table th{background:var(--bg);color:var(--text2);padding:7px 11px;text-align:left;font-weight:600;letter-spacing:.04em;text-transform:uppercase;font-size:10px;border-bottom:1px solid var(--border)}
+.data-table td{padding:7px 11px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(255,255,255,.015)}
+
+/* ── INPUTS ── */
+.fi{width:100%;background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13.5px;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--accent)}
+.fta{width:100%;background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11.5px;outline:none;resize:vertical;min-height:80px;transition:border-color .2s;line-height:1.6}
+.fta:focus{border-color:var(--accent)}
+
+/* ── BUTTONS ── */
+.btn-p{background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-size:12.5px;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p:hover{background:#00F2C0;transform:translateY(-1px)}
+.btn-g{background:transparent;color:var(--text2);font-weight:500;border:1px solid var(--border);border-radius:8px;padding:9px 15px;cursor:pointer;font-size:12.5px;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-g:hover{border-color:var(--text2);color:var(--text)}
+.btn-d{background:transparent;color:var(--red);border:1px solid var(--red);border-radius:8px;padding:9px 15px;cursor:pointer;font-size:12.5px;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-d:hover{background:rgba(239,68,68,.08)}
+.btn-blue{background:var(--accent2);color:#fff;font-weight:700;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-size:12.5px;font-family:'DM Sans',sans-serif;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-blue:hover{background:#60A5FA;transform:translateY(-1px)}
+
+/* ── MODAL ── */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal.show{opacity:1;pointer-events:all}
+.modal-box{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;transform:translateY(18px);transition:transform .25s}
+.modal-box.wide{max-width:900px}
+.modal.show .modal-box{transform:translateY(0)}
+
+/* ── JSON PANEL ── */
+#json-panel{position:fixed;right:0;top:0;height:100vh;width:420px;background:var(--bg-card);border-left:1px solid var(--border);z-index:45;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+#json-panel.open{transform:translateX(0)}
+@media(max-width:640px){#json-panel{width:100%}}
+
+/* ── SEARCH ── */
+#srch{background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 14px 9px 38px;width:100%;outline:none;transition:border-color .2s}
+#srch:focus{border-color:var(--accent)}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;right:20px;background:var(--bg-card);border-radius:10px;padding:11px 16px;font-size:12.5px;display:flex;align-items:center;gap:8px;z-index:999;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;border:1px solid var(--green);color:var(--green)}
+#toast.show{opacity:1;transform:translateY(0)}
+
+/* ── TAG CHIP ── */
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--bg-card2);border:1px solid var(--border);border-radius:99px;padding:3px 10px;font-size:11px;color:var(--text2);cursor:pointer;transition:all .15s}
+.chip:hover,.chip.on{border-color:var(--accent);color:var(--accent);background:rgba(0,212,170,.07)}
+
+/* ── MISC ── */
+.font-syne{font-family:'Syne',sans-serif}
+.font-mono{font-family:'JetBrains Mono',monospace}
+mark{background:rgba(0,212,170,.22);color:var(--accent);border-radius:2px;padding:0 1px}
+kbd{display:inline-block;background:var(--bg-card2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text2)}
+.progress{height:2px;background:var(--border);border-radius:99px;overflow:hidden}
+.pbar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s}
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--bg-card2);color:var(--text);font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);white-space:nowrap;z-index:999;pointer-events:none}
+.hint{font-size:11px;color:var(--text3);line-height:1.5}
+.lbl{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:.04em}
+.divider{height:1px;background:var(--border);margin:8px 0}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.kv-row{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.kv-row:last-child{border-bottom:none}
+.kv-k{font-family:'JetBrains Mono',monospace;color:var(--accent);min-width:150px;flex-shrink:0;font-size:11px}
+.kv-v{color:var(--text2);line-height:1.5}
+.li-item{display:flex;align-items:flex-start;gap:7px;padding:4px 0;font-size:12.5px;color:var(--text2);line-height:1.5}
+.li-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px}
+.json-ta{width:100%;background:#04080F;border:1px solid var(--border);border-radius:8px;padding:12px;color:#8FBCBB;font-family:'JetBrains Mono',monospace;font-size:11.5px;outline:none;resize:none;line-height:1.7;min-height:300px}
+.json-ta:focus{border-color:var(--accent)}
+.error-box{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px 12px;font-size:11.5px;color:#F87171;font-family:'JetBrains Mono',monospace}
+.warn-box{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:10px 12px;font-size:12px;color:#FCD34D}
+.info-box{background:rgba(0,212,170,.07);border:1px solid rgba(0,212,170,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- Overlay -->
+<div id="overlay" onclick="closeAll()"></div>
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside id="sidebar">
+  <div class="p-4" style="border-bottom:1px solid var(--border)">
+    <div class="flex items-center justify-between mb-3">
+      <span class="font-syne font-bold text-base" style="color:var(--accent)">⚡ SHK</span>
+      <button onclick="closeSidebar()" style="color:var(--text2)" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="relative">
+      <input id="sb-srch" type="text" placeholder="Filter topics…" oninput="renderSidebar(this.value)"
+        style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:12px;padding:7px 10px 7px 28px;width:100%;outline:none;">
+      <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--text3)"></i>
+    </div>
+  </div>
+  <div class="px-4 py-2.5 flex gap-5" style="border-bottom:1px solid var(--border)">
+    <div class="text-xs"><span id="sb-tc" class="font-bold font-mono" style="color:var(--accent)">0</span> <span style="color:var(--text3)">topics</span></div>
+    <div class="text-xs"><span id="sb-sc" class="font-bold font-mono" style="color:var(--accent2)">0</span> <span style="color:var(--text3)">sections</span></div>
+  </div>
+  <div id="sb-list" class="flex-1 overflow-y-auto py-2"></div>
+  <div class="p-3 space-y-2" style="border-top:1px solid var(--border)">
+    <button onclick="openAddModal()" class="btn-p w-full justify-center text-xs py-2"><i class="fa-solid fa-plus"></i> Add Topic</button>
+    <div class="flex gap-2">
+      <button onclick="openJsonPanel()" class="btn-blue flex-1 justify-center text-xs py-2"><i class="fa-solid fa-code"></i> Paste JSON</button>
+      <button onclick="exportAll()" class="btn-g flex-1 text-xs py-2 flex items-center justify-center gap-1"><i class="fa-solid fa-download"></i> Export</button>
+    </div>
+    <button onclick="if(confirm('Reset to default topics?')){topics=JSON.parse(JSON.stringify(DEFAULT_TOPICS));saveData();renderAll();showToast('Reset done!')}" class="btn-d w-full text-xs py-1.5">Reset to defaults</button>
+  </div>
+</aside>
+
+<!-- ══════════ JSON PASTE PANEL ══════════ -->
+<div id="json-panel">
+  <div class="p-4 flex items-center justify-between" style="border-bottom:1px solid var(--border)">
+    <div>
+      <h3 class="font-syne font-bold text-sm" style="color:var(--text)">📋 Paste JSON Topic</h3>
+      <p class="text-xs mt-0.5" style="color:var(--text3)">No file needed — paste & load instantly</p>
+    </div>
+    <button onclick="closeJsonPanel()" style="color:var(--text2)" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
+  <!-- Template selector -->
+  <div class="p-3" style="border-bottom:1px solid var(--border)">
+    <p class="lbl mb-2">QUICK TEMPLATES</p>
+    <div class="flex flex-wrap gap-1.5">
+      <button onclick="loadTemplate('single')" class="chip text-xs">Single Topic</button>
+      <button onclick="loadTemplate('multi')" class="chip text-xs">Multi Topics</button>
+      <button onclick="loadTemplate('protocol')" class="chip text-xs">Protocol</button>
+      <button onclick="loadTemplate('diagnostic')" class="chip text-xs">Diagnostic</button>
+    </div>
+  </div>
+
+  <!-- Paste area -->
+  <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label class="lbl mb-0">JSON CONTENT</label>
+        <button onclick="document.getElementById('jpaste').value=''" class="text-xs" style="color:var(--text3)"><i class="fa-solid fa-eraser"></i> Clear</button>
+      </div>
+      <textarea id="jpaste" class="json-ta" placeholder='Paste JSON here…&#10;&#10;Single topic: { "name": "...", ... }&#10;Multiple: [ { ... }, { ... } ]'></textarea>
+    </div>
+    <div id="json-err" class="hidden"></div>
+    <div id="json-preview" class="hidden"></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="p-4 space-y-2" style="border-top:1px solid var(--border)">
+    <button onclick="validateJSON()" class="btn-g w-full text-xs justify-center flex items-center gap-2 py-2"><i class="fa-solid fa-check-double"></i> Validate</button>
+    <button onclick="loadJSON(false)" class="btn-blue w-full justify-center text-xs py-2"><i class="fa-solid fa-plus-circle"></i> Add to Board (Merge)</button>
+    <button onclick="loadJSON(true)" class="btn-p w-full justify-center text-xs py-2"><i class="fa-solid fa-rotate"></i> Replace All Topics</button>
+    <div class="info-box text-xs">
+      <i class="fa-solid fa-circle-info mr-1"></i>
+      <strong>Merge</strong> adds without removing existing. <strong>Replace</strong> clears all first.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TOPBAR ══════════ -->
+<header id="topbar">
+  <div class="flex items-center gap-3 px-4 py-3 max-w-screen-2xl mx-auto">
+    <button onclick="toggleSidebar()" class="flex flex-col gap-1 p-1.5 rounded-lg hover:bg-white/5 transition-all" style="min-width:32px">
+      <span class="block h-0.5 w-5 rounded" style="background:var(--text)"></span>
+      <span class="block h-0.5 w-3.5 rounded" style="background:var(--text2)"></span>
+      <span class="block h-0.5 w-5 rounded" style="background:var(--text)"></span>
+    </button>
+    <div class="font-syne font-extrabold text-xl tracking-tight" style="color:var(--accent)">SHK</div>
+    <span class="hidden sm:block text-xs font-mono px-2 py-0.5 rounded" style="background:rgba(0,212,170,.09);color:var(--accent)">v2.0</span>
+    <div class="flex-1"></div>
+    <div class="relative flex-1 max-w-sm hidden md:block">
+      <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3)"></i>
+      <input id="srch" type="text" placeholder="Search topics, sections, content… ( / )" oninput="handleSearch(this.value)">
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="openJsonPanel()" class="btn-blue text-xs py-2 px-3 hidden sm:flex items-center gap-1.5" data-tip="Paste JSON directly">
+        <i class="fa-solid fa-code"></i><span class="hidden lg:inline">Paste JSON</span>
+      </button>
+      <button onclick="openAddModal()" class="btn-p text-xs py-2 px-3"><i class="fa-solid fa-plus"></i><span class="hidden sm:inline ml-1">Add Topic</span></button>
+      <button onclick="toggleView()" id="vbtn" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors" style="color:var(--text2);border:1px solid var(--border)" data-tip="Toggle layout">
+        <i class="fa-solid fa-table-cells-large" id="vicon"></i>
+      </button>
+      <button onclick="exportAll()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors" style="color:var(--text2);border:1px solid var(--border)" data-tip="Export JSON"><i class="fa-solid fa-download text-xs"></i></button>
+    </div>
+  </div>
+  <!-- Mobile search -->
+  <div class="md:hidden px-4 pb-3 relative">
+    <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:22px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--text3)"></i>
+    <input style="background:var(--bg-card2);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:13px;padding:9px 14px 9px 36px;width:100%;outline:none" type="text" placeholder="Search…" oninput="handleSearch(this.value)">
+  </div>
+</header>
+
+<!-- ══════════ MAIN ══════════ -->
+<main class="max-w-screen-2xl mx-auto px-4 py-5">
+
+  <!-- Stats -->
+  <div class="stats-grid mb-5" id="stats"></div>
+
+  <!-- Filters -->
+  <div class="flex flex-wrap items-center gap-2 mb-4">
+    <span class="text-xs font-semibold" style="color:var(--text3)">FILTER:</span>
+    <div id="tag-filters" class="flex flex-wrap gap-1.5"></div>
+    <span style="color:var(--text3)">·</span>
+    <select id="sort-sel" onchange="renderAll()" style="background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;color:var(--text2);font-size:11.5px;outline:none">
+      <option value="default">Default</option>
+      <option value="az">A → Z</option>
+      <option value="recent">Newest</option>
+      <option value="sects">Most Sections</option>
+    </select>
+  </div>
+
+  <div id="res-info" class="text-xs mb-4 font-mono" style="color:var(--text3)"></div>
+  <div id="board" class="masonry"></div>
+  <div id="empty" class="hidden text-center py-20">
+    <i class="fa-regular fa-folder-open text-5xl mb-4" style="color:var(--border)"></i>
+    <p class="font-syne font-bold text-lg mb-1" style="color:var(--text2)">No topics found</p>
+    <p class="text-sm mb-5" style="color:var(--text3)">Try searching differently or add a new topic.</p>
+    <button onclick="openAddModal()" class="btn-p">+ Add First Topic</button>
+  </div>
+</main>
+
+<!-- ══════════ ADD TOPIC MODAL ══════════ -->
+<div id="add-modal" class="modal">
+  <div class="modal-box p-6">
+    <div class="flex items-center justify-between mb-5">
+      <div><h2 class="font-syne font-bold text-base" style="color:var(--text)">Add New Topic</h2>
+        <p class="hint mt-0.5">Fill details below. Add as many sections as needed.</p></div>
+      <button onclick="closeModal('add-modal')" style="color:var(--text2)" class="hover:text-white transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+    </div>
+    <div class="space-y-4">
+      <div><label class="lbl">TOPIC NAME *</label><input id="tn" class="fi" type="text" placeholder="e.g. LIN Protocol, DoIP, FlexRay…"></div>
+      <div><label class="lbl">SHORT DESCRIPTION</label><input id="td" class="fi" type="text" placeholder="One-liner summary"></div>
+      <div class="flex gap-3">
+        <div class="flex-1"><label class="lbl">CATEGORY TAG</label><input id="tt" class="fi" type="text" placeholder="Protocol / Diagnostics / Scripting…"></div>
+        <div class="flex-1"><label class="lbl">COLOR</label>
+          <div class="flex items-center gap-2">
+            <select id="tc" class="fi" style="cursor:pointer" onchange="updateAddColorPreview()">
+              <option value="teal">🟢 Teal</option><option value="blue">🔵 Blue</option>
+              <option value="amber">🟡 Amber</option><option value="red">🔴 Red</option>
+              <option value="green">💚 Green</option><option value="purple">🟣 Purple</option>
+              <option value="coral">🌺 Coral</option><option value="mint">🌿 Mint</option><option value="violet">💜 Violet</option>
+              <option value="gray">⚪ Gray</option>
+            </select>
+            <div id="tc-preview" class="color-swatch" style="background:#00D4AA"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-2"><label class="lbl mb-0">SECTIONS</label>
+          <button onclick="addSF()" class="text-xs flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-white/5 transition-colors" style="color:var(--accent);border:1px solid var(--border)"><i class="fa-solid fa-plus text-xs"></i> Section</button></div>
+        <div id="sfc"></div>
+      </div>
+    </div>
+    <div class="flex gap-2 justify-end mt-5">
+      <button onclick="closeModal('add-modal')" class="btn-g">Cancel</button>
+      <button onclick="saveTopic()" class="btn-p"><i class="fa-solid fa-check"></i> Save Topic</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ EDIT MODAL ══════════ -->
+<div id="edit-modal" class="modal">
+  <div class="modal-box p-6">
+    <div class="flex items-center justify-between mb-5">
+      <h2 class="font-syne font-bold text-base" style="color:var(--text)">Edit Topic</h2>
+      <button onclick="closeModal('edit-modal')" style="color:var(--text2)" class="hover:text-white transition-colors"><i class="fa-solid fa-xmark text-lg"></i></button>
+    </div>
+    <div id="edit-body"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"><i class="fa-solid fa-check-circle"></i><span id="tmsg"></span></div>
+
+<script>
+// ═══════════════════════════════════════════
+// DEEP TECHNICAL DATA
+// ═══════════════════════════════════════════
+const DEFAULT_TOPICS = [
+{
+  id:"can",name:"CAN Protocol",desc:"Controller Area Network — ISO 11898 deep dive: physical layer, frame types, arbitration, error handling, timing",
+  color:"teal",tag:"Protocol",createdAt:Date.now()-9e5,
+  sections:[
+    {title:"Architecture & Physical Layer",type:"text",content:`CAN (Controller Area Network) was developed by Bosch in 1983, standardized as ISO 11898. It uses a two-wire differential bus: CANH (dominant high ~3.5V) and CANL (dominant low ~1.5V). In recessive state both are ~2.5V (0V differential). The dominant state (logic 0) always wins over recessive (logic 1) — this is the basis of non-destructive CSMA/CD arbitration.
+
+ISO 11898-2 (High-Speed CAN): up to 1 Mbps, 40m bus length. Requires 120Ω termination at each end. ISO 11898-3 (Low-Speed Fault-Tolerant CAN): up to 125 kbps, continues operation with single wire fault. Classical CAN max payload = 8 bytes. CAN FD (Flexible Data-Rate, ISO 11898-1:2015) extends payload to 64 bytes and supports dual bit rate (arbitration phase + data phase).`},
+    {title:"Frame Types & Structure",type:"table",content:`Frame Type|PCI / SOF|Purpose|Payload|Who Sends
+Data Frame|SOF dominant bit|Carry data to bus|0–8 bytes (CAN) / 0–64 bytes (FD)|Transmitting node
+Remote Frame|RTR bit recessive|Request data from specific ID|0 bytes (no data)|Requesting node
+Error Frame|6 dominant bits|Signal a detected error|None|Any node detecting error
+Overload Frame|2 dominant bits|Request delay between frames|None|Receiver needs more time
+Interframe Space|3 recessive bits|Mandatory gap between frames|None|Bus idle`},
+    {title:"Standard (11-bit) Data Frame Fields",type:"keyvalue",content:`SOF (Start of Frame):1 dominant bit — synchronizes all nodes
+Arbitration Field:11-bit ID + RTR bit (12 bits total)
+Control Field:IDE bit + r0 + 4-bit DLC (Data Length Code)
+Data Field:0–8 bytes actual payload
+CRC Field:15-bit CRC + 1 recessive delimiter
+ACK Field:1-bit ACK slot + 1 recessive delimiter (receiver pulls dominant)
+EOF + IFS:7 recessive + 3 recessive bits`},
+    {title:"Extended (29-bit) Frame Fields",type:"keyvalue",content:`SOF:1 dominant bit
+Base ID:11-bit identifier (MSB portion)
+SRR:Substitute Remote Request (recessive, replaces RTR in base)
+IDE:Identifier Extension bit = recessive (distinguishes from 11-bit)
+Extended ID:18-bit extension = total 29-bit ID
+RTR:Remote Transmission Request
+r1, r0:Reserved bits
+DLC:4-bit data length code
+Data:0–8 bytes
+CRC + ACK + EOF:Same as standard frame`},
+    {title:"Bit Timing & Synchronization",type:"text",content:`Each bit period is divided into 4 segments: SYNC_SEG (1 Tq, used for edge sync), PROP_SEG (1–8 Tq, compensates propagation delay), PHASE_SEG1 (1–8 Tq, lengthened on resync), PHASE_SEG2 (2–8 Tq, shortened on resync). Tq (Time Quantum) = 1 / (f_osc / BRP). Sample point is typically between PHASE_SEG1 and PHASE_SEG2.
+
+Example: 500 kbps at 16 MHz oscillator. BRP=2 → Tq = 125 ns. 16 Tq per bit = 500 kbps. Typical split: Sync=1, Prop=6, PS1=4, PS2=4, SJW=1. Sample point = (1+6+4)/16 = 68.75%.`},
+    {title:"CSMA/CA Arbitration",type:"text",content:`All nodes start transmitting simultaneously. Each node monitors bus while sending. If a node transmits recessive (1) but reads dominant (0), it lost arbitration — it immediately stops transmitting and becomes a receiver. The node with the lower numeric ID always wins (more leading zeros = more dominant bits). This is non-destructive: the winning frame is not corrupted.
+
+Priority scheme: Lower CAN ID = higher priority. 0x001 always beats 0x0FF. For same base ID, standard (11-bit) frame beats extended (29-bit) because IDE bit is dominant in standard.`},
+    {title:"Error Detection Mechanisms",type:"keyvalue",content:`CRC Check:15-bit polynomial remainder over bits from SOF to DLC+Data. Detects all single/double errors, odd-number errors, bursts ≤15 bits
+Bit Stuffing:After 5 consecutive same-polarity bits, transmitter inserts opposite bit. Receiver removes it. Violation = stuff error
+Bit Monitoring:Transmitter reads back every bit. Dominant-recessive mismatch = bit error (except during arbitration/ACK)
+Frame Check:SOF, EOF, IFS have fixed polarity. Violation = form error
+ACK Check:If no receiver pulls ACK slot dominant, transmitter signals ACK error`},
+    {title:"Error States & Counters",type:"keyvalue",content:`TEC (Transmit Error Counter):Incremented on transmit error (+8 or +1), decremented on success (-1)
+REC (Receive Error Counter):Incremented on receive error (+1), decremented on success
+Error Active State:TEC < 128 AND REC < 128 → sends active error frames (6 dominant), fully participates
+Error Passive State:TEC ≥ 128 OR REC ≥ 128 → sends passive error frames (6 recessive), waits 8+IFS extra bits before retransmit
+Bus-Off State:TEC ≥ 256 → node disconnects from bus. Recovery: 128 × 11 recessive bits (bus-off recovery sequence)`},
+    {title:"CAN FD Key Differences",type:"keyvalue",content:`BRS (Bit Rate Switch) bit:Switches from nominal to data phase bit rate at this bit
+ESI (Error Status Indicator):Transmitter error passive flag
+FDF (FD Frame) bit:Distinguishes CAN FD from Classical CAN
+DLC extension:DLC 9–15 map to 12,16,20,24,32,48,64 bytes
+Payload:Up to 64 bytes vs 8 bytes classical
+Data phase speed:Up to 8 Mbps (with proper transceiver)
+CRC:17-bit for ≤16 byte payload, 21-bit for 17–64 bytes`},
+    {title:"CAPL — CAN Bus Simulation",type:"code",content:`/* Send periodic CAN message every 100ms */
+variables {
+  message 0x200 engMsg;  // Engine status message
+  msTimer periodicTimer;
+  int rpm = 0;
+}
+
+on start {
+  setTimer(periodicTimer, 100);
+}
+
+on timer periodicTimer {
+  engMsg.dlc = 8;
+  rpm = (rpm + 10) % 8000;
+  engMsg.word(0) = rpm;          // Engine RPM (bytes 0-1)
+  engMsg.byte(2) = 0x01;         // Engine status: running
+  engMsg.byte(3) = 75;           // Coolant temp in degC
+  output(engMsg);
+  setTimer(periodicTimer, 100);
+}
+
+on message 0x201 {               // Receive ECU response
+  if (this.byte(0) == 0xFF) {
+    write("ECU ACK received, DTC count: %d", this.byte(1));
+  }
+}
+
+on errorFrame {
+  write("[ERROR] CAN error frame detected! TEC=%d REC=%d",
+        CanGetNodeState_TEC(), CanGetNodeState_REC());
+}
+
+/* Check bus-off state */
+on busOff {
+  write("[CRITICAL] Node entered Bus-Off state!");
+  CanBusOff_Reset();  // Trigger recovery
+}`}
+  ]
+},
+{
+  id:"cantp",name:"CAN-TP (ISO 15765-2)",desc:"Transport Protocol — segmented transfer, flow control, timing parameters, WFT handling, all frame types",
+  color:"blue",tag:"Protocol",createdAt:Date.now()-8e5,
+  sections:[
+    {title:"Purpose & Protocol Stack Position",type:"text",content:`CAN-TP (ISO 15765-2) sits between the CAN data link layer and application-layer protocols (UDS, OBD-II, J1939). Its job: segment messages larger than 7 bytes into multiple CAN frames and reassemble them at the receiver. Without CAN-TP, UDS would be limited to 7 bytes per request/response.
+
+Layer stack: Application (UDS/OBD) → CAN-TP (ISO 15765-2) → CAN (ISO 11898). CAN-TP is mandatory for any UDS implementation on CAN. Address modes: Normal Addressing (1 byte PCI, 7 bytes payload), Extended Addressing (1 byte address + 1 byte PCI, 6 bytes payload), Mixed Addressing (for NM).`},
+    {title:"All Frame Types — Byte-Level Detail",type:"table",content:`Frame|First Byte|Second Byte|Payload Bytes|Direction
+Single Frame (SF)|0x0N (N=length, 0–7)|Data byte 0|Up to 7 bytes|Tester→ECU / ECU→Tester
+First Frame (FF)|0x1H (H=high nibble of length)|Low byte of length (0x00–0xFF)|6 bytes of payload|Tester→ECU
+Consecutive Frame (CF)|0x2N (N=SN 1–15, wraps 0)|Data|7 bytes of payload|Tester→ECU
+Flow Control (FC)|0x3S (S=status: 0,1,2)|Block Size (BS)|STmin|ECU→Tester`},
+    {title:"Flow Control Parameters — Full Detail",type:"keyvalue",content:`FS=0 (ClearToSend):Receiver ready, send BS consecutive frames then wait
+FS=1 (Wait):Receiver not ready, wait for next FC. Max waits = N_WFTmax
+FS=2 (Overflow):Receiver buffer full — abort transmission entirely
+BS (Block Size)=0:No limit, sender transmits all remaining CFs without pause
+BS=1–255:Send exactly BS consecutive frames, then wait for next FC
+STmin=0x00–0x7F:Minimum separation time in milliseconds (0–127 ms)
+STmin=0x80–0xF0:Reserved — do not use
+STmin=0xF1–0xF9:Separation time in 100µs increments (100µs–900µs)
+N_As:Time for transmitter to send one frame (typically 25ms)
+N_Bs:Time for receiver to send Flow Control after FF (typically 75ms)
+N_Cr:Time for receiver to get next CF after previous CF (typically 150ms)`},
+    {title:"Complete Transfer Example — 13-byte payload",type:"text",content:`Scenario: Tester sends 13 bytes [01 02 03 04 05 06 07 08 09 0A 0B 0C 0D] to ECU.
+
+Frame 1 — First Frame (FF):
+  Byte0: 0x10 (FF, high nibble of length=0)
+  Byte1: 0x0D (length = 13 decimal)
+  Bytes 2–7: 01 02 03 04 05 06 (6 payload bytes)
+
+ECU → Flow Control (FC, ClearToSend):
+  Byte0: 0x30 (FC, FS=0=CTS)
+  Byte1: 0x00 (BS=0, no blocking)
+  Byte2: 0x0A (STmin=10ms)
+
+Frame 2 — Consecutive Frame SN=1:
+  Byte0: 0x21 (CF, SN=1)
+  Bytes 1–7: 07 08 09 0A 0B 0C 0D (7 bytes — transfer complete)
+
+Total frames: 3. If payload were 100 bytes: 1 FF + ceil((100-6)/7) = 14 CFs.`},
+    {title:"Address Formats",type:"table",content:`Format|CAN ID Usage|PCI Position|Use Case
+Normal|11 or 29-bit ID encodes TA/SA|Byte 0|Standard OBD/UDS on CAN
+Extended|11 or 29-bit ID + 1 byte target|Byte 1 (Byte 0=TA)|Multi-ECU on shared ID
+Mixed 11-bit|11-bit ID + address extension|Byte 1|Network management
+Mixed 29-bit|29-bit ID with SA/TA in ID|Byte 1|Full address in ID + AE`},
+    {title:"Timing — What Fails & Why",type:"keyvalue",content:`N_As timeout:Tx side: tester didn't get CAN ACK in time. Check bus load, termination
+N_Bs timeout:Tester sent FF, ECU didn't respond with FC. ECU busy, not ready for diagnostics, wrong addressing
+N_Cs timeout:Tester violated STmin — sent CF too fast. Add delay between consecutive frames
+N_Cr timeout:ECU waiting for next CF but tester went silent. Tester crash or buffer overflow
+WFT exceeded:ECU sent too many Wait FCs (N_WFTmax). ECU internal buffer contention`},
+    {title:"CAPL — CAN-TP Simulation",type:"code",content:`/* Simulate CAN-TP multi-frame transmission */
+variables {
+  byte payload[13] = {0x01,0x02,0x03,0x04,0x05,0x06,
+                      0x07,0x08,0x09,0x0A,0x0B,0x0C,0x0D};
+  msTimer stminTimer;
+  int cfIndex = 1;
+  int sn = 1;
+}
+
+on key 's' {
+  message 0x7DF ff;
+  ff.dlc = 8;
+  ff.byte(0) = 0x10;  // First Frame
+  ff.byte(1) = 0x0D;  // Length = 13
+  ff.byte(2) = payload[0]; ff.byte(3) = payload[1];
+  ff.byte(4) = payload[2]; ff.byte(5) = payload[3];
+  ff.byte(6) = payload[4]; ff.byte(7) = payload[5];
+  output(ff);
+  cfIndex = 6; sn = 1;
+  write("FF sent, length=13");
+}
+
+on message 0x7E8 {  // ECU response (Flow Control)
+  if ((this.byte(0) & 0xF0) == 0x30) {  // FC frame
+    byte fs = this.byte(0) & 0x0F;
+    if (fs == 0) {  // ClearToSend
+      int stmin = this.byte(2);
+      write("FC: CTS, BS=%d, STmin=%d ms", this.byte(1), stmin);
+      setTimer(stminTimer, stmin > 0 ? stmin : 1);
+    }
+  }
+}
+
+on timer stminTimer {
+  if (cfIndex >= 13) { write("Transfer complete!"); return; }
+  message 0x7DF cf;
+  cf.dlc = 8;
+  cf.byte(0) = 0x20 | (sn & 0x0F);  // CF + SN
+  int i;
+  for (i = 0; i < 7 && cfIndex < 13; i++) {
+    cf.byte(i+1) = payload[cfIndex++];
+  }
+  output(cf);
+  sn = (sn + 1) & 0x0F;
+  if (sn == 0) sn = 1;
+  if (cfIndex < 13) setTimer(stminTimer, 10);
+  else write("Last CF sent. Transfer done.");
+}`}
+  ]
+},
+{
+  id:"uds",name:"UDS (ISO 14229)",desc:"Unified Diagnostic Services — all 26 services, session management, security access, DTC handling, ECU flashing procedure",
+  color:"amber",tag:"Diagnostics",createdAt:Date.now()-7e5,
+  sections:[
+    {title:"Protocol Overview & Architecture",type:"text",content:`UDS (ISO 14229) defines a set of services for diagnosing and reprogramming ECUs over any automotive network. The tester is always the client; the ECU is the server. Communication is request/response: tester sends SID + sub-functions/parameters, ECU responds with positive (SID + 0x40) or negative response (0x7F + SID + NRC).
+
+Positive response SID = Request SID | 0x40. E.g., request 0x10 → positive response 0x50. Service IDs 0x00–0x3F are request SIDs. 0x40–0x7F are positive response SIDs. 0x7F is always the negative response SID. UDS runs on top of CAN-TP (ISO 15765-2) on CAN buses.`},
+    {title:"All 26 UDS Services",type:"table",content:`SID|Service Name|Sub-Function|Key Use Case
+0x10|DiagnosticSessionControl|0x01 Default, 0x02 Programming, 0x03 Extended|Switch ECU diagnostic session
+0x11|ECUReset|0x01 Hard, 0x02 Key Off/On, 0x03 Soft|Reset ECU
+0x14|ClearDiagnosticInformation|GroupOfDTC|Erase stored DTCs
+0x19|ReadDTCInformation|0x01–0x19 subtypes|Read DTCs by status, snapshot, extended data
+0x22|ReadDataByIdentifier|DID (2 bytes)|Read live data, VIN, calibration IDs
+0x23|ReadMemoryByAddress|Address + Length|Read raw ECU memory
+0x24|ReadScalingDataByIdentifier|DID|Read scaling data for measurements
+0x27|SecurityAccess|0x01/0x03 reqSeed, 0x02/0x04 sendKey|Unlock ECU for programming
+0x28|CommunicationControl|Sub-function|Enable/disable Tx/Rx
+0x29|Authentication|Sub-function|PKI-based authentication (ISO 14229-1:2020)
+0x2A|ReadDataByPeriodicIdentifier|Transmission mode|Periodic data subscription
+0x2C|DynamicallyDefineDataIdentifier|Sub-function|Create custom DID on-the-fly
+0x2E|WriteDataByIdentifier|DID + data|Write config, coding, calibration data
+0x2F|InputOutputControlByIdentifier|DID + controlParam|Override I/O (e.g. force actuator)
+0x31|RoutineControl|0x01 Start, 0x02 Stop, 0x03 Result|Run routines (erase flash, check memory)
+0x34|RequestDownload|Compression+Encrypting+MemAddr|Initiate ECU flash download
+0x35|RequestUpload|Compression+MemAddr+MemSize|Read firmware from ECU
+0x36|TransferData|Block sequence counter|Actual data transfer in chunks
+0x37|RequestTransferExit|None|End data transfer
+0x38|RequestFileTransfer|Mode+Path|File-based transfer (newer ECUs)
+0x3D|WriteMemoryByAddress|Address + Data|Write to ECU memory address
+0x3E|TesterPresent|0x00 with response, 0x80 no response|Keep session alive (heartbeat)
+0x83|AccessTimingParameter|—|Read/write P2/P2* timing values
+0x84|SecuredDataTransmission|—|Encrypted data channel
+0x85|ControlDTCSetting|0x01 On, 0x02 Off|Enable/disable DTC storage
+0x86|ResponseOnEvent|Sub-function|ECU sends response on trigger event
+0x87|LinkControl|Sub-function|Change communication baud rate`},
+    {title:"Session Management — Full State Machine",type:"keyvalue",content:`Default Session (0x01):Power-on default. Read DTCs, read data (0x22), clear DTCs (0x14), TesterPresent. No security required
+Extended Diagnostic Session (0x03):All default + write data (0x2E), I/O control (0x2F), communication control (0x28). Requires security access for writes
+Programming Session (0x02):ECU flash reprogramming. Requires security access. Typically on physical CAN only, functional addressing disabled. Boot software takes over
+P2_Server_Max:50ms — max time ECU waits before responding (or sending 0x78)
+P2*_Server_Max:5000ms — extended response time after 0x78 NRC (pending response)
+Session Timeout:Default 5 seconds. If TesterPresent (0x3E) not sent, ECU reverts to default session`},
+    {title:"Security Access — Complete Flow",type:"text",content:`Step 1 — Request Seed (SID=0x27, sub=0x01 for level 1):
+  Tester: 02 27 01
+  ECU: 06 67 01 [SEED_B0] [SEED_B1] [SEED_B2] [SEED_B3]
+
+Step 2 — Calculate Key (algorithm is OEM-specific):
+  Simple XOR example: KEY = SEED XOR 0xA5B6C7D8
+  More common: AES-based computation, or CRC with secret constant
+  
+Step 3 — Send Key (SID=0x27, sub=0x02):
+  Tester: 06 27 02 [KEY_B0] [KEY_B1] [KEY_B2] [KEY_B3]
+  ECU: 02 67 02 (positive) OR 03 7F 27 35 (wrong key - NRC 0x35)
+
+Security Levels: 0x01/0x02 = Level 1, 0x03/0x04 = Level 2, 0x11/0x12 = Level 9 (programming).
+Attempt counter: After N wrong attempts (typically 3), ECU locks with NRC 0x37 and requires time delay before next attempt.`},
+    {title:"DTC Structure — ISO 14229 Format",type:"keyvalue",content:`DTC Format:3 bytes — Group byte + System byte + Fault byte
+Example 0xC0 0x12 0x00:C0=Chassis, 12=system, 00=fault type
+Status Byte bits:Bit0=testFailed, Bit1=testFailedThisOperationCycle, Bit2=pendingDTC, Bit3=confirmedDTC, Bit4=testNotCompletedSinceLastClear, Bit5=testFailedSinceLastClear, Bit6=testNotCompletedThisOperationCycle, Bit7=warningIndicatorRequested
+Snapshot (Freeze Frame):Captured data at time of fault — DID values recorded when DTC set
+Extended Data:DTC-specific data — occurrence counter, aging counter, failed/passed cycles`},
+    {title:"NRC — All Negative Response Codes",type:"table",content:`NRC|Hex|Meaning|Common Cause
+generalReject|0x10|Generic rejection|Service completely unsupported
+serviceNotSupported|0x11|Service ID unknown|Wrong SID sent
+subFunctionNotSupported|0x12|Sub-function invalid|Wrong sub-function byte
+incorrectMessageLengthOrFormat|0x13|Wrong length|Data bytes count mismatch
+responseTooLong|0x14|Response bigger than buffer|Rare, CAN-TP overflow
+busyRepeatRequest|0x21|ECU busy, retry|High bus load
+conditionsNotCorrect|0x22|Pre-conditions failed|Engine not running, wrong session
+requestSequenceError|0x24|Wrong order of requests|SecurityAccess step violation
+noResponseFromSubnetComponent|0x25|Sub-component silent|Gateway addressing issue
+failurePreventsExecutionOfRequestedAction|0x26|HW failure|Sensor fault blocks write
+requestOutOfRange|0x31|Parameter value outside limits|DID or address out of range
+securityAccessDenied|0x33|Not unlocked|Must do SecurityAccess first
+authenticationRequired|0x34|PKI auth needed|ISO 14229-1:2020 services
+invalidKey|0x35|Wrong seed-key answer|Key calculation error
+exceededNumberOfAttempts|0x36|Too many wrong keys|Attempt counter exhausted
+requiredTimeDelayNotExpired|0x37|Security cooldown|Wait before retry
+uploadDownloadNotAccepted|0x70|ECU rejected transfer|Conditions not met for flash
+transferDataSuspended|0x71|Transfer interrupted|Timing or sequence error
+generalProgrammingFailure|0x72|Flash write failed|Bad sector, erase failed
+wrongBlockSequenceCounter|0x73|Block counter mismatch|Missing block in sequence
+requestCorrectlyReceivedResponsePending|0x78|Processing, wait|Normal — wait for actual response
+subFunctionNotSupportedInActiveSession|0x7E|Wrong session|Needs extended/programming session
+serviceNotSupportedInActiveSession|0x7F|Wrong session|Service needs different session`},
+    {title:"ECU Flash Programming Sequence",type:"list",content:`1. Switch to Extended Session: 02 10 03 → response 02 50 03
+2. Security Access Level 9: Request seed 02 27 11, get seed, calculate key, send 06 27 12 [KEY]
+3. Switch to Programming Session: 02 10 02 → response 02 50 02 (re-authenticate if required)
+4. Security Access Level 1: 02 27 01, calculate key, 06 27 02 [KEY]
+5. Erase Memory Routine: 31 01 FF 00 [addr 4 bytes] [size 4 bytes] → await result
+6. Check Erase Result: 31 03 FF 00 → confirm success
+7. Request Download: 34 00 [compression:encryption] [addr] [size] → ECU responds with max block size
+8. Transfer Data Loop: 36 [block_seq_ctr] [data…] × N blocks → positive response each block
+9. Request Transfer Exit: 37 → 77 (all data sent)
+10. Check Programming Integrity Routine: 31 01 0F 02 [checksum] → confirm CRC/hash match
+11. Reset ECU: 11 01 (Hard Reset) or 11 03 (Soft Reset)
+12. Verify: Read ECU Part Number (22 F1 87) and Software Version (22 F1 89)`},
+    {title:"Python — UDS Tester Script",type:"code",content:`import socket
+import time
+
+# UDS over ISO-TP (python-can + python-isotp)
+try:
+    import can, isotp
+    HAS_CAN = True
+except ImportError:
+    HAS_CAN = False
+
+class UDSTester:
+    """Minimal UDS tester using python-isotp"""
+    
+    SERVICES = {
+        0x10: "DiagnosticSessionControl",
+        0x22: "ReadDataByIdentifier",
+        0x27: "SecurityAccess",
+        0x2E: "WriteDataByIdentifier",
+        0x31: "RoutineControl",
+        0x3E: "TesterPresent",
+    }
+    
+    NRC_DESC = {
+        0x10:"generalReject", 0x11:"serviceNotSupported",
+        0x12:"subFunctionNotSupported", 0x13:"incorrectMessageLength",
+        0x22:"conditionsNotCorrect", 0x24:"requestSequenceError",
+        0x31:"requestOutOfRange", 0x33:"securityAccessDenied",
+        0x35:"invalidKey", 0x36:"exceededAttempts",
+        0x37:"requiredTimeDelayNotExpired", 0x78:"responsePending",
+        0x7E:"subFunctionNotSupportedInSession",
+        0x7F:"serviceNotSupportedInSession",
+    }
+    
+    def __init__(self, channel='vcan0', tx_id=0x7DF, rx_id=0x7E8):
+        self.tx_id = tx_id
+        self.rx_id = rx_id
+        self.session = 0x01
+    
+    def parse_response(self, data: bytes) -> dict:
+        if not data:
+            return {"status": "timeout"}
+        if data[0] == 0x7F:
+            nrc = data[2] if len(data) > 2 else 0
+            return {
+                "status": "negative",
+                "service": hex(data[1]),
+                "nrc": hex(nrc),
+                "nrc_desc": self.NRC_DESC.get(nrc, "unknown")
+            }
+        return {
+            "status": "positive",
+            "service": hex(data[0]),
+            "service_name": self.SERVICES.get(data[0] - 0x40, "unknown"),
+            "data": data[1:].hex()
+        }
+    
+    def switch_session(self, session: int):
+        """0x01=default, 0x02=programming, 0x03=extended"""
+        req = bytes([0x10, session])
+        print(f"→ Switch to session 0x{session:02X}")
+        return req  # send via isotp transport
+    
+    def read_did(self, did: int) -> bytes:
+        """Request DID, e.g. 0xF187 = ECU Part Number"""
+        return bytes([0x22, (did >> 8) & 0xFF, did & 0xFF])
+    
+    def tester_present(self, suppress_response=True):
+        """Send every 2–4 seconds to keep session alive"""
+        return bytes([0x3E, 0x80 if suppress_response else 0x00])
+    
+    def security_access_seed_request(self, level=0x01):
+        return bytes([0x27, level])
+    
+    def calculate_key(self, seed: bytes, secret=0xA5B6C7D8) -> bytes:
+        """Example XOR key calculation — OEM-specific in production"""
+        seed_val = int.from_bytes(seed, 'big')
+        key_val = seed_val ^ secret
+        return key_val.to_bytes(len(seed), 'big')
+
+# Example usage (without real hardware):
+tester = UDSTester()
+print("Session switch:", tester.switch_session(0x03).hex())
+print("Read Part No:", tester.read_did(0xF187).hex())
+print("Seed request:", tester.security_access_seed_request(0x01).hex())
+seed_example = bytes([0xA1, 0xB2, 0xC3, 0xD4])
+key = tester.calculate_key(seed_example)
+print(f"Seed: {seed_example.hex()}, Key: {key.hex()}")`}
+  ]
+},
+{
+  id:"bt",name:"Bluetooth Profiles",desc:"HFP, A2DP, AVRCP, PBAP, MAP — deep dive on profiles, AT commands, codec negotiation, pairing modes",
+  color:"purple",tag:"Connectivity",createdAt:Date.now()-6e5,
+  sections:[
+    {title:"Bluetooth Stack in Automotive HU",type:"text",content:`Classic Bluetooth (BR/EDR) uses 2.4 GHz ISM band with FHSS (1600 hops/sec, 79 channels). BLE uses 40 channels, 3 advertising channels. Automotive HU typically supports dual-mode (BR/EDR + BLE). Profile stack: Application → Profile (HFP/A2DP/PBAP) → L2CAP → HCI → Controller.
+
+SDP (Service Discovery Protocol) lets devices discover supported profiles. RFCOMM provides serial port emulation over L2CAP (used by HFP, SPP, MAP, PBAP). AVDTP (Audio/Video Distribution Transport Protocol) used by A2DP. AVCTP (Audio/Video Control Transport Protocol) used by AVRCP.`},
+    {title:"All Automotive Bluetooth Profiles",type:"table",content:`Profile|PSM/Channel|Codec/Protocol|Automotive Use
+HFP 1.8|RFCOMM|PCM/mSBC/LC3-SWB|Phone calls, Siri, Google Assistant
+A2DP 1.4|L2CAP/AVDTP|SBC, AAC, aptX, LDAC|Music streaming
+AVRCP 1.6|L2CAP/AVCTP|Metadata + controls|Play/pause/next, album art
+PBAP 1.2|RFCOMM/OBEX|vCard|Contact/call history sync
+MAP 1.4|RFCOMM/OBEX|SMS/MMS/email|Message notifications, reply
+SPP 1.2|RFCOMM|Serial|Legacy data, debug ports
+BLE GATT|L2CAP LE|ATT|Sensors, keys, BLE audio
+AVRCP TG|L2CAP|—|HU as Target (receives commands)
+AVRCP CT|L2CAP|—|HU as Controller (sends commands)`},
+    {title:"HFP AT Commands — Complete Reference",type:"table",content:`Command|Direction|Description|Example
+AT+BRSF=<n>|Tester→AG|Supported features bitmask exchange|AT+BRSF=1039
++BRSF:<n>|AG→HF|AG supported features|+BRSF:3711
+AT+BAC=<codecs>|HF→AG|Codec negotiation (1=CVSD 2=mSBC 4=LC3)|AT+BAC=1,2
++BCS:<codec>|AG→HF|Codec connection request|+BCS:2
+AT+BCS=<codec>|HF→AG|Accept codec|AT+BCS=2
+AT+CIND=?|HF→AG|Query supported indicators|—
+AT+CIND?|HF→AG|Current indicator values|—
++CIND:|AG→HF|Indicator values response|+CIND:1,1,1,4,1,5,0
+AT+CMER=3,0,0,1|HF→AG|Enable unsolicited indicator reporting|—
+AT+CHLD=?|HF→AG|Query call hold features|—
+ATA|HF→AG|Answer incoming call|—
+AT+CHUP|HF→AG|Hang up|—
+ATD<number>;|HF→AG|Dial number|ATD+919876543210;
+AT+CLCC|HF→AG|List current calls|—
++CLCC:|AG→HF|Current call list|+CLCC:1,0,0,0,0,"9876",129
+AT+VGS=<n>|HF→AG|Set speaker volume (0–15)|AT+VGS=10
+AT+VGM=<n>|HF→AG|Set microphone gain (0–15)|AT+VGM=7
+AT+CLIP=1|HF→AG|Enable Caller ID notification|—
++CLIP:|AG→HF|Incoming caller ID|+CLIP:"9876543210",129
+AT+BVRA=1|HF→AG|Activate voice recognition (Siri/GA)|—
+AT+BVRA=0|HF→AG|Deactivate voice recognition|—
++BSIR:<n>|AG→HF|In-band ring tone status|+BSIR:1`},
+    {title:"A2DP & SBC Codec Negotiation",type:"text",content:`A2DP establishes a streaming channel using AVDTP. The initiator (typically phone) sends AVDTP_DISCOVER to find Stream End Points (SEPs). Each SEP has a media type (audio/video) and codec capabilities.
+
+SBC (Sub-Band Coding) — mandatory codec for A2DP:
+  Sampling: 44.1 kHz or 48 kHz
+  Channels: Mono, Dual-Channel, Stereo, Joint Stereo
+  Blocks: 4, 8, 12, 16
+  Subbands: 4 or 8
+  Allocation: Loudness or SNR
+  Bitpool: 2–53 (HQ), 2–35 (standard)
+  
+AAC (Advanced Audio Coding): Better quality at same bitrate. Apple devices prefer AAC. Requires license.
+aptX: Qualcomm codec, 352 kbps, lower latency (~40ms vs ~100ms SBC).
+aptX HD: 576 kbps, 24-bit audio.
+LDAC: Sony codec, up to 990 kbps, Hi-Res audio.
+LC3 / LC3plus: Bluetooth LE Audio codec, efficient at low bitrates.`},
+    {title:"Pairing Modes — Security Levels",type:"keyvalue",content:`Legacy Pairing (BT 2.0):PIN-based. 4–16 digit PIN entered on both devices. Vulnerable to MITM if PIN known
+SSP — Just Works:No PIN, no confirmation. Passkey = 000000. Zero MITM protection. Used for headsets
+SSP — Numeric Comparison:6-digit code shown on both devices, user confirms match. MITM protection. Used for HU↔Phone
+SSP — Passkey Entry:One device shows passkey, user enters on other. MITM protection
+SSP — OOB (Out-of-Band):Authentication data via NFC or QR. MITM protection via secure channel
+BLE — LE Legacy Pairing:TK exchanged — Just Works, OOB, or Passkey Entry
+BLE — LE Secure Connections:ECDH key exchange (P-256 curve). Strong MITM + eavesdropping protection. BT 4.2+`},
+    {title:"ADB Commands for Bluetooth Testing",type:"code",content:`# Check Bluetooth service state
+adb shell service check bluetooth
+
+# Dump Bluetooth system info
+adb shell dumpsys bluetooth_manager
+
+# Check connected BT devices and profiles
+adb shell dumpsys bluetooth_manager | grep -A5 "Bonded"
+
+# Enable verbose BT logging
+adb shell setprop bluetooth.btsnoop true
+adb shell setprop log.tag.bluetooth VERBOSE
+
+# Pull Bluetooth HCI snoop log (pcap format — open in Wireshark)
+adb pull /data/misc/bluetooth/logs/btsnoop_hci.log .
+
+# Check A2DP state
+adb shell dumpsys media.audio_flinger | grep -i bluetooth
+
+# Trigger BT scan
+adb shell am broadcast -a android.bluetooth.adapter.action.DISCOVERY_STARTED
+
+# Check HFP connection state
+adb shell dumpsys bluetooth_manager | grep -A3 "HFP"
+
+# Monitor BT logcat in real time
+adb logcat -s BtGatt:V bt_btm:V A2dpStateMachine:V BluetoothHeadset:V`}
+  ]
+},
+{
+  id:"carplay",name:"CarPlay & Android Auto",desc:"Apple CarPlay + Google Android Auto — protocols, certification, iAP2, AOA, testing, ADB automation",
+  color:"red",tag:"Certification",createdAt:Date.now()-5e5,
+  sections:[
+    {title:"Protocol Architecture",type:"text",content:`Apple CarPlay uses iAP2 (iPod Accessory Protocol v2) over USB (Lightning/USB-C) or Wi-Fi. The HU acts as an iAP2 Accessory. Apple defines the CarPlay accessory protocol on top of iAP2 using a binary protocol with TLV (Type-Length-Value) encoding.
+
+Google Android Auto uses AOA 2.0 (Android Open Accessory Protocol v2) over USB, or WIFI Direct for wireless. The phone runs the Android Auto app; HU runs Android Auto receiver (AAOS or a dedicated AA app). Communication is via protobuf-encoded messages over USB or TCP/IP.
+
+Wireless variants: Wireless CarPlay uses 5 GHz 802.11ac + BLE for discovery/handoff. Wireless Android Auto uses Wi-Fi Direct (GO on HU typically). Both require initial wired pairing before wireless works.`},
+    {title:"CarPlay Certification Requirements",type:"list",content:`Must have valid MFi (Made for iPhone) certification — without this, iAP2 authentication chip rejects connection
+HU must implement iAP2 Link Layer correctly — link negotiation, session setup, error recovery
+CarPlay accessory identifier must match Apple's approved list
+Screen resolution: 800×480 (WVGA) minimum; 1280×720 or 1920×720 common
+Touch latency: ≤100ms end-to-end from touch event to visual response on screen
+Audio latency: ≤200ms for Siri, ≤10ms HFP call audio start
+Must support both USB and wireless (for CarPlay 2.0 certification)
+Siri must be accessible via steering wheel button or hard key
+App Store submission requires CarPlay entitlement from Apple
+No third-party CarPlay apps — only Apple-approved categories (navigation, audio, communication, EV)`},
+    {title:"Android Auto — AA vs AAOS Difference",type:"table",content:`Aspect|Android Auto (Phone Projection)|AAOS (Android Automotive OS)
+Architecture|Phone runs apps, HU displays|Apps run natively on HU
+Connection|USB or Wi-Fi Direct|Not needed
+App dependency|Phone must be connected|Standalone
+Updates|Phone updates apps|OTA updates to HU
+Privacy|Data stays on phone|Data on vehicle
+Google Account|Phone's account used|HU can have its own account
+Maps offline|Phone storage|HU storage
+Custom HMI|Limited (AA restricts it)|Full flexibility
+Network|Phone's data plan|HU modem or tethering`},
+    {title:"Key Test Scenarios",type:"list",content:`USB enumeration timing: device must enumerate as iAP2/AOA within 2 seconds of plug-in
+Wired to wireless handoff: plug in phone, connect, unplug — must seamlessly switch to Wi-Fi without restart
+Audio routing: Media audio (A2DP) must immediately hand off to AA/CarPlay during projection; restore on disconnect
+Call audio: Incoming call during CarPlay must switch to HFP call audio path with <150ms latency
+Siri/GA activation: Hard key press → Siri response within 600ms including wake word transmission
+Reverse camera override: CarPlay must immediately yield display to reverse camera feed on gear-shift
+Disconnect recovery: Abrupt USB disconnect (cable pull) must not crash HU; graceful session cleanup required
+Multi-device: Second phone plug-in while first connected — must prompt user or follow configured policy
+Background audio: Music from CarPlay must pause/resume correctly with in-car audio events
+Deep sleep recovery: Wake from park mode — reconnect must happen within 5 seconds without user intervention`},
+    {title:"ADB Automation for Android Auto",type:"code",content:`#!/bin/bash
+# Android Auto Testing Automation Suite
+
+echo "=== AA System Check ==="
+
+# 1. Check if AA service is running
+adb shell service check com.google.android.projection.gearhead
+
+# 2. Check AA connection state
+adb shell dumpsys activity service com.google.android.projection.gearhead/.car.projection.ProjectionService | head -50
+
+# 3 Monitor AA events in real-time
+adb logcat -s "AndroidAuto:V" "CarProjection:V" "AudioManager:V" \
+  "BluetoothHeadset:V" 2>&1 | tee /tmp/aa_session.log &
+LOGPID=$!
+
+# 4. Simulate Siri/GA button press
+adb shell input keyevent 231  # KEYCODE_VOICE_ASSIST
+
+# 5. Check audio focus state
+adb shell dumpsys audio | grep -A3 "AudioFocus"
+
+# 6. Check USB device enumeration
+adb shell lsusb
+adb shell cat /sys/kernel/debug/usb/devices 2>/dev/null | grep -A5 "Android\|Apple"
+
+# 7. Capture a bugreport during AA session
+adb bugreport /tmp/aa_bugreport_$(date +%Y%m%d_%H%M).zip
+
+# 8. Force AA to reconnect
+adb shell am force-stop com.google.android.projection.gearhead
+sleep 2
+adb shell monkey -p com.google.android.projection.gearhead 1
+
+# 9. Check screen resolution reported to AA
+adb shell wm size
+adb shell wm density
+
+# 10. Test audio focus
+adb shell dumpsys media.audio_policy | grep -i "focus\|CarPlay\|Auto"
+
+kill $LOGPID
+echo "=== Test complete ==="`}
+  ]
+},
+{
+  id:"capl",name:"CAPL Scripting",desc:"Communication Access Programming Language — complete reference: all events, functions, system vars, test automation patterns",
+  color:"green",tag:"Scripting",createdAt:Date.now()-4e5,
+  sections:[
+    {title:"CAPL Language Overview",type:"text",content:`CAPL (Communication Access Programming Language) is a C-like event-driven language used in Vector CANoe and CANalyzer. It compiles to a DLL that runs in the measurement kernel. Execution is event-triggered, not sequential — you define handlers for events (messages, timers, keys, errors) and the kernel calls them.
+
+Differences from C: No pointers, no dynamic memory allocation, no recursion. Has built-in types for CAN messages (message), environment variables (envVar), timers (timer/msTimer/mstimer), and system variables. Variables in the variables{} block are static/global to the CAPL node. Functions are synchronous within a single event context — no threading concerns.`},
+    {title:"All Event Handler Types",type:"table",content:`Handler|Syntax|When Triggered|Typical Use
+Message|on message 0x123|CAN frame with matching ID received|Decode signal, trigger response
+Message (any)|on message *|Any CAN frame|Bus monitoring, logging
+Env Variable|on envVar myVar|Panel/test environment variable changed|UI-triggered actions
+Key|on key 'a'|Keyboard key pressed in CANoe|Manual test stimulus
+Timer|on timer myTimer|msTimer fires|Periodic transmit, timeout detection
+Error Frame|on errorFrame|CAN error frame detected|Error logging, counter
+BusOff|on busOff|Node enters bus-off state|Alert, recovery trigger
+Start|on start|Measurement starts|Init variables, start timers
+Stop|on stop|Measurement stops|Log summary, reset
+PreStart|on preStart|Before measurement actually starts|Setup before run
+startOfDBEvent|on startOfDBEvent|Database event triggered|DB-driven tests
+Signal change|on signal sig|Signal value changes|Threshold monitoring`},
+    {title:"Core Built-in Functions",type:"table",content:`Function|Parameters|Return|Description
+output(msg)|message|void|Transmit CAN message on bus
+write(fmt,...)|printf-style|void|Print to Write window
+setTimer(t,ms)|timer, int|void|Arm a timer in milliseconds
+cancelTimer(t)|timer|void|Disarm a timer
+getSignal(sig)|signal name|double|Read signal value from last received message
+putSignal(sig,val)|signal, double|void|Write signal value and encode into DB message
+getValue(envvar)|envVar|varies|Get environment variable value
+setValue(envvar,val)|envVar, varies|void|Set environment variable value
+testSetVerdictFail()|—|void|Fail current test case
+testSetVerdictPass()|—|void|Pass current test case
+testStepFail("msg")|string|void|Log test step failure
+testStepPass("msg")|string|void|Log test step pass
+TestWaitForMessage(id,ms)|int, int|int|Block test until message received (returns 0=ok)
+TestWaitForTimeout(ms)|int|void|Block test for N ms
+DiagSendRequest(req)|DiagRequest|int|Send UDS/diagnostic request
+CanGetMsgStatus(id)|int|int|Get last message receive status`},
+    {title:"Complete CAPL Test Script Example",type:"code",content:`/*
+ * AutoKB — CAPL Test: Engine ECU Communication Validation
+ * Tests: frame transmission, signal range, response timing
+ */
+includes {
+  // #include "CAN_DB.dbc"  // usually auto-included from config
+}
+
+variables {
+  message 0x100 engineReq;
+  message 0x200 diagReq;
+  msTimer watchdog;
+  msTimer responseTimer;
+  
+  int testsPassed = 0;
+  int testsFailed = 0;
+  int responseReceived = 0;
+  long lastMsgTime = 0;
+  
+  // Expected signal values
+  float MIN_VOLTAGE = 11.5;
+  float MAX_VOLTAGE = 14.5;
+}
+
+// ─── INIT ───────────────────────────────────────────────
+on start {
+  write("=== ECU Communication Test Suite ===");
+  write("DUT: Engine Control Module");
+  engineReq.dlc = 8;
+  setTimer(watchdog, 100);  // 100ms periodic
+}
+
+// ─── PERIODIC STIMULUS ──────────────────────────────────
+on timer watchdog {
+  static int cycle = 0;
+  cycle++;
+  
+  // Send engine status request every second
+  if (cycle % 10 == 0) {
+    engineReq.byte(0) = 0x01;  // Request: Engine data
+    engineReq.byte(1) = cycle & 0xFF;  // Rolling counter
+    output(engineReq);
+    responseReceived = 0;
+    setTimer(responseTimer, 200);  // Expect response in 200ms
+  }
+  setTimer(watchdog, 100);
+}
+
+// ─── RESPONSE MONITOR ───────────────────────────────────
+on timer responseTimer {
+  if (!responseReceived) {
+    write("[FAIL] No response from ECU within 200ms!");
+    testsFailed++;
+    testStepFail("ECU response timeout");
+  }
+}
+
+// ─── MESSAGE HANDLERS ───────────────────────────────────
+on message 0x201 {  // ECU Response
+  responseReceived = 1;
+  cancelTimer(responseTimer);
+  
+  float voltage = (this.byte(2) * 0.1);  // Byte 2 = voltage * 10
+  int engineState = this.byte(0);
+  int rpm = (this.byte(3) << 8) | this.byte(4);
+  
+  // Validate voltage range
+  if (voltage >= MIN_VOLTAGE && voltage <= MAX_VOLTAGE) {
+    testsPassed++;
+    write("[PASS] Battery voltage: %.1fV (range: %.1f-%.1fV)",
+           voltage, MIN_VOLTAGE, MAX_VOLTAGE);
+  } else {
+    testsFailed++;
+    write("[FAIL] Voltage %.1fV out of range!", voltage);
+    testStepFail("Battery voltage out of range");
+  }
+  
+  // Validate engine state
+  if (engineState == 0x01 || engineState == 0x00) {
+    write("[PASS] Engine state: %d (valid)", engineState);
+    testsPassed++;
+  } else {
+    write("[FAIL] Unknown engine state: 0x%02X", engineState);
+    testsFailed++;
+  }
+  
+  // Track inter-message timing
+  long now = timeNow();
+  if (lastMsgTime > 0) {
+    long delta = (now - lastMsgTime) / 100000;  // Convert to ms
+    if (delta > 250 || delta < 50) {
+      write("[WARN] Unusual message interval: %dms", delta);
+    }
+  }
+  lastMsgTime = now;
+}
+
+on errorFrame {
+  write("[ERROR] CAN error frame! Bus load may be high.");
+  testStepFail("Error frame detected");
+}
+
+// ─── TEST SUMMARY ────────────────────────────────────────
+on stop {
+  write("=================================");
+  write("TEST SUMMARY");
+  write("  Passed: %d", testsPassed);
+  write("  Failed: %d", testsFailed);
+  write("  Total:  %d", testsPassed + testsFailed);
+  if (testsFailed == 0)
+    write("  Result: ALL PASS ✓");
+  else
+    write("  Result: FAILURES DETECTED ✗");
+  write("=================================");
+}`},
+    {title:"CAPL Signal Access Patterns",type:"keyvalue",content:`Read signal directly:getSignal(EngineSpeed.RPM) — returns double
+Write via putSignal:putSignal(EngineSpeed.RPM, 2500.0) — encodes into DB message
+Read from received message:on message 0x100 { float v = this.word(0) * 0.1; }
+Access by byte offset:this.byte(0), this.word(0), this.dword(0), this.qword(0)
+Byte array access:byte data[8]; this.data(data) — copies all bytes
+Check message direction:this.dir == RX (received) or TX (transmitted)
+Message timestamp:this.time — time in 10µs units since measurement start`}
+  ]
+},
+{
+  id:"autosar",name:"AUTOSAR Architecture",desc:"Classic & Adaptive AUTOSAR — layers, BSW, RTE, SWCs, COM stack, ARXML, methodology",
+  color:"blue",tag:"Architecture",createdAt:Date.now()-3e5,
+  sections:[
+    {title:"Classic AUTOSAR Layers",type:"keyvalue",content:`Application Layer:Software Components (SWCs) — runnable entities, ports, interfaces. OEM/Tier1 application logic lives here
+Runtime Environment (RTE):Auto-generated middleware. Connects SWCs to each other and to BSW. Abstracts communication and I/O. Acts as OS for SWC communication
+ECU Abstraction Layer:Provides hardware-independent APIs to upper layers. MCAL below, complex drivers above
+Microcontroller Abstraction Layer (MCAL):Direct hardware drivers — DIO, ADC, PWM, SPI, ICU, WDG, MCU, PORT. Provided by MCU vendor or tool vendor (EB Tresos/Vector)
+Complex Drivers:Non-standard HW not covered by MCAL — e.g. LIN over SPI, custom sensors
+Basic Software (BSW):All non-application software — OS, COM stack, diagnostics, memory, NvM, Watchdog, Crypto`},
+    {title:"BSW Module Groups",type:"table",content:`Group|Key Modules|Purpose
+Services Layer|OS, NvM, WdgM, ComM, DcmM, Det|Core services — scheduling, memory, diagnostics
+COM Stack|PduR, COM, CanIf, CanTp, CanNm, FrIf|CAN/LIN/FlexRay communication
+ECU Abstraction|EcuM, IoHwAb|ECU state management, I/O hardware abstraction
+Diagnostics|Dcm, Dem, FiM|UDS services, DTC storage, fault inhibition
+Crypto|Crypto, SecOC, Csm|Security, MAC verification, key management
+Memory|MemIf, NvM, Fee, Fls|Non-volatile memory stack
+System|EcuM, BswM, WdgM, SchM|ECU lifecycle, mode management, watchdog`},
+    {title:"SWC Communication Patterns",type:"keyvalue",content:`Sender-Receiver (S/R):Asynchronous data flow. Producer writes, consumer reads. Used for sensor data, status signals
+Client-Server (C/S):Synchronous or asynchronous function call. Used for services (NvM read, Dcm service)
+Mode-Switch Interface:SWC subscribes to mode changes (e.g. ECU mode, ComM mode). RTE generates callbacks
+I/O Hardware Abstraction:SWC reads sensor/actuator via IoHwAb ports — abstracted from physical pin
+Inter-ECU via COM:PDU (Protocol Data Unit) carries signals. PduR routes between CAN/LIN/FlexRay and COM
+Trigger Interface:SWC triggers runnable in another SWC without data — event notification`},
+    {title:"Adaptive AUTOSAR Key Differences",type:"table",content:`Aspect|Classic AUTOSAR|Adaptive AUTOSAR
+Base OS|AUTOSAR OS (OSEK-based)|POSIX (Linux-based, e.g. QNX, Android)
+Language|C (mainly)|C++14/17
+ECU Type|Deeply embedded MCU|High-compute SoC (ADAS, Gateway)
+Communication|Static (compile-time)|Dynamic (runtime service discovery — SOME/IP)
+Update|Full reflash|OTA partial updates
+Standards|ISO 17356|ISO 17458 (SOME/IP), AUTOSAR AP R20-11+
+Use Cases|Powertrain, Chassis|ADAS, Infotainment, Central Gateway
+Middleware|RTE (generated)|ARA (AUTOSAR Runtime for Adaptive) — ara::com
+Memory|Fixed, no MMU needed|MMU, virtual memory, processes`},
+    {title:"ARXML & Toolchain",type:"list",content:`ARXML is the XML exchange format for AUTOSAR configurations — SWC descriptions, system topology, ECU configs
+Tool vendors: Vector (DaVinci, CANdb++), EB (Tresos), ETAS (RTA-OS), Mentor Automotive
+Workflow: System Design (ARXML) → SWC Design (ARXML) → ECU Config (ARXML) → Code Generation → Integration → Build
+OEM provides system ARXML (network topology, signals, PDU mapping)
+Tier1 uses tool to configure BSW modules (OS tasks, COM signals, NvM blocks)
+RTE generator creates rte.c/.h — the glue between SWC and BSW
+AUTOSAR Schema versions: R3.x (legacy), R4.x (current), AP R17-R23 (Adaptive)`}
+  ]
+},
+{
+  id:"iso26262",name:"ISO 26262 (Functional Safety)",desc:"Road vehicle functional safety — ASIL levels, safety lifecycle, FMEA, FTA, HARA, verification methods",
+  color:"red",tag:"Safety",createdAt:Date.now()-2e5,
+  sections:[
+    {title:"Standard Structure",type:"keyvalue",content:`ISO 26262:2018 Part 1:Vocabulary and definitions
+ISO 26262 Part 2:Management of functional safety — safety management, supplier management
+ISO 26262 Part 3:Concept phase — Item definition, Hazard Analysis and Risk Assessment (HARA), Functional Safety Concept
+ISO 26262 Part 4:Product development at system level — Technical Safety Concept, system design, verification
+ISO 26262 Part 5:Product development at hardware level — HW safety requirements, FMEA, PMHF
+ISO 26262 Part 6:Product development at software level — SW safety requirements, coding guidelines, unit testing
+ISO 26262 Part 7:Production and operation
+ISO 26262 Part 8:Supporting processes — configuration management, change management, documentation
+ISO 26262 Part 9:ASIL-oriented and safety-oriented analyses (FMEA, FTA, FMEDA)
+ISO 26262 Part 10:Guideline on ISO 26262
+ISO 26262 Part 11:Semiconductor guidelines
+ISO 26262 Part 12:Adaptation for motorcycles`},
+    {title:"ASIL Levels",type:"table",content:`ASIL|Severity|Exposure|Controllability|Example
+ASIL D|S3 (life-threatening)|E4 (continuous)|C3 (<90% drivers control)|Steering, braking, airbag deploy
+ASIL C|S3|E3 (frequent)|C3|ABS, electronic stability
+ASIL B|S2 (serious injury)|E3|C2 (normal control)|Power windows, door locks
+ASIL A|S1 (minor injury)|E1 (rare)|C1 (simply controllable)|Windscreen wiper, horn
+QM (Quality Managed)|S0 or low risk|—|—|Interior lighting, infotainment UI`},
+    {title:"HARA — Hazard Analysis & Risk Assessment",type:"text",content:`HARA identifies hazardous events and assigns ASIL levels. Process:
+
+1. Item Definition: Define item boundary, functions, interfaces, assumptions about vehicle context.
+2. Situation Analysis: Enumerate operational situations (highway, parking, night driving, wet road…)
+3. Hazard Identification: For each function + situation, identify what could go wrong (omission, commission, too early, too late, stuck at value)
+4. Risk Assessment: For each hazardous event, rate:
+   - Severity (S0–S3): Injury consequence to road users
+   - Exposure (E0–E4): How often the situation occurs
+   - Controllability (C0–C3): Can average driver avoid accident?
+5. ASIL Determination: Look up ASIL table based on S+E+C
+6. Safety Goals: For each hazardous event with ASIL ≥ QM, define a safety goal — e.g. "The steering assist shall not produce unintended torque > 2 Nm"`},
+    {title:"Safety Mechanisms by ASIL",type:"table",content:`Mechanism|ASIL A|ASIL B|ASIL C|ASIL D
+Plausibility checks|Recommended|Required|Required|Required
+CRC on communication|Optional|Recommended|Required|Required
+E2E protection (AUTOSAR)|Not required|Recommended|Required|Required
+Hardware watchdog|Optional|Required|Required|Required
+Dual-core lockstep|Not required|Not required|Optional|Required
+Memory ECC|Not required|Recommended|Required|Required
+Diverse SW redundancy|Not required|Not required|Optional|Required (for D)*
+FMEDA + PMHF|Required|Required|Required|Required`},
+    {title:"Key Metrics — Hardware Reliability",type:"keyvalue",content:`FIT (Failure In Time):Failures per 10^9 hours. E.g. 100 FIT = 100 failures per billion hours
+PMHF (Probabilistic Metric for HW Failures):Probability of random hardware failure per hour causing violation of safety goal. Target: ASIL D < 10^-8/hour, ASIL C < 10^-7/hour, ASIL B < 10^-6/hour
+SPFM (Single Point Fault Metric):% of total random HW faults covered by safety mechanisms. ASIL D ≥ 99%, ASIL C ≥ 97%
+LFM (Latent Fault Metric):% of latent faults detected before they combine with another fault. ASIL D ≥ 90%, ASIL C ≥ 80%
+DC (Diagnostic Coverage):Percentage of failure modes detected by safety mechanism. Low (<60%), Medium (60–90%), High (>90%)`},
+    {title:"SW Safety Requirements (Part 6)",type:"list",content:`Coding guidelines: MISRA C:2012 is the baseline for ASIL B/C/D (enforced via PC-lint, QAC, Polyspace)
+No dynamic memory allocation after startup for ASIL B+
+No recursion for ASIL B+
+Defensive programming: range checks on all external inputs
+Stack usage analysis: prove no stack overflow (Worst Case Stack Usage analysis)
+Unit test coverage: Statement 100% (ASIL A/B), Branch 100% (ASIL C), MC/DC 100% (ASIL D)
+Structural coverage tools: BullseyeCoverage, LDRA, Parasoft
+Software unit testing: each unit tested in isolation, traceability to software requirements
+Integration testing: verify interaction between software units
+Back-to-back testing: compare model simulation vs embedded target for safety-critical functions`}
+  ]
+}
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let topics = JSON.parse(localStorage.getItem('autokb_v2')||'null') || JSON.parse(JSON.stringify(DEFAULT_TOPICS));
+let srchQ = '';
+let activeTag = null;
+let viewMode = 'masonry';
+let sfIdx = 0;
+
+const COLORS = {
+  teal:{dot:'#00D4AA',badge:'b-teal'},
+  blue:{dot:'#60A5FA',badge:'b-blue'},
+  amber:{dot:'#FCD34D',badge:'b-amber'},
+  red:{dot:'#F87171',badge:'b-red'},
+  green:{dot:'#34D399',badge:'b-green'},
+  purple:{dot:'#A78BFA',badge:'b-purple'},
+  coral:{dot:'#FB7185',badge:'b-coral'},
+  mint:{dot:'#34D399',badge:'b-mint'},
+  violet:{dot:'#F472B6',badge:'b-violet'},
+  gray:{dot:'#94A3B8',badge:'b-gray'}
+};
+
+function save(){localStorage.setItem('autokb_v2',JSON.stringify(topics));}
+
+// ═══════════════════════════════════════════
+// SIDEBAR
+// ═══════════════════════════════════════════
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+function closeJsonPanel(){document.getElementById('json-panel').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+function openJsonPanel(){document.getElementById('json-panel').classList.add('open');document.getElementById('overlay').classList.add('show');closeSidebar();}
+function closeAll(){closeSidebar();closeJsonPanel();}
+
+function renderSidebar(q=''){
+  const list=document.getElementById('sb-list');
+  const needle=q.toLowerCase();
+  let f=topics.filter(t=>[t.name,t.desc,t.tag].join(' ').toLowerCase().includes(needle));
+  document.getElementById('sb-tc').textContent=topics.length;
+  document.getElementById('sb-sc').textContent=topics.reduce((a,t)=>a+(t.sections?.length||0),0);
+  list.innerHTML=f.map(t=>{
+    const c=COLORS[t.color]||COLORS.teal;
+    return `<div class="nav-item" onclick="scrollTo(${JSON.stringify(t.id)});closeSidebar()">
+      <span class="nav-dot" style="background:${c.dot}"></span>
+      <span class="flex-1 truncate">${esc(t.name)}</span>
+      <span class="text-xs font-mono" style="color:var(--text3)">${(t.sections||[]).length}</span>
+    </div>`;
+  }).join('');
+}
+
+function scrollTo(id){
+  const el=document.getElementById('card-'+id);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'start'});el.classList.add('highlighted');setTimeout(()=>el.classList.remove('highlighted'),1800);}
+}
+
+// ═══════════════════════════════════════════
+// STATS
+// ═══════════════════════════════════════════
+function renderStats(){
+  const s=[
+    {l:'Topics',v:topics.length,i:'fa-layer-group',c:'#00D4AA'},
+    {l:'Sections',v:topics.reduce((a,t)=>a+(t.sections?.length||0),0),i:'fa-list',c:'#60A5FA'},
+    {l:'Code Blocks',v:topics.reduce((a,t)=>a+(t.sections?.filter(s=>s.type==='code').length||0),0),i:'fa-code',c:'#A78BFA'},
+    {l:'Tables',v:topics.reduce((a,t)=>a+(t.sections?.filter(s=>s.type==='table').length||0),0),i:'fa-table',c:'#FCD34D'},
+  ];
+  document.getElementById('stats').innerHTML=s.map(x=>`
+    <div class="rounded-xl p-3.5 flex items-center gap-3" style="background:var(--bg-card);border:1px solid var(--border)">
+      <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${x.c}15">
+        <i class="fa-solid ${x.i} text-sm" style="color:${x.c}"></i>
+      </div>
+      <div>
+        <div class="text-xl font-bold font-syne" style="color:${x.c};line-height:1">${x.v}</div>
+        <div class="text-xs" style="color:var(--text3)">${x.l}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════
+function renderFilters(){
+  const tags=[...new Set(topics.map(t=>t.tag).filter(Boolean))];
+  document.getElementById('tag-filters').innerHTML=['All',...tags].map(tag=>`
+    <span class="chip text-xs ${tag===(activeTag||'All')?'on':''}" onclick="setTag('${tag}')">${tag}</span>`).join('');
+}
+function setTag(tag){activeTag=tag==='All'?null:tag;renderFilters();renderAll();}
+
+// ═══════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════
+function handleSearch(q){srchQ=q.toLowerCase();renderAll();}
+
+function getFiltered(){
+  const sort=document.getElementById('sort-sel')?.value||'default';
+  let list=topics.filter(t=>{
+    const mq=!srchQ||[t.name,t.desc,t.tag,...(t.sections||[]).map(s=>s.title+' '+s.content)].join(' ').toLowerCase().includes(srchQ);
+    const mt=!activeTag||t.tag===activeTag;
+    return mq&&mt;
+  });
+  if(sort==='az')list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==='recent')list.sort((a,b)=>b.createdAt-a.createdAt);
+  else if(sort==='sectsions')list.sort((a,b)=>(b.sections?.length||0)-(a.sections?.length||0));
+  return list;
+}
+
+function hl(s){
+  if(!srchQ)return s;
+  const re=new RegExp(`(${srchQ.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return String(s||'').replace(re,'<mark>$1</mark>');
+}
+
+function renderAll(){
+  const list=getFiltered();
+  const board=document.getElementById('board');
+  const empty=document.getElementById('empty');
+  const ri=document.getElementById('res-info');
+
+  ri.textContent=srchQ||activeTag?`${list.length} of ${topics.length} topic${topics.length!==1?'s':''} shown`:'';
+
+  if(list.length===0){board.innerHTML='';empty.classList.remove('hidden');return;}
+  empty.classList.add('hidden');
+  board.className=viewMode==='list'?'list-view masonry':'masonry';
+  board.innerHTML=list.map(t=>renderCard(t)).join('');
+  renderSidebar();renderStats();renderFilters();save();
+}
+
+function renderCard(t){
+  const c=COLORS[t.color]||COLORS.teal;
+  const secs=t.sections||[];
+  return `<div class="topic-card" id="card-${t.id}">
+    <div class="p-4 pb-3" style="border-bottom:1px solid var(--border)">
+      <div class="flex items-start justify-between gap-2 mb-1.5">
+        <h3 class="font-syne font-bold text-sm leading-snug" style="color:var(--text)">${hl(esc(t.name))}</h3>
+        <div class="flex gap-1 flex-shrink-0">
+          <button onclick="openEdit(${JSON.stringify(t.id)})" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-white/5 transition-colors" style="color:var(--text3)" data-tip="Edit">
+            <i class="fa-solid fa-pen text-xs"></i></button>
+          <button onclick="delTopic(${JSON.stringify(t.id)})" class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-red-500/10 transition-colors" style="color:var(--text3)" data-tip="Delete">
+            <i class="fa-solid fa-trash text-xs"></i></button>
+        </div>
+      </div>
+      ${t.desc?`<p class="text-xs mb-2 leading-relaxed" style="color:var(--text2)">${hl(esc(t.desc))}</p>`:''}
+      <div class="flex items-center gap-2 flex-wrap">
+        ${t.tag?`<span class="badge ${c.badge}">${esc(t.tag)}</span>`:''}
+        <span class="text-xs font-mono" style="color:var(--text3)">${secs.length} sect${secs.length!==1?'s':''}</span>
+        <div class="flex-1"></div>
+        <div class="w-1.5 h-1.5 rounded-full flex-shrink-0" style="background:${c.dot}"></div>
+      </div>
+    </div>
+    <div class="p-3">
+      ${secs.map((s,i)=>renderSec(s,i)).join('')}
+      ${secs.length===0?`<p class="text-xs text-center py-4" style="color:var(--text3)">No sections. <span style="color:var(--accent);cursor:pointer" onclick="openEdit(${JSON.stringify(t.id)})">Add one →</span></p>`:''}
+    </div>
+    <div class="px-3 pb-3 flex items-center justify-between gap-2">
+      <span class="text-xs font-mono" style="color:var(--text3)">${new Date(t.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'})}</span>
+      <button onclick="copyJSON(${JSON.stringify(t.id)})" class="text-xs flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg transition-all hover:bg-white/5" style="color:var(--text3);border:1px solid var(--border)">
+        <i class="fa-regular fa-copy text-xs"></i> JSON
+      </button>
+    </div>
+  </div>`;
+}
+
+function renderSec(s){
+  const icons={text:'fa-align-left',code:'fa-code',table:'fa-table',list:'fa-list-ul',keyvalue:'fa-key'};
+  let body='';
+  if(s.type==='text'){
+    body=`<p class="text-xs leading-relaxed" style="color:var(--text2)">${esc(s.content)}</p>`;
+  }else if(s.type==='code'){
+    body=`<div class="code-block" style="max-height:260px;overflow-y:auto">
+      <button class="copy-btn" onclick="cpCode(this)"><i class="fa-regular fa-copy"></i> Copy</button>
+      <pre>${esc(s.content)}</pre></div>`;
+  }else if(s.type==='list'){
+    const items=s.content.split('\n').filter(l=>l.trim());
+    body=`<ul class="space-y-0.5">${items.map(i=>`<li class="li-item"><span class="li-dot"></span><span>${esc(i)}</span></li>`).join('')}</ul>`;
+  }else if(s.type==='table'){
+    const rows=s.content.split('\n').filter(l=>l.trim()&&l.includes('|'));
+    if(rows.length>0){
+      const hdrs=rows[0].split('|');
+      const drs=rows.slice(1);
+      body=`<div style="overflow-x:auto"><table class="data-table"><thead><tr>${hdrs.map(h=>`<th>${esc(h.trim())}</th>`).join('')}</tr></thead><tbody>${drs.map(r=>`<tr>${r.split('|').map(c=>`<td>${esc(c.trim())}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    }
+  }else if(s.type==='keyvalue'){
+    const pairs=s.content.split('\n').filter(l=>l.includes(':'));
+    body=`<div>${pairs.map(p=>{const[k,...v]=p.split(':');return `<div class="kv-row"><span class="kv-k">${esc(k.trim())}</span><span class="kv-v">${esc(v.join(':').trim())}</span></div>`;}).join('')}</div>`;
+  }
+  return `<div class="sec-block">
+    <div class="sec-hdr" onclick="toggleSec(this)">
+      <div class="flex items-center gap-2">
+        <i class="fa-solid ${icons[s.type]||'fa-file'} text-xs" style="color:var(--text3)"></i>
+        <span>${esc(s.title)}</span>
+      </div>
+      <i class="fa-solid fa-chevron-down chevron text-xs open" style="color:var(--text3)"></i>
+    </div>
+    <div class="sec-body">${body}</div>
+  </div>`;
+}
+
+function toggleSec(hdr){
+  const chev=hdr.querySelector('.chevron');
+  const body=hdr.nextElementSibling;
+  const isOpen=chev.classList.contains('open');
+  body.style.display=isOpen?'none':'';
+  chev.classList.toggle('open',!isOpen);
+}
+
+// ═══════════════════════════════════════════
+// ADD TOPIC
+// ═══════════════════════════════════════════
+function openAddModal(){
+  sfIdx=0;
+  document.getElementById('tn').value='';
+  document.getElementById('td').value='';
+  document.getElementById('tt').value='';
+  document.getElementById('tc').value='teal';
+  document.getElementById('sfc').innerHTML='';
+  addSF();
+  updateAddColorPreview();
+  openModal('add-modal');
+}
+
+const HINTS={text:'Free-form text. Rendered as paragraph.',code:'Code snippet. Rendered with copy button.',table:'Pipe-separated: Col1|Col2 on line 1, then data rows. E.g: Name|Value\\nCAN|1Mbps',list:'One item per line → bullet list.',keyvalue:'Key:Value per line. E.g: Speed:1 Mbps'};
+
+function addSF(){
+  const i=sfIdx++;
+  const d=document.createElement('div');
+  d.className='rounded-lg p-3 mb-2';
+  d.style.cssText='background:var(--bg-card3);border:1px solid var(--border)';
+  d.id='sf'+i;
+  d.innerHTML=`<div class="flex items-center justify-between mb-2">
+    <span class="text-xs font-bold" style="color:var(--accent)">Section ${i+1}</span>
+    <button onclick="document.getElementById('sf${i}').remove()" style="color:var(--red)" class="text-xs"><i class="fa-solid fa-trash"></i></button>
+  </div>
+  <div class="flex gap-2 mb-2">
+    <input type="text" id="st${i}" class="fi flex-1" placeholder="Section title…">
+    <select id="sy${i}" class="fi" style="max-width:120px;cursor:pointer" onchange="updateHint(${i})">
+      ${['text','code','table','list','keyvalue'].map(t=>`<option value="${t}">${t}</option>`).join('')}
+    </select>
+  </div>
+  <div id="sh${i}" class="hint mb-1.5 px-0.5">Free-form text.</div>
+  <textarea id="sc${i}" class="fta" rows="4" placeholder="Content…"></textarea>`;
+  document.getElementById('sfc').appendChild(d);
+}
+
+function updateHint(i){
+  const t=document.getElementById('sy'+i).value;
+  document.getElementById('sh'+i).textContent=HINTS[t]||'';
+}
+
+function updateAddColorPreview(){
+  const color=document.getElementById('tc')?.value;
+  const swatch=document.getElementById('tc-preview');
+  if(swatch && COLORS[color]) swatch.style.background=COLORS[color].dot;
+}
+
+function updateEditColorPreview(){
+  const color=document.getElementById('ecol')?.value;
+  const swatch=document.getElementById('ecol-preview');
+  if(swatch && COLORS[color]) swatch.style.background=COLORS[color].dot;
+}
+
+function saveTopic(){
+  const name=document.getElementById('tn').value.trim();
+  if(!name){showToast('Name required!',true);return;}
+  const secs=[];
+  document.querySelectorAll('#sfc>div').forEach(d=>{
+    const i=d.id.slice(2);
+    const title=document.getElementById('st'+i)?.value?.trim();
+    const type=document.getElementById('sy'+i)?.value||'text';
+    const content=document.getElementById('sc'+i)?.value?.trim()||'';
+    if(title)secs.push({title,type,content});
+  });
+  topics.unshift({id:'t'+Date.now(),name,desc:document.getElementById('td').value.trim(),color:document.getElementById('tc').value,tag:document.getElementById('tt').value.trim(),createdAt:Date.now(),sections:secs});
+  closeModal('add-modal');
+  renderAll();
+  showToast(`"${name}" added!`);
+}
+
+// ═══════════════════════════════════════════
+// EDIT
+// ═══════════════════════════════════════════
+function openEdit(id){
+  const t=topics.find(x=>x.id===id);if(!t)return;
+  let ei=0;
+  document.getElementById('edit-body').innerHTML=`
+    <div class="space-y-4">
+      <div><label class="lbl">NAME</label><input id="en" class="fi" value="${esc(t.name)}"></div>
+      <div><label class="lbl">DESCRIPTION</label><input id="edesc" class="fi" value="${esc(t.desc||'')}"></div>
+      <div class="flex gap-3">
+        <div class="flex-1"><label class="lbl">TAG</label><input id="etag" class="fi" value="${esc(t.tag||'')}"></div>
+        <div class="flex-1"><label class="lbl">COLOR</label>
+          <div class="flex items-center gap-2">
+            <select id="ecol" class="fi" onchange="updateEditColorPreview()">${Object.keys(COLORS).map(c=>`<option value="${c}" ${t.color===c?'selected':''}>${c}</option>`).join('')}</select>
+            <div id="ecol-preview" class="color-swatch" style="background:${COLORS[t.color]?.dot||COLORS.teal.dot}"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center justify-between mb-2"><label class="lbl mb-0">SECTIONS</label>
+          <button onclick="addEditSec()" class="text-xs px-2.5 py-1 rounded-lg hover:bg-white/5" style="color:var(--accent);border:1px solid var(--border)"><i class="fa-solid fa-plus text-xs"></i> Add</button>
+        </div>
+        <div id="esecs">
+          ${(t.sections||[]).map(s=>{const i=ei++;return `<div class="rounded-lg p-3 mb-2" style="background:var(--bg-card3);border:1px solid var(--border)" id="es${i}">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold" style="color:var(--accent)">Section</span>
+              <button onclick="document.getElementById('es${i}').remove()" style="color:var(--red)" class="text-xs"><i class="fa-solid fa-trash"></i></button>
+            </div>
+            <div class="flex gap-2 mb-2">
+              <input class="fi flex-1 estt" value="${esc(s.title)}" placeholder="Title">
+              <select class="fi esty" style="max-width:120px;cursor:pointer">${['text','code','table','list','keyvalue'].map(tp=>`<option value="${tp}" ${s.type===tp?'selected':''}>${tp}</option>`).join('')}</select>
+            </div>
+            <textarea class="fta esco" rows="5">${esc(s.content||'')}</textarea>
+          </div>`;}).join('')}
+        </div>
+      </div>
+      <div class="flex gap-2 justify-end pt-2">
+        <button onclick="closeModal('edit-modal')" class="btn-g">Cancel</button>
+        <button onclick="saveEdit(${JSON.stringify(id)})" class="btn-p"><i class="fa-solid fa-check"></i> Save</button>
+      </div>
+    </div>`;
+  openModal('edit-modal');
+}
+
+function addEditSec(){
+  const c=document.getElementById('esecs');
+  const i=Date.now();
+  const d=document.createElement('div');
+  d.className='rounded-lg p-3 mb-2';d.style.cssText='background:var(--bg-card3);border:1px solid var(--border)';d.id='es'+i;
+  d.innerHTML=`<div class="flex items-center justify-between mb-2"><span class="text-xs font-bold" style="color:var(--accent)">New Section</span><button onclick="document.getElementById('es${i}').remove()" style="color:var(--red)" class="text-xs"><i class="fa-solid fa-trash"></i></button></div>
+    <div class="flex gap-2 mb-2"><input class="fi flex-1 estt" placeholder="Title"><select class="fi esty" style="max-width:120px;cursor:pointer">${['text','code','table','list','keyvalue'].map(tp=>`<option value="${tp}">${tp}</option>`).join('')}</select></div>
+    <textarea class="fta esco" rows="4" placeholder="Content…"></textarea>`;
+  c.appendChild(d);
+}
+
+function saveEdit(id){
+  const t=topics.find(x=>x.id===id);if(!t)return;
+  t.name=document.getElementById('en').value.trim();
+  t.desc=document.getElementById('edesc').value.trim();
+  t.tag=document.getElementById('etag').value.trim();
+  t.color=document.getElementById('ecol').value;
+  t.sections=[];
+  document.querySelectorAll('#esecs>div').forEach(d=>{
+    const title=d.querySelector('.estt')?.value?.trim();
+    const type=d.querySelector('.esty')?.value||'text';
+    const content=d.querySelector('.esco')?.value?.trim()||'';
+    if(title)t.sections.push({title,type,content});
+  });
+  closeModal('edit-modal');renderAll();showToast(`"${t.name}" updated!`);
+}
+
+// ═══════════════════════════════════════════
+// DELETE
+// ═══════════════════════════════════════════
+function delTopic(id){
+  const t=topics.find(x=>x.id===id);
+  if(!t||!confirm(`Delete "${t.name}"?`))return;
+  topics=topics.filter(x=>x.id!==id);
+  renderAll();showToast(`Deleted "${t.name}"`);
+}
+
+// ═══════════════════════════════════════════
+// JSON PASTE PANEL
+// ═══════════════════════════════════════════
+const TEMPLATES={
+  single:JSON.stringify({id:"my-topic",name:"Topic Name",desc:"Brief description",color:"teal",tag:"Protocol",createdAt:Date.now(),sections:[{title:"Overview",type:"text",content:"Detailed text here."},{title:"Parameters",type:"keyvalue",content:"Key1:Value1\nKey2:Value2"},{title:"Code Example",type:"code",content:"// code here"},{title:"Key Points",type:"list",content:"Point one\nPoint two"},{title:"Data Table",type:"table",content:"Col1|Col2|Col3\nA|B|C"}]},null,2),
+  multi:JSON.stringify([{id:"topic-1",name:"First Topic",desc:"Description",color:"blue",tag:"Protocol",createdAt:Date.now(),sections:[{title:"Overview",type:"text",content:"Content here."}]},{id:"topic-2",name:"Second Topic",desc:"Description",color:"amber",tag:"Diagnostics",createdAt:Date.now(),sections:[{title:"Overview",type:"text",content:"Content here."}]}],null,2),
+  protocol:JSON.stringify({id:"new-protocol",name:"Protocol Name",desc:"Protocol purpose and overview",color:"teal",tag:"Protocol",createdAt:Date.now(),sections:[{title:"Architecture",type:"text",content:"Describe the protocol architecture, layers, and history."},{title:"Frame Structure",type:"keyvalue",content:"Field1:Bits/Bytes and purpose\nField2:Bits/Bytes and purpose"},{title:"Message Types",type:"table",content:"Type|ID/Value|Purpose\nType1|0x01|Description\nType2|0x02|Description"},{title:"Error Handling",type:"list",content:"Error condition 1\nError condition 2"},{title:"Code Example",type:"code",content:"// Protocol code example"}]},null,2),
+  diagnostic:JSON.stringify({id:"new-diagnostic",name:"Diagnostic Service",desc:"Service description and purpose",color:"amber",tag:"Diagnostics",createdAt:Date.now(),sections:[{title:"Service Overview",type:"text",content:"What this diagnostic service does."},{title:"Request Format",type:"keyvalue",content:"SID:0xXX\nSub-Function:0xXX\nParameters:Description"},{title:"Response Format",type:"keyvalue",content:"Positive SID:0xXX (request + 0x40)\nData:Description\nNRC:List of possible NRC codes"},{title:"Usage Sequence",type:"list",content:"Step 1: Switch to correct session\nStep 2: Security access if needed\nStep 3: Send request\nStep 4: Parse response"}]},null,2)
+};
+
+function loadTemplate(type){
+  document.getElementById('jpaste').value=TEMPLATES[type]||'';
+  document.getElementById('json-err').classList.add('hidden');
+  document.getElementById('json-preview').classList.add('hidden');
+}
+
+function validateJSON(){
+  const raw=document.getElementById('jpaste').value.trim();
+  const errEl=document.getElementById('json-err');
+  const prvEl=document.getElementById('json-preview');
+  if(!raw){errEl.innerHTML='<div class="error-box">Paste some JSON first.</div>';errEl.classList.remove('hidden');prvEl.classList.add('hidden');return false;}
+  try{
+    const data=JSON.parse(raw);
+    const arr=Array.isArray(data)?data:[data];
+    errEl.classList.add('hidden');
+    prvEl.innerHTML=`<div class="info-box"><i class="fa-solid fa-check-circle mr-1"></i><strong>Valid JSON!</strong> ${arr.length} topic${arr.length!==1?'s':''} detected: ${arr.map(t=>`"${t.name||'unnamed'}"`).join(', ')}</div>`;
+    prvEl.classList.remove('hidden');
+    return true;
+  }catch(e){
+    errEl.innerHTML=`<div class="error-box"><i class="fa-solid fa-circle-xmark mr-1"></i><strong>JSON Error:</strong> ${e.message}</div>`;
+    errEl.classList.remove('hidden');
+    prvEl.classList.add('hidden');
+    return false;
+  }
+}
+
+function loadJSON(replace){
+  if(!validateJSON())return;
+  try{
+    const data=JSON.parse(document.getElementById('jpaste').value.trim());
+    const arr=Array.isArray(data)?data:[data];
+    arr.forEach(t=>{if(!t.id)t.id='j'+Date.now()+Math.random().toString(36).slice(2,6);if(!t.createdAt)t.createdAt=Date.now();});
+    if(replace){
+      if(!confirm(`Replace ALL ${topics.length} existing topic(s) with ${arr.length} new topic(s)?`))return;
+      topics=arr;
+    }else{
+      let added=0;
+      arr.forEach(t=>{if(!topics.find(x=>x.id===t.id)){topics.unshift(t);added++;}else{// Update existing
+        const idx=topics.findIndex(x=>x.id===t.id);topics[idx]=t;}});
+      showToast(`Loaded ${arr.length} topic(s) from JSON!`);
+    }
+    closeJsonPanel();
+    document.getElementById('jpaste').value='';
+    document.getElementById('json-err').classList.add('hidden');
+    document.getElementById('json-preview').classList.add('hidden');
+    renderAll();
+    if(replace)showToast(`Replaced with ${arr.length} topic(s)!`);
+  }catch(e){showToast('Parse error: '+e.message,true);}
+}
+
+// ═══════════════════════════════════════════
+// EXPORT / COPY
+// ═══════════════════════════════════════════
+function exportAll(){
+  const b=new Blob([JSON.stringify(topics,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='autokb-topics.json';a.click();
+  showToast('Exported autokb-topics.json');
+}
+
+function copyJSON(id){
+  const t=topics.find(x=>x.id===id);if(!t)return;
+  navigator.clipboard.writeText(JSON.stringify(t,null,2)).then(()=>showToast('JSON copied!'));
+}
+
+function cpCode(btn){
+  const pre=btn.nextElementSibling;
+  navigator.clipboard.writeText(pre.textContent).then(()=>{
+    btn.classList.add('ok');btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!';
+    setTimeout(()=>{btn.classList.remove('ok');btn.innerHTML='<i class="fa-regular fa-copy"></i> Copy';},2000);
+  });
+}
+
+// ═══════════════════════════════════════════
+// MISC
+// ═══════════════════════════════════════════
+function toggleView(){
+  viewMode=viewMode==='masonry'?'list':'masonry';
+  document.getElementById('vicon').className=viewMode==='masonry'?'fa-solid fa-table-cells-large':'fa-solid fa-list';
+  renderAll();
+}
+
+function openModal(id){document.getElementById(id).classList.add('show');document.body.style.overflow='hidden';}
+function closeModal(id){document.getElementById(id).classList.remove('show');document.body.style.overflow='';}
+
+let toastT;
+function showToast(msg,err=false){
+  const t=document.getElementById('toast');
+  t.style.borderColor=err?'var(--red)':'var(--green)';
+  t.style.color=err?'var(--red)':'var(--green)';
+  document.getElementById('tmsg').textContent=msg;
+  t.classList.add('show');clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)closeModal(m.id);}));
+
+// Keyboard
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){document.querySelectorAll('.modal.show').forEach(m=>{m.classList.remove('show');document.body.style.overflow='';});closeJsonPanel();closeSidebar();}
+  if(e.key==='/'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();document.getElementById('srch')?.focus();}
+});
+
+// INIT
+renderAll();
+setTimeout(()=>{const ri=document.getElementById('res-info');if(!ri.textContent)ri.innerHTML='<kbd>/</kbd> search &nbsp;·&nbsp; <kbd>Esc</kbd> close panels';},600);
+</script>
+</body>
+</html>
