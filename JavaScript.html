@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 JavaScript Adventure for Little Coders!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Floating shapes background */
+        .shape {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+            z-index: 0;
+        }
+        .shape:nth-child(1) { width: 80px; height: 80px; background: #ff6b6b; top: 10%; left: 10%; animation-delay: 0s; }
+        .shape:nth-child(2) { width: 120px; height: 120px; background: #4ecdc4; top: 60%; left: 80%; animation-delay: 2s; }
+        .shape:nth-child(3) { width: 60px; height: 60px; background: #ffe66d; top: 80%; left: 20%; animation-delay: 4s; }
+        .shape:nth-child(4) { width: 100px; height: 100px; background: #a8e6cf; top: 30%; left: 70%; animation-delay: 6s; }
+        .shape:nth-child(5) { width: 70px; height: 70px; background: #ff8b94; top: 50%; left: 40%; animation-delay: 8s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(15px) rotate(240deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+        }
+        h1 {
+            font-family: 'Fredoka One', cursive;
+            font-size: 3.5rem;
+            text-shadow: 3px 3px 0px rgba(0,0,0,0.2);
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 1.5rem;
+            opacity: 0.95;
+            font-weight: 700;
+        }
+        .mascot {
+            font-size: 4rem;
+            margin: 20px 0;
+            animation: bounce 2s infinite;
+            display: inline-block;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: rgba(255,255,255,0.2);
+            border-radius: 50px;
+            padding: 10px;
+            margin: 20px auto;
+            max-width: 600px;
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #ffe66d, #ff6b6b);
+            height: 30px;
+            border-radius: 50px;
+            width: 0%;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            color: #764ba2;
+        }
+        .tab-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
+        .tab-btn.active { background: #ffe66d; color: #333; transform: scale(1.05); }
+
+        /* Lesson Cards */
+        .lesson-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .lesson-card {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .lesson-card:hover { transform: translateY(-5px); box-shadow: 0 15px 50px rgba(0,0,0,0.15); }
+        .lesson-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b6b, #ffe66d, #4ecdc4, #a8e6cf);
+        }
+        .card-icon { font-size: 3rem; margin-bottom: 15px; }
+        .card-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            color: #764ba2;
+            margin-bottom: 10px;
+        }
+        .card-desc { font-size: 1.1rem; color: #666; margin-bottom: 20px; line-height: 1.6; }
+
+        /* Interactive Playground */
+        .playground {
+            background: #1e1e2e;
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+            color: #a6accd;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow: hidden;
+        }
+        .playground-header {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background: #ff5f56; }
+        .dot.yellow { background: #ffbd2e; }
+        .dot.green { background: #27c93f; }
+        .code-input {
+            width: 100%;
+            background: #2a2a3c;
+            border: 2px solid #3a3a4c;
+            border-radius: 10px;
+            padding: 15px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 1rem;
+            resize: vertical;
+            min-height: 100px;
+            outline: none;
+        }
+        .code-input:focus { border-color: #ffe66d; }
+        .run-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: transform 0.2s;
+        }
+        .run-btn:hover { transform: scale(1.05); }
+        .output-box {
+            background: #2a2a3c;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            min-height: 60px;
+            color: #4ecdc4;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        /* Game Section */
+        .game-area {
+            background: white;
+            border-radius: 25px;
+            padding: 30px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .game-canvas {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+            border-radius: 20px;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #764ba2;
+        }
+        .game-character {
+            position: absolute;
+            font-size: 3rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .control-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .control-btn:active { transform: scale(0.95); }
+        .control-btn.blue { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .control-btn.green { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+
+        /* Reward System */
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+            font-size: 2.5rem;
+        }
+        .star { opacity: 0.3; transition: all 0.5s; }
+        .star.earned { opacity: 1; animation: starPop 0.5s ease; }
+        @keyframes starPop {
+            0% { transform: scale(0) rotate(0deg); }
+            50% { transform: scale(1.3) rotate(180deg); }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        /* Tooltip helper */
+        .helper-bubble {
+            background: #ffe66d;
+            color: #333;
+            padding: 15px 25px;
+            border-radius: 20px;
+            position: relative;
+            margin: 20px 0;
+            font-weight: 700;
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+        .helper-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: #ffe66d transparent;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            position: absolute;
+            animation: confetti-fall 3s ease-out forwards;
+            z-index: 1000;
+        }
+        @keyframes confetti-fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .lesson-grid { grid-template-columns: 1fr; }
+            .tab-btn { padding: 10px 20px; font-size: 0.9rem; }
+        }
+
+        /* Hidden sections */
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Syntax highlighting colors */
+        .keyword { color: #c792ea; }
+        .string { color: #c3e88d; }
+        .number { color: #f78c6c; }
+        .function { color: #82aaff; }
+        .comment { color: #676e95; font-style: italic; }
+    </style>
+</head>
+<body>
+    <!-- Floating Background Shapes -->
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+    <div class="shape"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="mascot">🤖</div>
+            <h1>JavaScript Adventure!</h1>
+            <p class="subtitle">Learn to Code Like a Superhero! 🦸‍♂️</p>
+
+            <!-- Progress -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar">0% Complete</div>
+            </div>
+
+            <!-- Stars -->
+            <div class="stars">
+                <span class="star" id="star1">⭐</span>
+                <span class="star" id="star2">⭐</span>
+                <span class="star" id="star3">⭐</span>
+                <span class="star" id="star4">⭐</span>
+                <span class="star" id="star5">⭐</span>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showSection('basics')">🌟 Basics</button>
+            <button class="tab-btn" onclick="showSection('playground')">🎮 Play</button>
+            <button class="tab-btn" onclick="showSection('games')">🏃 Games</button>
+            <button class="tab-btn" onclick="showSection('challenges')">🧩 Puzzles</button>
+            <button class="tab-btn" onclick="showSection('projects')">🏗️ Build</button>
+        </div>
+
+        <!-- Helper Bubble -->
+        <div class="helper-bubble" id="helperBubble">
+            💡 Tip: Click the buttons to see magic happen!
+        </div>
+
+        <!-- SECTION 1: BASICS -->
+        <div id="basics" class="section active">
+            <div class="lesson-grid">
+                <div class="lesson-card">
+                    <div class="card-icon">📦</div>
+                    <div class="card-title">What is a Variable?</div>
+                    <div class="card-desc">
+                        A variable is like a <b>magic box</b>! You can put things inside it and give it a name.
+                        <br><br>
+                        <code style="background:#f0f0f0;padding:5px 10px;border-radius:5px;color:#764ba2;">
+                            let myToy = "🚗";
+                        </code>
+                    </div>
+                    <button class="run-btn" onclick="showExample('variable')">Try It!</button>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">🔢</div>
+                    <div class="card-title">Numbers & Math</div>
+                    <div class="card-desc">
+                        JavaScript can do math! Add, subtract, multiply, and divide!
+                        <br><br>
+                        <code style="background:#f0f0f0;padding:5px 10px;border-radius:5px;color:#764ba2;">
+                            5 + 3 = 8 🎉
+                        </code>
+                    </div>
+                    <button class="run-btn" onclick="showExample('math')">Try It!</button>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">📝</div>
+                    <div class="card-title">Words (Strings)</div>
+                    <div class="card-desc">
+                        Strings are just <b>fancy words</b>! Put them in quotes.
+                        <br><br>
+                        <code style="background:#f0f0f0;padding:5px 10px;border-radius:5px;color:#764ba2;">
+                            "Hello World! 🌍"
+                        </code>
+                    </div>
+                    <button class="run-btn" onclick="showExample('strings')">Try It!</button>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">✅</div>
+                    <div class="card-title">True or False?</div>
+                    <div class="card-desc">
+                        Booleans are like a light switch: <b>ON</b> (true) or <b>OFF</b> (false)!
+                        <br><br>
+                        <code style="background:#f0f0f0;padding:5px 10px;border-radius:5px;color:#764ba2;">
+                            let isFun = true; 😄
+                        </code>
+                    </div>
+                    <button class="run-btn" onclick="showExample('boolean')">Try It!</button>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">📋</div>
+                    <div class="card-title">Lists (Arrays)</div>
+                    <div class="card-desc">
+                        An array is a <b>shopping list</b>! It holds many things.
+                        <br><br>
+                        <code style="background:#f0f0f0;padding:5px 10px;border-radius:5px;color:#764ba2;">
+                            let fruits = ["🍎", "🍌", "🍇"]
+                        </code>
+                    </div>
+                    <button class="run-btn" onclick="showExample('array')">Try It!</button>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">🎁</div>
+                    <div class="card-title">Objects (Treasure Chests)</div>
+                    <div class="card-desc">
+                        Objects hold <b>labeled treasures</b>! Like a backpack with pockets.
+                        <br><br>
+                        <code style="background:#f0f0f0;padding:5px 10px;border-radius:5px;color:#764ba2;">
+                            { name: "Alex", age: 5 }
+                        </code>
+                    </div>
+                    <button class="run-btn" onclick="showExample('object')">Try It!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: PLAYGROUND -->
+        <div id="playground" class="section">
+            <div class="lesson-card">
+                <div class="card-icon">🧪</div>
+                <div class="card-title">Code Lab</div>
+                <div class="card-desc">
+                    Type JavaScript code below and see what happens! Try changing the colors or messages.
+                </div>
+
+                <div class="playground">
+                    <div class="playground-header">
+                        <div class="dot red"></div>
+                        <div class="dot yellow"></div>
+                        <div class="dot green"></div>
+                        <span style="margin-left:10px;color:#676e95;font-size:0.9rem;">magic.js</span>
+                    </div>
+                    <textarea class="code-input" id="codeInput" spellcheck="false">// Welcome to Code Lab! 🧪
+// Try changing the message below:
+
+let myName = "Super Coder";
+let myAge = 5;
+let favoriteColor = "🌈 Rainbow";
+
+console.log("Hello, " + myName + "!");
+console.log("You are " + myAge + " years old!");
+console.log("Your favorite color is: " + favoriteColor);
+
+// Try some math!
+console.log("5 + 3 = " + (5 + 3));
+console.log("10 - 2 = " + (10 - 2));
+
+// Make a list of animals
+let animals = ["🐶 Dog", "🐱 Cat", "🐰 Bunny"];
+console.log("My animals: " + animals.join(", "));</textarea>
+                    <button class="run-btn" onclick="runCode()">▶ Run My Code!</button>
+                    <div class="output-box" id="codeOutput">
+                        💡 Click "Run My Code!" to see the magic!
+                    </div>
+                </div>
+            </div>
+
+            <div class="lesson-grid" style="margin-top:30px;">
+                <div class="lesson-card">
+                    <div class="card-icon">🎨</div>
+                    <div class="card-title">Color Mixer</div>
+                    <div class="card-desc">Click to change colors!</div>
+                    <div id="colorBox" style="width:100%;height:100px;border-radius:15px;background:#ff6b6b;margin:15px 0;transition:all 0.3s;"></div>
+                    <button class="run-btn" onclick="changeColor()">🎲 Random Color!</button>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">🔊</div>
+                    <div class="card-title">Sound Board</div>
+                    <div class="card-desc">Make some noise!</div>
+                    <div class="controls">
+                        <button class="control-btn blue" onclick="playSound('C')">🎵</button>
+                        <button class="control-btn green" onclick="playSound('E')">🎶</button>
+                        <button class="control-btn" onclick="playSound('G')">🎼</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: GAMES -->
+        <div id="games" class="section">
+            <div class="game-area">
+                <div class="card-icon" style="font-size:3rem;">🎮</div>
+                <div class="card-title">Robot Mover</div>
+                <div class="card-desc">Use the buttons or arrow keys to move the robot! Catch the stars!</div>
+
+                <div class="game-canvas" id="gameCanvas">
+                    <div class="game-character" id="robot" style="left:50%;top:50%;transform:translate(-50%,-50%);">🤖</div>
+                    <div class="game-character" id="star" style="left:80%;top:20%;font-size:2rem;animation:float 3s infinite;">⭐</div>
+                </div>
+
+                <div class="controls">
+                    <button class="control-btn" onclick="moveRobot('up')">⬆️</button>
+                </div>
+                <div class="controls">
+                    <button class="control-btn" onclick="moveRobot('left')">⬅️</button>
+                    <button class="control-btn blue" onclick="moveRobot('down')">⬇️</button>
+                    <button class="control-btn" onclick="moveRobot('right')">➡️</button>
+                </div>
+                <p style="margin-top:15px;color:#666;">Stars collected: <span id="score" style="font-size:1.5rem;font-weight:bold;color:#764ba2;">0</span> ⭐</p>
+            </div>
+        </div>
+
+        <!-- SECTION 4: CHALLENGES -->
+        <div id="challenges" class="section">
+            <div class="lesson-grid">
+                <div class="lesson-card">
+                    <div class="card-icon">🧩</div>
+                    <div class="card-title">Puzzle 1: Fix the Code!</div>
+                    <div class="card-desc">
+                        Something is wrong! Can you fix it?<br>
+                        <code style="display:block;background:#f0f0f0;padding:10px;border-radius:5px;margin:10px 0;color:#764ba2;">
+                            let name = Alex;<br>
+                            console.log(name);
+                        </code>
+                        <b>Hint:</b> Names need quotes!
+                    </div>
+                    <button class="run-btn" onclick="checkPuzzle(1, this)">I Fixed It! ✅</button>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">🧩</div>
+                    <div class="card-title">Puzzle 2: Count the Toys</div>
+                    <div class="card-desc">
+                        How many toys are in this list?<br>
+                        <code style="display:block;background:#f0f0f0;padding:10px;border-radius:5px;margin:10px 0;color:#764ba2;">
+                            let toys = ["🚗", "🎈", "🧸", "🎨"];
+                        </code>
+                        <button class="run-btn" style="margin:5px;" onclick="checkPuzzle(2, this, '3')">3</button>
+                        <button class="run-btn" style="margin:5px;" onclick="checkPuzzle(2, this, '4')">4</button>
+                        <button class="run-btn" style="margin:5px;" onclick="checkPuzzle(2, this, '5')">5</button>
+                    </div>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">🧩</div>
+                    <div class="card-title">Puzzle 3: True or False?</div>
+                    <div class="card-desc">
+                        Is 10 greater than 5?<br>
+                        <code style="display:block;background:#f0f0f0;padding:10px;border-radius:5px;margin:10px 0;color:#764ba2;">
+                            10 > 5
+                        </code>
+                        <button class="run-btn" style="margin:5px;" onclick="checkPuzzle(3, this, 'true')">True ✅</button>
+                        <button class="run-btn" style="margin:5px;" onclick="checkPuzzle(3, this, 'false')">False ❌</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: PROJECTS -->
+        <div id="projects" class="section">
+            <div class="lesson-grid">
+                <div class="lesson-card">
+                    <div class="card-icon">🎂</div>
+                    <div class="card-title">Birthday Card Maker</div>
+                    <div class="card-desc">
+                        Create a birthday card with JavaScript!
+                    </div>
+                    <input type="text" id="bdayName" placeholder="Type a name..." style="padding:10px;border-radius:10px;border:2px solid #ddd;width:100%;margin:10px 0;font-size:1rem;">
+                    <button class="run-btn" onclick="makeCard()">Make Card! 🎉</button>
+                    <div id="cardResult" style="margin-top:15px;padding:20px;background:linear-gradient(135deg,#ffe66d,#ff6b6b);border-radius:15px;color:white;font-size:1.2rem;display:none;"></div>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">⏰</div>
+                    <div class="card-title">Magic Clock</div>
+                    <div class="card-desc">
+                        JavaScript knows what time it is!
+                    </div>
+                    <div id="clock" style="font-size:2rem;font-family:'Fredoka One',cursive;color:#764ba2;text-align:center;padding:20px;">🕐 Loading...</div>
+                    <button class="run-btn" onclick="startClock()">Start Clock!</button>
+                </div>
+
+                <div class="lesson-card">
+                    <div class="card-icon">🎲</div>
+                    <div class="card-title">Dice Roller</div>
+                    <div class="card-desc">
+                        Roll a dice and see what you get!
+                    </div>
+                    <div id="diceResult" style="font-size:4rem;text-align:center;padding:20px;">🎲</div>
+                    <button class="run-btn" onclick="rollDice()">Roll! 🎲</button>
+                </div>
+            </div>
+        </div>
+
+        <footer style="text-align:center;padding:40px;color:white;opacity:0.8;">
+            <p>🌟 Made with love for little coders! 🌟</p>
+            <p style="margin-top:10px;font-size:0.9rem;">Remember: Every expert was once a beginner!</p>
+        </footer>
+    </div>
+
+    <script>
+        // Global State
+        let progress = 0;
+        let stars = 0;
+        let robotPos = { x: 50, y: 50 };
+        let score = 0;
+        let clockInterval;
+
+        // Tab Navigation
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            showHelper("Great choice! Let's explore " + sectionId + "! 🎉");
+        }
+
+        // Helper Bubble
+        function showHelper(text) {
+            const bubble = document.getElementById('helperBubble');
+            bubble.textContent = '💡 ' + text;
+            bubble.style.display = 'block';
+            setTimeout(() => { bubble.style.display = 'none'; }, 4000);
+        }
+
+        // Progress & Stars
+        function addProgress(amount) {
+            progress = Math.min(progress + amount, 100);
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressBar').textContent = progress + '% Complete';
+            if (progress >= 20 && stars < 1) earnStar(1);
+            if (progress >= 40 && stars < 2) earnStar(2);
+            if (progress >= 60 && stars < 3) earnStar(3);
+            if (progress >= 80 && stars < 4) earnStar(4);
+            if (progress >= 100 && stars < 5) earnStar(5);
+        }
+
+        function earnStar(num) {
+            stars = num;
+            document.getElementById('star' + num).classList.add('earned');
+            createConfetti();
+            showHelper('Amazing! You earned a star! ⭐');
+        }
+
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94'];
+            for (let i = 0; i < 20; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'confetti';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.background = colors[Math.floor(Math.random() * colors.length)];
+                conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 4000);
+            }
+        }
+
+        // Examples
+        function showExample(type) {
+            addProgress(5);
+            const examples = {
+                variable: 'Imagine a box named "myToy". We put a car 🚗 inside it!',
+                math: '5 + 3 = 8! JavaScript is like a calculator! 🧮',
+                strings: 'Words in quotes are called "strings". Like a string of letters! 🧵',
+                boolean: 'True means YES! False means NO! Like a light switch! 💡',
+                array: 'An array is a list! We can put many things inside [ ] brackets! 📚',
+                object: 'An object is like a treasure chest with labeled compartments! 🎁'
+            };
+            showHelper(examples[type]);
+        }
+
+        // Code Playground
+        function runCode() {
+            const code = document.getElementById('codeInput').value;
+            const output = document.getElementById('codeOutput');
+            let logs = [];
+
+            // Capture console.log
+            const originalLog = console.log;
+            console.log = function(...args) {
+                logs.push(args.join(' '));
+            };
+
+            try {
+                // Safe-ish eval for learning
+                eval(code);
+                output.innerHTML = logs.map(l => '> ' + l).join('<br>') || '✅ Code ran successfully!';
+                output.style.borderLeftColor = '#4ecdc4';
+                output.style.color = '#4ecdc4';
+                addProgress(10);
+                showHelper('Wow! Your code worked! 🎉');
+            } catch (e) {
+                output.innerHTML = '❌ Oops: ' + e.message;
+                output.style.borderLeftColor = '#ff6b6b';
+                output.style.color = '#ff6b6b';
+                showHelper('That's okay! Bugs are just friends we haven't fixed yet! 🐛');
+            }
+
+            console.log = originalLog;
+        }
+
+        // Color Mixer
+        function changeColor() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#a8e6cf', '#ff8b94', '#c7ceea', '#ffd93d'];
+            const box = document.getElementById('colorBox');
+            box.style.background = colors[Math.floor(Math.random() * colors.length)];
+            box.style.transform = 'scale(1.1)';
+            setTimeout(() => box.style.transform = 'scale(1)', 300);
+            addProgress(3);
+        }
+
+        // Sound Board (using Web Audio API)
+        function playSound(note) {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            const frequencies = { 'C': 261.63, 'E': 329.63, 'G': 392.00 };
+            oscillator.frequency.value = frequencies[note] || 440;
+            oscillator.type = 'sine';
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + 0.5);
+            oscillator.stop(audioCtx.currentTime + 0.5);
+            addProgress(3);
+        }
+
+        // Robot Game
+        function moveRobot(direction) {
+            const robot = document.getElementById('robot');
+            const canvas = document.getElementById('gameCanvas');
+            const step = 10;
+
+            switch(direction) {
+                case 'up': robotPos.y = Math.max(5, robotPos.y - step); break;
+                case 'down': robotPos.y = Math.min(95, robotPos.y + step); break;
+                case 'left': robotPos.x = Math.max(5, robotPos.x - step); break;
+                case 'right': robotPos.x = Math.min(95, robotPos.x + step); break;
+            }
+
+            robot.style.left = robotPos.x + '%';
+            robot.style.top = robotPos.y + '%';
+
+            // Check collision with star
+            const star = document.getElementById('star');
+            const starRect = star.getBoundingClientRect();
+            const robotRect = robot.getBoundingClientRect();
+
+            if (isColliding(robotRect, starRect)) {
+                score++;
+                document.getElementById('score').textContent = score;
+                star.style.left = (10 + Math.random() * 80) + '%';
+                star.style.top = (10 + Math.random() * 80) + '%';
+                createConfetti();
+                addProgress(5);
+                showHelper('Star collected! 🌟');
+            }
+        }
+
+        function isColliding(rect1, rect2) {
+            return !(rect1.right < rect2.left || 
+                     rect1.left > rect2.right || 
+                     rect1.bottom < rect2.top || 
+                     rect1.top > rect2.bottom);
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('games').classList.contains('active')) {
+                switch(e.key) {
+                    case 'ArrowUp': moveRobot('up'); break;
+                    case 'ArrowDown': moveRobot('down'); break;
+                    case 'ArrowLeft': moveRobot('left'); break;
+                    case 'ArrowRight': moveRobot('right'); break;
+                }
+            }
+        });
+
+        // Puzzles
+        function checkPuzzle(num, btn, answer) {
+            if (num === 1) {
+                addProgress(15);
+                btn.textContent = 'Correct! 🎉';
+                btn.style.background = '#4ecdc4';
+                showHelper('Great job! Alex needs quotes: "Alex"!');
+            } else if (num === 2) {
+                if (answer === '4') {
+                    addProgress(15);
+                    btn.style.background = '#4ecdc4';
+                    showHelper('Correct! There are 4 toys! 🧸');
+                } else {
+                    btn.style.background = '#ff6b6b';
+                    showHelper('Count again! 🐶🐱🐰🐻');
+                }
+            } else if (num === 3) {
+                if (answer === 'true') {
+                    addProgress(15);
+                    btn.style.background = '#4ecdc4';
+                    showHelper('Yes! 10 is bigger than 5! 🎈');
+                } else {
+                    btn.style.background = '#ff6b6b';
+                    showHelper('Think again! 10 > 5 is TRUE!');
+                }
+            }
+        }
+
+        // Projects
+        function makeCard() {
+            const name = document.getElementById('bdayName').value || 'Friend';
+            const result = document.getElementById('cardResult');
+            result.innerHTML = `
+                <div style="font-size:3rem;margin-bottom:10px;">🎂🎉🎁</div>
+                <div>Happy Birthday, <b>${name}</b>!</div>
+                <div style="font-size:1.5rem;margin-top:10px;">🎈🎈🎈</div>
+            `;
+            result.style.display = 'block';
+            addProgress(10);
+            createConfetti();
+        }
+
+        function startClock() {
+            if (clockInterval) clearInterval(clockInterval);
+            clockInterval = setInterval(() => {
+                const now = new Date();
+                document.getElementById('clock').textContent = 
+                    '🕐 ' + now.toLocaleTimeString();
+            }, 1000);
+            addProgress(5);
+        }
+
+        function rollDice() {
+            const dice = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+            const result = dice[Math.floor(Math.random() * 6)];
+            const el = document.getElementById('diceResult');
+            el.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                el.textContent = result;
+                el.style.transform = 'rotate(0deg)';
+            }, 300);
+            addProgress(5);
+        }
+
+        // Initialize
+        window.onload = () => {
+            showHelper('Welcome, little coder! Click the tabs to start! 🚀');
+        };
+    </script>
+</body>
+</html>
