@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EE Master Sheet — Electrical Engineering Terminology</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg: #080d1a;
+            --bg2: #0d1528;
+            --card: rgba(16, 26, 52, 0.72);
+            --card-border: rgba(0, 229, 255, 0.13);
+            --cyan: #00e5ff;
+            --cyan-dim: rgba(0, 229, 255, 0.18);
+            --amber: #ffb300;
+            --amber-dim: rgba(255, 179, 0, 0.18);
+            --purple: #a855f7;
+            --purple-dim: rgba(168, 85, 247, 0.18);
+            --green: #22c55e;
+            --green-dim: rgba(34, 197, 94, 0.18);
+            --text: #e2e8f0;
+            --text-muted: #64748b;
+            --text-dim: #94a3b8;
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Inter', sans-serif;
+            --nav-h: 60px;
+            --radius: 14px;
+            --highlight-border: rgba(0, 229, 255, 0.7);
+            --highlight-glow: rgba(0, 229, 255, 0.25);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--sans);
+            font-size: 15px;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Circuit-trace SVG background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: -50%;
+            width: 200%;
+            height: 200%;
+            background-image:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(0, 229, 255, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(168, 85, 247, 0.07) 0%, transparent 55%),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cpath d='M0 40 H20 M60 40 H80 M40 0 V20 M40 60 V80' stroke='rgba(0,229,255,0.045)' stroke-width='1' fill='none'/%3E%3Ccircle cx='20' cy='40' r='2.5' fill='rgba(0,229,255,0.09)'/%3E%3Ccircle cx='60' cy='40' r='2.5' fill='rgba(0,229,255,0.09)'/%3E%3Ccircle cx='40' cy='20' r='2.5' fill='rgba(0,229,255,0.09)'/%3E%3Ccircle cx='40' cy='60' r='2.5' fill='rgba(0,229,255,0.09)'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+            animation: bgDrift 40s linear infinite alternate;
+        }
+
+        @keyframes bgDrift {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(-10%, -10%); }
+        }
+
+        /* ── NAV ── */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            height: var(--nav-h);
+            background: rgba(8, 13, 26, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            gap: 0;
+            justify-content: space-between;
+        }
+
+        .nav-brand {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: 15px;
+            color: var(--cyan);
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-brand i {
+            font-size: 14px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .nav-links::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 12.5px;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 20px;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border: 1px solid transparent;
+        }
+
+        .nav-links a:hover {
+            color: var(--cyan);
+            border-color: rgba(0, 229, 255, 0.25);
+            background: var(--cyan-dim);
+        }
+
+        .nav-links a.active {
+            color: var(--cyan);
+            background: var(--cyan-dim);
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 72px 24px 48px;
+        }
+
+        .hero-tag {
+            display: inline-block;
+            font-family: var(--mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--cyan);
+            background: var(--cyan-dim);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-family: var(--mono);
+            font-size: clamp(28px, 5vw, 52px);
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 14px;
+            background: linear-gradient(135deg, #fff 0%, var(--cyan) 50%, var(--amber) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.4));
+            animation: textPulse 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes textPulse {
+            0% { filter: drop-shadow(0 0 20px rgba(0, 229, 255, 0.3)); }
+            100% { filter: drop-shadow(0 0 40px rgba(0, 229, 255, 0.6)); }
+        }
+
+        .hero p {
+            color: var(--text-dim);
+            font-size: 16px;
+            max-width: 560px;
+            margin: 0 auto 32px;
+            line-height: 1.7;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-num {
+            font-family: var(--mono);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--cyan);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        /* ── SECTION ── */
+        .section {
+            position: relative;
+            z-index: 1;
+            padding: 48px 24px;
+            max-width: 1340px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 32px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .section-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .icon-dc {
+            background: var(--cyan-dim);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+        }
+
+        .icon-ac {
+            background: var(--amber-dim);
+            color: var(--amber);
+            border: 1px solid rgba(255, 179, 0, 0.25);
+        }
+
+        .icon-rec {
+            background: var(--purple-dim);
+            color: var(--purple);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+        }
+
+        .icon-pwr {
+            background: var(--green-dim);
+            color: var(--green);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .section-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        /* ── GRID ── */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        @media(max-width: 1024px) {
+            .card-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media(max-width: 640px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── TERM CARD ── */
+        .term-card {
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 22px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            cursor: pointer;
+            transition: transform 0.22s, border-color 0.22s, box-shadow 0.22s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .term-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-color, var(--cyan)), transparent);
+            opacity: 0;
+            transition: opacity 0.22s;
+        }
+
+        .term-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px -8px var(--accent-glow, var(--cyan-dim));
+            border-color: var(--accent-color, var(--cyan));
+        }
+
+        .term-card:hover::before {
+            opacity: 1;
+        }
+
+        /* God-level mouse glow effect */
+        .term-card::after, .calc-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(
+                800px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+                rgba(255, 255, 255, 0.06),
+                transparent 40%
+            );
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            border-radius: inherit;
+        }
+
+        .term-card:hover::after, .calc-card:hover::after {
+            opacity: 1;
+        }
+
+        .card-top, .meta-row, .term-def, .where-used, .sub-term, .reciprocal-badge {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), 
+                        transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Category colour overrides */
+        .cat-ac {
+            --accent-color: var(--amber);
+            --accent-glow: rgba(255, 179, 0, 0.2);
+        }
+
+        .cat-rec {
+            --accent-color: var(--purple);
+            --accent-glow: rgba(168, 85, 247, 0.2);
+        }
+
+        .cat-pwr {
+            --accent-color: var(--green);
+            --accent-glow: rgba(34, 197, 94, 0.2);
+        }
+
+        /* Highlighted state (from JS) */
+        .term-card.highlighted {
+            border-color: var(--highlight-border) !important;
+            box-shadow: 0 0 0 2px var(--highlight-glow), 0 8px 32px var(--highlight-glow) !important;
+        }
+
+        .term-card.dimmed {
+            opacity: 0.28;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 14px;
+            gap: 8px;
+        }
+
+        .term-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.3;
+        }
+
+        .term-symbol-badge {
+            font-family: var(--mono);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-color, var(--cyan));
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 4px 10px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .meta-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .meta-chip {
+            font-family: var(--mono);
+            font-size: 11px;
+            padding: 3px 9px;
+            border-radius: 20px;
+            border: 1px solid;
+            font-weight: 600;
+        }
+
+        .chip-unit {
+            color: var(--amber);
+            border-color: rgba(255, 179, 0, 0.28);
+            background: rgba(255, 179, 0, 0.08);
+        }
+
+        .chip-formula {
+            color: var(--cyan);
+            border-color: rgba(0, 229, 255, 0.28);
+            background: rgba(0, 229, 255, 0.06);
+            font-size: 12px;
+        }
+
+        .chip-formula-purple {
+            color: var(--purple);
+            border-color: rgba(168, 85, 247, 0.28);
+            background: rgba(168, 85, 247, 0.06);
+            font-size: 12px;
+        }
+
+        .term-def {
+            font-size: 13.5px;
+            color: var(--text-dim);
+            line-height: 1.65;
+            margin-bottom: 12px;
+        }
+
+        .where-used {
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            padding: 10px 12px;
+            border-left: 3px solid var(--accent-color, var(--cyan));
+        }
+
+        .where-used i {
+            color: var(--accent-color, var(--cyan));
+            margin-top: 2px;
+            flex-shrink: 0;
+            font-size: 12px;
+        }
+
+        .where-used-text {
+            font-size: 12.5px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ── RECIPROCAL SPECIAL CARD ── */
+        .reciprocal-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--purple);
+            background: var(--purple-dim);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 20px;
+            padding: 2px 10px;
+            margin-bottom: 10px;
+        }
+
+        .sub-term {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            border-left: 3px solid var(--purple);
+        }
+
+        .sub-term-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--purple);
+            margin-bottom: 4px;
+            font-family: var(--mono);
+        }
+
+        .sub-term-body {
+            font-size: 12.5px;
+            color: var(--text-dim);
+            line-height: 1.5;
+        }
+
+        /* ── CALCULATORS ── */
+        .calc-section {
+            position: relative;
+            z-index: 1;
+            background: rgba(13, 21, 40, 0.7);
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+            padding: 56px 24px;
+            backdrop-filter: blur(6px);
+        }
+
+        .calc-inner {
+            max-width: 1340px;
+            margin: 0 auto;
+        }
+
+        .calc-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .calc-header h2 {
+            font-family: var(--mono);
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .calc-header p {
+            color: var(--text-muted);
+            font-size: 13.5px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media(max-width: 860px) {
+            .calc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .calc-card {
+            background: rgba(16, 26, 52, 0.8);
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: var(--radius);
+            padding: 26px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .calc-card > * {
+            position: relative;
+            z-index: 2;
+        }
+
+        .calc-card-title {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--cyan);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 22px;
+        }
+
+        .calc-card-title i {
+            font-size: 14px;
+        }
+
+        .ohm-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .ohm-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ohm-row label {
+            font-family: var(--mono);
+            font-size: 14px;
+            font-weight: 700;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .ohm-row label.lv {
+            color: var(--cyan);
+        }
+
+        .ohm-row label.li {
+            color: var(--amber);
+        }
+
+        .ohm-row label.lr {
+            color: var(--purple);
+        }
+
+        .ohm-row input[type="number"] {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-family: var(--mono);
+            font-size: 14px;
+            padding: 9px 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .ohm-row input[type="number"]:focus {
+            border-color: var(--cyan);
+        }
+
+        .ohm-row .unit-tag {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            width: 30px;
+            text-align: left;
+        }
+
+        .ohm-lock-btn {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.25);
+            color: var(--cyan);
+            border-radius: 6px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 12px;
+            display: grid;
+            place-items: center;
+            transition: background 0.2s;
+            flex-shrink: 0;
+        }
+
+        .ohm-lock-btn:hover {
+            background: rgba(0, 229, 255, 0.2);
+        }
+
+        .ohm-lock-btn.locked {
+            background: rgba(0, 229, 255, 0.3);
+            color: #fff;
+        }
+
+        .ohm-result {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 10px;
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .result-item {
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 4px;
+        }
+
+        .result-val {
+            font-family: var(--mono);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .rv-v {
+            color: var(--cyan);
+        }
+
+        .rv-i {
+            color: var(--amber);
+        }
+
+        .rv-r {
+            color: var(--purple);
+        }
+
+        .rv-p {
+            color: var(--green);
+        }
+
+        .result-err {
+            grid-column: 1 / -1;
+            color: #f87171;
+            font-size: 13px;
+            text-align: center;
+            font-family: var(--mono);
+        }
+
+        /* Reactance calc */
+        .rx-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .rx-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .rx-row-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rx-label {
+            font-size: 13px;
+            color: var(--text-dim);
+            font-family: var(--mono);
+        }
+
+        .rx-val-label {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .rx-val-label.vc {
+            color: var(--cyan);
+        }
+
+        .rx-val-label.va {
+            color: var(--amber);
+        }
+
+        .rx-val-label.vp {
+            color: var(--purple);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            appearance: none;
+            -webkit-appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .rx-row:nth-child(1) input[type="range"] {
+            accent-color: var(--cyan);
+        }
+
+        .rx-row:nth-child(1) input[type="range"]::-webkit-slider-thumb {
+            background: var(--cyan);
+        }
+
+        .rx-row:nth-child(2) input[type="range"] {
+            accent-color: var(--amber);
+        }
+
+        .rx-row:nth-child(2) input[type="range"]::-webkit-slider-thumb {
+            background: var(--amber);
+        }
+
+        .rx-row:nth-child(3) input[type="range"] {
+            accent-color: var(--purple);
+        }
+
+        .rx-row:nth-child(3) input[type="range"]::-webkit-slider-thumb {
+            background: var(--purple);
+        }
+
+        .rx-results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .rx-res-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .rx-res-card .rl {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .rx-res-card .rv {
+            font-family: var(--mono);
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .rx-res-card .rdesc {
+            font-size: 10.5px;
+            color: var(--text-muted);
+        }
+
+        .rx-res-xl .rv {
+            color: var(--amber);
+        }
+
+        .rx-res-xc .rv {
+            color: var(--cyan);
+        }
+
+        .rx-res-bl .rv {
+            color: var(--purple);
+        }
+
+        .rx-res-bc .rv {
+            color: var(--green);
+        }
+
+        /* ── FOOTER ── */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 28px 24px;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        footer span {
+            color: var(--cyan);
+            font-family: var(--mono);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 229, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 229, 255, 0.4);
+        }
+
+        /* ── FORMULA DISPLAY ── */
+        .formula-display {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--cyan);
+            background: rgba(0, 229, 255, 0.06);
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 6px;
+            padding: 4px 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .tag-reciprocal .formula-display {
+            color: var(--purple);
+            background: rgba(168, 85, 247, 0.06);
+            border-color: rgba(168, 85, 247, 0.15);
+        }
+
+        /* pulse animation on hover for calc */
+        @keyframes pulseGlow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.0);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(0, 229, 255, 0.08);
+            }
+        }
+
+        .calc-card:hover {
+            animation: pulseGlow 2.5s ease infinite;
+        }
+
+        /* highlight tooltip hint */
+        .hint-bar {
+            position: relative;
+            z-index: 1;
+            background: rgba(0, 229, 255, 0.06);
+            border: 1px solid rgba(0, 229, 255, 0.15);
+            border-radius: 8px;
+            padding: 9px 16px;
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .hint-bar i {
+            color: var(--cyan);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ══════════════ NAV ══════════════ -->
+    <nav>
+        <div class="nav-brand"><i class="fa-solid fa-bolt"></i> EE Master Sheet</div>
+        <div class="nav-links">
+            <a href="#cat-dc">⚡ DC Quantities</a>
+            <a href="#cat-ac">〜 AC &amp; Reactive</a>
+            <a href="#cat-rec">⇄ Reciprocals</a>
+            <a href="#cat-pwr">💡 AC Power</a>
+            <a href="#calculators">🔢 Calculators</a>
+        </div>
+    </nav>
+
+    <!-- ══════════════ HERO ══════════════ -->
+    <div class="hero">
+        <div class="hero-tag"><i class="fa-solid fa-microchip"></i> &nbsp;From First Principles to Advanced AC Theory
+        </div>
+        <h1>Electrical Engineering<br />Terminology Master Sheet</h1>
+        <p>Every fundamental EE term with symbol, unit, formula, plain-English definition, and a real-world application
+            — plus live interactive calculators.</p>
+        <div class="hero-stats">
+            <div class="stat">
+                <div class="stat-num">25+</div>
+                <div class="stat-label">Terms Covered</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">4</div>
+                <div class="stat-label">Categories</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">2</div>
+                <div class="stat-label">Live Calculators</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">∞</div>
+                <div class="stat-label">Insight</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="hint-bar"><i class="fa-solid fa-circle-info"></i> Click any term card to highlight its mathematically
+        related terms across the sheet.</div>
+
+    <!-- ══════════════ CATEGORY 1: DC QUANTITIES ══════════════ -->
+    <div class="section" id="cat-dc">
+        <div class="section-header">
+            <div class="section-icon icon-dc"><i class="fa-solid fa-bolt"></i></div>
+            <div>
+                <div class="section-title">Category 1 — Fundamental DC Quantities</div>
+                <div class="section-subtitle">The bedrock building blocks: charge, voltage, current, resistance, and
+                    power.</div>
+            </div>
+        </div>
+        <div class="card-grid" id="grid-dc">
+
+            <!-- Q -->
+            <div class="term-card" data-id="Q" data-related="V,I,C,W">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-atom"
+                            style="color:var(--cyan);font-size:13px;margin-right:6px;"></i>Electric Charge</div>
+                    <div class="term-symbol-badge">Q</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit">Coulombs (C)</span>
+                    <span class="meta-chip chip-formula">Q = I × t</span>
+                    <span class="meta-chip chip-formula">Q = C × V</span>
+                </div>
+                <p class="term-def">The fundamental property of matter that causes it to experience a force in an
+                    electromagnetic field. It is quantised — the smallest unit is the charge of one electron (≈1.6 ×
+                    10⁻¹⁹ C). Charge is the "stuff" that actually flows when we talk about electricity.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot"></i><span
+                        class="where-used-text"><strong>Where used:</strong> EV battery sizing — a 75 kWh Tesla pack
+                        stores charge equivalent to tens of millions of Coulombs, used to calculate how long it can
+                        drive at a given current draw.</span></div>
+            </div>
+
+            <!-- V -->
+            <div class="term-card" data-id="V" data-related="Q,I,R,P,W,C,Z,XL,XC">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-gauge-high"
+                            style="color:var(--cyan);font-size:13px;margin-right:6px;"></i>Voltage (EMF)</div>
+                    <div class="term-symbol-badge">V / E</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit">Volts (V)</span>
+                    <span class="meta-chip chip-formula">V = I × R</span>
+                    <span class="meta-chip chip-formula">V = W / Q</span>
+                    <span class="meta-chip chip-formula">V = P / I</span>
+                </div>
+                <p class="term-def">The electric potential difference between two points — the "pressure" that pushes
+                    charge carriers through a conductor. Think of it like water pressure in a pipe: higher voltage means
+                    more push. EMF (Electromotive Force) is the voltage produced by a source like a battery or
+                    generator.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Power grid transmission lines operate at
+                        400 kV to reduce current (and thus I²R losses) over long distances, exploiting the V = IR
+                        relationship.</span></div>
+            </div>
+
+            <!-- I -->
+            <div class="term-card" data-id="I" data-related="V,R,P,Q,G,Z,Y">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-water"
+                            style="color:var(--cyan);font-size:13px;margin-right:6px;"></i>Current</div>
+                    <div class="term-symbol-badge">I</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit">Amperes (A)</span>
+                    <span class="meta-chip chip-formula">I = V / R</span>
+                    <span class="meta-chip chip-formula">I = Q / t</span>
+                    <span class="meta-chip chip-formula">I = P / V</span>
+                </div>
+                <p class="term-def">The rate of flow of electric charge past a point in a circuit. One Ampere equals one
+                    Coulomb of charge flowing per second. Conventional current flows from positive to negative; actual
+                    electrons flow the opposite way (from negative to positive).</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot"></i><span
+                        class="where-used-text"><strong>Where used:</strong> PCB trace width design — engineers
+                        calculate maximum current per trace to avoid copper melting, using PCB trace current capacity
+                        charts based on I = Q/t.</span></div>
+            </div>
+
+            <!-- R -->
+            <div class="term-card" data-id="R" data-related="V,I,P,G,Z,XL,XC">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-sliders"
+                            style="color:var(--cyan);font-size:13px;margin-right:6px;"></i>Resistance</div>
+                    <div class="term-symbol-badge">R</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit">Ohms (Ω)</span>
+                    <span class="meta-chip chip-formula">R = V / I</span>
+                    <span class="meta-chip chip-formula">R = ρL / A</span>
+                    <span class="meta-chip chip-formula">R = 1 / G</span>
+                </div>
+                <p class="term-def">The opposition to the flow of direct current, converting electrical energy into
+                    heat. It depends on the material's resistivity (ρ), its length (L), and cross-sectional area (A).
+                    Unlike reactance, resistance dissipates real energy regardless of frequency.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot"></i><span
+                        class="where-used-text"><strong>Where used:</strong> LED current-limiting resistors — a 220 Ω
+                        resistor in series with an LED on a 5V supply limits current to ~(5-2.2)/220 ≈ 12.7 mA,
+                        protecting the LED.</span></div>
+            </div>
+
+            <!-- G (DC) -->
+            <div class="term-card" data-id="G" data-related="R,I,V,Y,B">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-arrow-right-arrow-left"
+                            style="color:var(--cyan);font-size:13px;margin-right:6px;"></i>Conductance</div>
+                    <div class="term-symbol-badge">G</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit">Siemens (S)</span>
+                    <span class="meta-chip chip-formula">G = 1 / R</span>
+                    <span class="meta-chip chip-formula">G = I / V</span>
+                </div>
+                <p class="term-def">The ease with which DC current flows — the exact reciprocal of resistance. A high
+                    conductance means very little opposition. A 2 Ω resistor has G = 0.5 S. Conductance belongs to the
+                    "admittance family" (Y = G + jB) in AC circuits, representing only the real, energy-dissipating
+                    part.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Ground-fault circuit analysis — parallel
+                        branch conductances are added directly (G<sub>total</sub> = G₁ + G₂ + …), making fault path
+                        calculations cleaner than summing resistances in parallel.</span></div>
+            </div>
+
+            <!-- P (DC) -->
+            <div class="term-card" data-id="P" data-related="V,I,R,W,S">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-fire-flame-curved"
+                            style="color:var(--cyan);font-size:13px;margin-right:6px;"></i>Power (DC)</div>
+                    <div class="term-symbol-badge">P</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit">Watts (W)</span>
+                    <span class="meta-chip chip-formula">P = V × I</span>
+                    <span class="meta-chip chip-formula">P = I² × R</span>
+                    <span class="meta-chip chip-formula">P = V² / R</span>
+                </div>
+                <p class="term-def">The rate at which electrical energy is converted into another form (heat, light,
+                    mechanical work). In DC circuits, all power is "real" power — it actually does work. The three forms
+                    of the formula are all equivalent via Ohm's Law.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Calculating I²R heat losses in a power
+                        supply MOSFET — a 10 mΩ FET carrying 20 A dissipates P = 20² × 0.01 = 4 W, which must be managed
+                        with a heatsink.</span></div>
+            </div>
+
+            <!-- W -->
+            <div class="term-card" data-id="W" data-related="P,V,Q,I">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-battery-three-quarters"
+                            style="color:var(--cyan);font-size:13px;margin-right:6px;"></i>Energy</div>
+                    <div class="term-symbol-badge">W</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit">Joules (J) / Wh</span>
+                    <span class="meta-chip chip-formula">W = P × t</span>
+                    <span class="meta-chip chip-formula">W = V × Q</span>
+                    <span class="meta-chip chip-formula">W = ½CV²</span>
+                </div>
+                <p class="term-def">The total work done or the amount of power consumed over a period of time. Energy is
+                    the capacity to do work. In electrical billing, kilowatt-hours (kWh) are used: 1 kWh = 3.6 MJ. A 100
+                    W bulb on for 10 hours uses 1 kWh of energy.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Electricity billing meters (smart meters) —
+                        they integrate power over time (W = P × t) to measure kWh consumed by a household for billing
+                        purposes.</span></div>
+            </div>
+
+        </div><!-- /grid-dc -->
+    </div>
+
+    <!-- ══════════════ CATEGORY 2: AC & REACTIVE ══════════════ -->
+    <div class="section" id="cat-ac">
+        <div class="section-header">
+            <div class="section-icon icon-ac"><i class="fa-solid fa-wave-square"></i></div>
+            <div>
+                <div class="section-title">Category 2 — AC &amp; Reactive Quantities: The "Opposition" Family</div>
+                <div class="section-subtitle">Frequency, phase, reactance, and impedance — how AC circuits fight back.
+                </div>
+            </div>
+        </div>
+        <div class="card-grid" id="grid-ac">
+
+            <!-- f & T -->
+            <div class="term-card cat-ac" data-id="f" data-related="XL,XC,B,Y,L,C">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-wave-square"
+                            style="color:var(--amber);font-size:13px;margin-right:6px;"></i>Frequency &amp; Period</div>
+                    <div class="term-symbol-badge" style="color:var(--amber);">f / T</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);background:rgba(255,179,0,0.08);">Hz
+                        / Seconds (s)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--amber);border-color:rgba(255,179,0,0.3);">f
+                        = 1 / T</span>
+                    <span class="meta-chip chip-formula" style="color:var(--amber);border-color:rgba(255,179,0,0.3);">ω
+                        = 2πf</span>
+                </div>
+                <p class="term-def"><strong>Frequency (f)</strong> is the number of complete AC cycles per second.
+                    <strong>Period (T)</strong> is the time for one full cycle — they are exact reciprocals. Angular
+                    frequency ω (rad/s) = 2πf is used in reactance formulas. Mains frequency is 50 Hz (UK/India) or 60
+                    Hz (USA).</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--amber);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Power grid synchronisation — all generators
+                        on a grid must run at exactly 50.00 Hz. A 0.5 Hz deviation triggers automatic load shedding to
+                        prevent grid collapse.</span></div>
+            </div>
+
+            <!-- θ -->
+            <div class="term-card cat-ac" data-id="theta" data-related="Z,XL,XC,R,S,Q_ac,P_ac,PF">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-compass"
+                            style="color:var(--amber);font-size:13px;margin-right:6px;"></i>Phase Angle</div>
+                    <div class="term-symbol-badge" style="color:var(--amber);">θ (phi)</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);background:rgba(255,179,0,0.08);">Degrees
+                        (°) / Radians</span>
+                    <span class="meta-chip chip-formula" style="color:var(--amber);border-color:rgba(255,179,0,0.3);">θ
+                        = arctan(X/R)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--amber);border-color:rgba(255,179,0,0.3);">PF
+                        = cos θ</span>
+                </div>
+                <p class="term-def">The time difference between the voltage and current waveforms in an AC circuit,
+                    expressed as an angle. A purely resistive circuit has θ = 0° (V and I perfectly in phase). An ideal
+                    inductor has θ = +90° (current lags voltage). An ideal capacitor has θ = −90° (current leads
+                    voltage).</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--amber);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Industrial motor drives — a lagging phase
+                        angle (inductive motor load) means poor power factor; capacitor banks are switched in to reduce
+                        θ and improve PF, lowering electricity bills.</span></div>
+            </div>
+
+            <!-- L -->
+            <div class="term-card cat-ac" data-id="L" data-related="XL,BL,f,V,I">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-coil"
+                            style="color:var(--amber);font-size:13px;margin-right:6px;"></i>Inductance</div>
+                    <div class="term-symbol-badge" style="color:var(--amber);">L</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);background:rgba(255,179,0,0.08);">Henries
+                        (H)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--amber);border-color:rgba(255,179,0,0.3);">V
+                        = L × (dI/dt)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--amber);border-color:rgba(255,179,0,0.3);">W
+                        = ½LI²</span>
+                </div>
+                <p class="term-def">A coil's ability to oppose changes in current by storing energy in a magnetic field.
+                    When current changes, the magnetic field induces a back-EMF that fights that change (Lenz's Law). A
+                    1 H inductor generates 1 V when current changes at 1 A/s. Real inductors also have series resistance
+                    (DCR).</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--amber);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Switching power supply (SMPS) output filter
+                        — a 22 µH inductor smooths the pulsed output of a buck converter into a steady DC voltage for a
+                        USB charger.</span></div>
+            </div>
+
+            <!-- C -->
+            <div class="term-card cat-ac" data-id="C" data-related="XC,BC,f,V,Q,W">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-circle-half-stroke"
+                            style="color:var(--amber);font-size:13px;margin-right:6px;"></i>Capacitance</div>
+                    <div class="term-symbol-badge" style="color:var(--amber);">C</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);background:rgba(255,179,0,0.08);">Farads
+                        (F)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--amber);border-color:rgba(255,179,0,0.3);">C
+                        = Q / V</span>
+                    <span class="meta-chip chip-formula" style="color:var(--amber);border-color:rgba(255,179,0,0.3);">W
+                        = ½CV²</span>
+                </div>
+                <p class="term-def">A capacitor's ability to store electric charge by creating an electric field between
+                    two conductors. A 1 F capacitor stores 1 Coulomb of charge when 1 Volt is applied. Capacitors block
+                    DC but pass AC — the higher the frequency, the more current they allow through (lower reactance).
+                </p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--amber);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> DRAM memory cells — each bit is stored as
+                        charge on a tiny ~30 fF capacitor. Billions of these on a single chip form your computer's
+                        RAM.</span></div>
+            </div>
+
+            <!-- XL -->
+            <div class="term-card cat-ac" data-id="XL" data-related="L,f,Z,BL,R,theta">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-arrow-up"
+                            style="color:var(--amber);font-size:13px;margin-right:6px;"></i>Inductive Reactance</div>
+                    <div class="term-symbol-badge" style="color:var(--amber);">X<sub>L</sub></div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);background:rgba(255,179,0,0.08);">Ohms
+                        (Ω)</span>
+                    <span class="meta-chip chip-formula"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);">X<sub>L</sub> = 2πfL = ωL</span>
+                </div>
+                <p class="term-def">The frequency-dependent opposition to AC current offered by an inductor. Unlike
+                    resistance, it stores and returns energy rather than dissipating it as heat. Crucially,
+                    X<sub>L</sub> <strong>increases</strong> with frequency: at high frequencies, an inductor becomes
+                    nearly an open circuit. At DC (f = 0), X<sub>L</sub> = 0 — a wire.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--amber);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> EMI filter chokes on mains cables — a high
+                        X<sub>L</sub> at RF frequencies (MHz range) blocks high-frequency noise from entering
+                        appliances, while passing 50 Hz mains current freely.</span></div>
+            </div>
+
+            <!-- XC -->
+            <div class="term-card cat-ac" data-id="XC" data-related="C,f,Z,BC,R,theta">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-arrow-down"
+                            style="color:var(--amber);font-size:13px;margin-right:6px;"></i>Capacitive Reactance</div>
+                    <div class="term-symbol-badge" style="color:var(--amber);">X<sub>C</sub></div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);background:rgba(255,179,0,0.08);">Ohms
+                        (Ω)</span>
+                    <span class="meta-chip chip-formula"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);">X<sub>C</sub> = 1 / (2πfC)</span>
+                </div>
+                <p class="term-def">The frequency-dependent opposition to AC current offered by a capacitor. It
+                    <strong>decreases</strong> with increasing frequency: at high frequencies, a capacitor is nearly a
+                    short circuit. At DC (f = 0), X<sub>C</sub> → ∞ — an open circuit. This is the opposite behaviour to
+                    X<sub>L</sub>, making LC circuits resonate.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--amber);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Audio crossover networks — a series
+                        capacitor (high X<sub>C</sub> at low f) blocks bass from tweeters, while a series inductor (high
+                        X<sub>L</sub> at high f) blocks treble from woofers.</span></div>
+            </div>
+
+            <!-- Z -->
+            <div class="term-card cat-ac" data-id="Z" data-related="R,XL,XC,V,I,Y,theta">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-shapes"
+                            style="color:var(--amber);font-size:13px;margin-right:6px;"></i>Impedance</div>
+                    <div class="term-symbol-badge" style="color:var(--amber);">Z</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);background:rgba(255,179,0,0.08);">Ohms
+                        (Ω)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--amber);border-color:rgba(255,179,0,0.3);">Z
+                        = R + j(X<sub>L</sub>−X<sub>C</sub>)</span>
+                    <span class="meta-chip chip-formula"
+                        style="color:var(--amber);border-color:rgba(255,179,0,0.3);">|Z| = √(R²+X²)</span>
+                </div>
+                <p class="term-def">The total opposition to AC current — the AC generalisation of resistance. Impedance
+                    is a complex number combining the real part (Resistance R, which dissipates energy) and the
+                    imaginary part (Net Reactance X = X<sub>L</sub> − X<sub>C</sub>, which stores energy). Think of it
+                    as the hypotenuse of the impedance triangle.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--amber);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Antenna design — a 50 Ω coaxial cable must
+                        be impedance-matched to an antenna. Mismatched impedance causes signal reflections, measured by
+                        the Standing Wave Ratio (SWR).</span></div>
+            </div>
+
+        </div><!-- /grid-ac -->
+    </div>
+
+    <!-- ══════════════ CATEGORY 3: RECIPROCAL QUANTITIES ══════════════ -->
+    <div class="section" id="cat-rec">
+        <div class="section-header">
+            <div class="section-icon icon-rec"><i class="fa-solid fa-right-left"></i></div>
+            <div>
+                <div class="section-title">Category 3 — The "Reciprocal" AC Quantities</div>
+                <div class="section-subtitle">Admittance, Conductance (AC), and Susceptance — the flip-side of the
+                    opposition family.</div>
+            </div>
+        </div>
+        <div class="card-grid" id="grid-rec">
+
+            <!-- Y — Admittance -->
+            <div class="term-card cat-rec" data-id="Y" data-related="Z,G,B,BC,BL,I,V">
+                <div class="reciprocal-badge"><i class="fa-solid fa-right-left"></i> Reciprocal of Impedance</div>
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-unlock"
+                            style="color:var(--purple);font-size:13px;margin-right:6px;"></i>Admittance</div>
+                    <div class="term-symbol-badge" style="color:var(--purple);">Y</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--purple);border-color:rgba(168,85,247,0.3);background:rgba(168,85,247,0.08);">Siemens
+                        (S)</span>
+                    <span class="meta-chip chip-formula-purple">Y = 1 / Z</span>
+                    <span class="meta-chip chip-formula-purple">Y = G + jB</span>
+                    <span class="meta-chip chip-formula-purple">|Y| = 1 / |Z|</span>
+                </div>
+                <p class="term-def">The total ease with which AC current flows through a circuit — the exact reciprocal
+                    of Impedance (Z). Just as impedance Z = R + jX (opposition), admittance Y = G + jB (ease of flow).
+                    <strong>G</strong> is the conductance (ease despite resistance) and <strong>B</strong> is the
+                    susceptance (ease despite reactance). Admittance makes parallel circuit analysis much simpler —
+                    parallel admittances add directly, just like parallel conductances.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--purple);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> RF circuit design and power systems —
+                        admittance (Y-parameters) simplify analysis of parallel-connected loads on a bus, making power
+                        flow calculations tractable in large grids.</span></div>
+            </div>
+
+            <!-- G (AC Conductance) -->
+            <div class="term-card cat-rec" data-id="G_ac" data-related="R,Y,B,Z,I,V">
+                <div class="reciprocal-badge"><i class="fa-solid fa-right-left"></i> Reciprocal of Resistance</div>
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-plug-circle-plus"
+                            style="color:var(--purple);font-size:13px;margin-right:6px;"></i>Conductance (AC context)
+                    </div>
+                    <div class="term-symbol-badge" style="color:var(--purple);">G</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--purple);border-color:rgba(168,85,247,0.3);background:rgba(168,85,247,0.08);">Siemens
+                        (S)</span>
+                    <span class="meta-chip chip-formula-purple">G = 1 / R</span>
+                    <span class="meta-chip chip-formula-purple">G = Re(Y)</span>
+                </div>
+                <p class="term-def">In the admittance framework (Y = G + jB), <strong>G is the real part of
+                        admittance</strong> — it represents pure, DC-like ease of current flow due to resistance alone.
+                    It dissipates real energy as heat. Crucially, <em>G is NOT the reciprocal of |Z|</em> in a complex
+                    circuit; it specifically reciprocates only the resistive (real) component R. A 4 Ω resistor has G =
+                    0.25 S.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--purple);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Transmission line modelling — the shunt
+                        conductance G (S/m) models leakage current through imperfect insulation along coaxial cables and
+                        power lines.</span></div>
+            </div>
+
+            <!-- B — Susceptance -->
+            <div class="term-card cat-rec" data-id="B" data-related="XL,XC,Y,BC,BL,f,C,L">
+                <div class="reciprocal-badge"><i class="fa-solid fa-right-left"></i> Reciprocal of Reactance</div>
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-shuffle"
+                            style="color:var(--purple);font-size:13px;margin-right:6px;"></i>Susceptance</div>
+                    <div class="term-symbol-badge" style="color:var(--purple);">B</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--purple);border-color:rgba(168,85,247,0.3);background:rgba(168,85,247,0.08);">Siemens
+                        (S)</span>
+                    <span class="meta-chip chip-formula-purple">B = 1 / X</span>
+                    <span class="meta-chip chip-formula-purple">B = Im(Y)</span>
+                </div>
+                <p class="term-def">The imaginary part of admittance — the ease with which AC current flows through the
+                    <em>reactive</em> part of a circuit. It is the reciprocal of reactance (B = 1/X). Susceptance does
+                    NOT dissipate energy; it only stores and returns it. The sign convention is the <strong>opposite of
+                        reactance</strong>: capacitive susceptance is positive, inductive susceptance is negative.</p>
+
+                <div class="sub-term">
+                    <div class="sub-term-title">B<sub>C</sub> — Capacitive Susceptance (Positive)</div>
+                    <div class="sub-term-body">
+                        <strong>B<sub>C</sub> = 2πfC = ωC</strong><br />
+                        B<sub>C</sub> is <strong>positive</strong> and increases with frequency and capacitance. A
+                        larger capacitor or higher frequency means more current can flow through the reactive path.
+                        B<sub>C</sub> = 1/X<sub>C</sub>, and since X<sub>C</sub> decreases with f, B<sub>C</sub>
+                        increases — the capacitor becomes more "transparent" to current.
+                    </div>
+                </div>
+                <div class="sub-term">
+                    <div class="sub-term-title">B<sub>L</sub> — Inductive Susceptance (Negative)</div>
+                    <div class="sub-term-body">
+                        <strong>B<sub>L</sub> = −1 / (2πfL) = −1/(ωL)</strong><br />
+                        B<sub>L</sub> is <strong>negative</strong> and its magnitude decreases as frequency or
+                        inductance increases. A large inductor at high frequency has a tiny B<sub>L</sub> — it strongly
+                        opposes current flow. The negative sign correctly places it in the 4th quadrant of the
+                        admittance phasor diagram, opposing B<sub>C</sub>.
+                    </div>
+                </div>
+                <div class="where-used" style="margin-top:12px;"><i class="fa-solid fa-location-dot"
+                        style="color:var(--purple);"></i><span class="where-used-text"><strong>Where used:</strong>
+                        Static VAR Compensators (SVC) on power grids — thyristor-controlled reactors tune B<sub>L</sub>
+                        and B<sub>C</sub> in real-time to maintain grid voltage stability, compensating for reactive
+                        power swings.</span></div>
+            </div>
+
+        </div><!-- /grid-rec -->
+    </div>
+
+    <!-- ══════════════ CATEGORY 4: AC POWER ══════════════ -->
+    <div class="section" id="cat-pwr">
+        <div class="section-header">
+            <div class="section-icon icon-pwr"><i class="fa-solid fa-lightbulb"></i></div>
+            <div>
+                <div class="section-title">Category 4 — AC Power &amp; Efficiency</div>
+                <div class="section-subtitle">Real, reactive, and apparent power — the power triangle explained.</div>
+            </div>
+        </div>
+        <div class="card-grid" id="grid-pwr">
+
+            <!-- Real Power P -->
+            <div class="term-card cat-pwr" data-id="P_ac" data-related="S,Q_ac,PF,theta,V,I">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-fire"
+                            style="color:var(--green);font-size:13px;margin-right:6px;"></i>Real Power (Active Power)
+                    </div>
+                    <div class="term-symbol-badge" style="color:var(--green);">P</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--green);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);">Watts
+                        (W)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">P
+                        = V×I×cos θ</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">P
+                        = S×PF</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">P
+                        = I²R</span>
+                </div>
+                <p class="term-def">The actual power that performs useful work — converted irreversibly into heat,
+                    light, or mechanical energy. The <strong>cos θ</strong> factor (power factor) reduces it from the
+                    apparent power. Only the resistive component of a circuit consumes real power. Real power is what
+                    your electricity meter bills you for.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--green);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Data centre power planning — IT equipment
+                        is rated in Watts (real power), but UPS systems must supply VA. A server drawing 500 W at PF 0.9
+                        requires 556 VA from its UPS.</span></div>
+            </div>
+
+            <!-- Reactive Power Q -->
+            <div class="term-card cat-pwr" data-id="Q_ac" data-related="S,P_ac,PF,theta,XL,XC,L,C">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-arrows-rotate"
+                            style="color:var(--green);font-size:13px;margin-right:6px;"></i>Reactive Power</div>
+                    <div class="term-symbol-badge" style="color:var(--green);">Q</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--green);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);">VAr
+                        (Volt-Ampere reactive)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">Q
+                        = V×I×sin θ</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">Q
+                        = √(S²−P²)</span>
+                </div>
+                <p class="term-def">The power that oscillates back and forth between source and reactive components
+                    (inductors, capacitors) without doing useful work. It's "borrowed" from the source and returned each
+                    half-cycle. Inductive loads (motors) generate positive Q (lagging); capacitive loads generate
+                    negative Q (leading). Q represents the tax on the supply system — it heats wires without doing work.
+                </p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--green);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Industrial power factor correction — a
+                        factory with inductive motors generating +50 kVAr adds capacitor banks generating −50 kVAr to
+                        cancel reactive power, reducing electricity charges.</span></div>
+            </div>
+
+            <!-- Apparent Power S -->
+            <div class="term-card cat-pwr" data-id="S" data-related="P_ac,Q_ac,PF,theta,V,I">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-expand"
+                            style="color:var(--green);font-size:13px;margin-right:6px;"></i>Apparent Power</div>
+                    <div class="term-symbol-badge" style="color:var(--green);">S</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--green);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);">VA
+                        (Volt-Amperes)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">S
+                        = V × I</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">S
+                        = √(P²+Q²)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">S
+                        = P + jQ</span>
+                </div>
+                <p class="term-def">The vector sum of real power (P) and reactive power (Q) — what the supply source
+                    "feels" it is delivering. It is the hypotenuse of the power triangle: S² = P² + Q². Apparent power
+                    determines the size of generators, transformers, and cables, even though only P does useful work.
+                    Rated in VA, not Watts, to emphasise this distinction.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--green);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Transformer nameplate ratings — a 100 kVA
+                        distribution transformer can supply 100 kVA of apparent power, but how much of that is useful
+                        (kW) depends on the load's power factor.</span></div>
+            </div>
+
+            <!-- Power Factor -->
+            <div class="term-card cat-pwr" data-id="PF" data-related="P_ac,S,Q_ac,theta">
+                <div class="card-top">
+                    <div class="term-name"><i class="fa-solid fa-percent"
+                            style="color:var(--green);font-size:13px;margin-right:6px;"></i>Power Factor</div>
+                    <div class="term-symbol-badge" style="color:var(--green);">PF</div>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-chip chip-unit"
+                        style="color:var(--green);border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.08);">Dimensionless
+                        (0 to 1)</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">PF
+                        = P / S</span>
+                    <span class="meta-chip chip-formula" style="color:var(--green);border-color:rgba(34,197,94,0.3);">PF
+                        = cos θ</span>
+                </div>
+                <p class="term-def">The ratio of real power (P) to apparent power (S) — a measure of how efficiently a
+                    circuit converts supplied power into useful work. PF = 1.0 (unity) is ideal: all supplied power does
+                    useful work, zero reactive current. PF = 0 (purely reactive load) means no real work is done. Poor
+                    PF forces larger conductors and equipment to carry the extra reactive current.</p>
+                <div class="where-used"><i class="fa-solid fa-location-dot" style="color:var(--green);"></i><span
+                        class="where-used-text"><strong>Where used:</strong> Electricity tariffs for large commercial
+                        users — industries with PF below 0.95 are penalised by utilities, incentivising capacitor bank
+                        installation to correct the lagging PF of motor loads.</span></div>
+            </div>
+
+        </div><!-- /grid-pwr -->
+    </div>
+
+    <!-- ══════════════ CALCULATORS ══════════════ -->
+    <div class="calc-section" id="calculators">
+        <div class="calc-inner">
+            <div class="calc-header">
+                <h2><i class="fa-solid fa-calculator" style="color:var(--cyan);margin-right:10px;"></i>Interactive
+                    Calculators</h2>
+                <p>Live, auto-computing tools — change any value and watch all others update instantly.</p>
+            </div>
+            <div class="calc-grid">
+
+                <!-- Ohm's Law Calculator -->
+                <div class="calc-card" id="ohm-calc">
+                    <div class="calc-card-title"><i class="fa-solid fa-bolt"></i> Ohm's Law &amp; Power Calculator</div>
+                    <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:18px;">Lock the two known values,
+                        then edit the third to solve. Power (P) is always computed from V &amp; I.</p>
+
+                    <div class="ohm-inputs">
+                        <div class="ohm-row">
+                            <label class="lv">V</label>
+                            <input type="number" id="ohm-v" placeholder="Voltage" step="any" />
+                            <span class="unit-tag">V</span>
+                            <button class="ohm-lock-btn" data-target="ohm-v" title="Lock/unlock this field"><i
+                                    class="fa-solid fa-lock-open"></i></button>
+                        </div>
+                        <div class="ohm-row">
+                            <label class="li">I</label>
+                            <input type="number" id="ohm-i" placeholder="Current" step="any" />
+                            <span class="unit-tag">A</span>
+                            <button class="ohm-lock-btn" data-target="ohm-i" title="Lock/unlock this field"><i
+                                    class="fa-solid fa-lock-open"></i></button>
+                        </div>
+                        <div class="ohm-row">
+                            <label class="lr">R</label>
+                            <input type="number" id="ohm-r" placeholder="Resistance" step="any" min="0" />
+                            <span class="unit-tag">Ω</span>
+                            <button class="ohm-lock-btn" data-target="ohm-r" title="Lock/unlock this field"><i
+                                    class="fa-solid fa-lock-open"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="ohm-result">
+                        <div class="result-item">
+                            <div class="result-label">Voltage (V)</div>
+                            <div class="result-val rv-v" id="res-v">—</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Current (I)</div>
+                            <div class="result-val rv-i" id="res-i">—</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Resistance (R)</div>
+                            <div class="result-val rv-r" id="res-r">—</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">Power (P = V×I)</div>
+                            <div class="result-val rv-p" id="res-p">—</div>
+                        </div>
+                        <div class="result-err" id="ohm-err" style="display:none;"></div>
+                    </div>
+                </div>
+
+                <!-- Reactance & Susceptance Calculator -->
+                <div class="calc-card" id="rx-calc">
+                    <div class="calc-card-title"><i class="fa-solid fa-wave-square"></i> Reactance &amp; Susceptance
+                        Calculator</div>
+                    <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:18px;">Drag the sliders to see
+                        X<sub>L</sub>, X<sub>C</sub>, B<sub>L</sub>, B<sub>C</sub> update live — watch how they oppose
+                        each other.</p>
+
+                    <div class="rx-inputs">
+                        <div class="rx-row">
+                            <div class="rx-row-top">
+                                <span class="rx-label">Frequency (f)</span>
+                                <span class="rx-val-label vc" id="rx-f-val">100 Hz</span>
+                            </div>
+                            <input type="range" id="rx-f" min="1" max="10000" value="100" step="1" />
+                        </div>
+                        <div class="rx-row">
+                            <div class="rx-row-top">
+                                <span class="rx-label">Inductance (L)</span>
+                                <span class="rx-val-label va" id="rx-l-val">100 mH</span>
+                            </div>
+                            <input type="range" id="rx-l" min="1" max="1000" value="100" step="1" />
+                        </div>
+                        <div class="rx-row">
+                            <div class="rx-row-top">
+                                <span class="rx-label">Capacitance (C)</span>
+                                <span class="rx-val-label vp" id="rx-c-val">100 µF</span>
+                            </div>
+                            <input type="range" id="rx-c" min="1" max="1000" value="100" step="1" />
+                        </div>
+                    </div>
+
+                    <div class="rx-results">
+                        <div class="rx-res-card rx-res-xl">
+                            <div class="rl">X<sub>L</sub> = 2πfL</div>
+                            <div class="rv" id="rx-xl">—</div>
+                            <div class="rdesc">Inductive Reactance<br /><span style="color:#6b7280;font-size:10px;">↑
+                                    with f &amp; L</span></div>
+                        </div>
+                        <div class="rx-res-card rx-res-xc">
+                            <div class="rl">X<sub>C</sub> = 1/(2πfC)</div>
+                            <div class="rv" id="rx-xc">—</div>
+                            <div class="rdesc">Capacitive Reactance<br /><span style="color:#6b7280;font-size:10px;">↓
+                                    with f &amp; C</span></div>
+                        </div>
+                        <div class="rx-res-card rx-res-bl">
+                            <div class="rl">B<sub>L</sub> = −1/(2πfL)</div>
+                            <div class="rv" id="rx-bl">—</div>
+                            <div class="rdesc">Inductive Susceptance<br /><span
+                                    style="color:#6b7280;font-size:10px;">Negative — opposes X<sub>L</sub></span></div>
+                        </div>
+                        <div class="rx-res-card rx-res-bc">
+                            <div class="rl">B<sub>C</sub> = 2πfC</div>
+                            <div class="rv" id="rx-bc">—</div>
+                            <div class="rdesc">Capacitive Susceptance<br /><span
+                                    style="color:#6b7280;font-size:10px;">Positive — opposes X<sub>C</sub></span></div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:14px;background:rgba(0,0,0,0.3);border-radius:8px;padding:10px 14px;">
+                        <div
+                            style="font-size:11px;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em;">
+                            Resonance Insight</div>
+                        <div id="resonance-info"
+                            style="font-family:var(--mono);font-size:12px;color:var(--text-dim);line-height:1.6;"></div>
+                    </div>
+                </div>
+
+            </div><!-- /calc-grid -->
+        </div>
+    </div>
+
+    <!-- ══════════════ FOOTER ══════════════ -->
+    <footer>
+        Built for electrical engineering students — <span>EE Master Sheet</span> &nbsp;|&nbsp; All formulas per IEEE /
+        IEC conventions &nbsp;|&nbsp; Click any card to see related terms highlighted
+    </footer>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════════
+        //  DYNAMIC FORMULA HIGHLIGHTER
+        // ═══════════════════════════════════════════════════════════════════
+        const cards = document.querySelectorAll('.term-card');
+        let activeCard = null;
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                if (activeCard === card) {
+                    // deselect
+                    cards.forEach(c => { c.classList.remove('highlighted', 'dimmed'); });
+                    activeCard = null;
+                    return;
+                }
+                activeCard = card;
+                const id = card.dataset.id;
+                const relatedRaw = (card.dataset.related || '').split(',').map(s => s.trim()).filter(Boolean);
+
+                cards.forEach(c => {
+                    const cid = c.dataset.id;
+                    if (c === card) {
+                        c.classList.add('highlighted');
+                        c.classList.remove('dimmed');
+                    } else if (relatedRaw.includes(cid)) {
+                        c.classList.add('highlighted');
+                        c.classList.remove('dimmed');
+                    } else {
+                        c.classList.remove('highlighted');
+                        c.classList.add('dimmed');
+                    }
+                });
+            });
+        });
+
+        // ═══════════════════════════════════════════════════════════════════
+        //  OHM'S LAW CALCULATOR
+        // ═══════════════════════════════════════════════════════════════════
+        const ohm = {
+            v: document.getElementById('ohm-v'),
+            i: document.getElementById('ohm-i'),
+            r: document.getElementById('ohm-r'),
+            locked: { 'ohm-v': false, 'ohm-i': false, 'ohm-r': false }
+        };
+
+        const fmtNum = (n, unit = '') => {
+            if (!isFinite(n)) return 'Error';
+            const abs = Math.abs(n);
+            if (abs === 0) return '0' + (unit ? ' ' + unit : '');
+            if (abs >= 1e9) return (n / 1e9).toPrecision(4) + ' G' + unit;
+            if (abs >= 1e6) return (n / 1e6).toPrecision(4) + ' M' + unit;
+            if (abs >= 1e3) return (n / 1e3).toPrecision(4) + ' k' + unit;
+            if (abs >= 1) return n.toPrecision(5) + (unit ? ' ' + unit : '');
+            if (abs >= 1e-3) return (n * 1e3).toPrecision(4) + ' m' + unit;
+            if (abs >= 1e-6) return (n * 1e6).toPrecision(4) + ' µ' + unit;
+            return (n * 1e9).toPrecision(4) + ' n' + unit;
+        };
+
+        function computeOhm(changed) {
+            const vEl = ohm.v, iEl = ohm.i, rEl = ohm.r;
+            const resV = document.getElementById('res-v');
+            const resI = document.getElementById('res-i');
+            const resR = document.getElementById('res-r');
+            const resP = document.getElementById('res-p');
+            const err = document.getElementById('ohm-err');
+            err.style.display = 'none';
+
+            const v = parseFloat(vEl.value);
+            const i = parseFloat(iEl.value);
+            const r = parseFloat(rEl.value);
+
+            const hv = !isNaN(v), hi = !isNaN(i), hr = !isNaN(r);
+            const knowCount = [hv, hi, hr].filter(Boolean).length;
+
+            let cv = v, ci = i, cr = r;
+
+            if (knowCount >= 2) {
+                if (hv && hi) { cr = v / i; }
+                else if (hv && hr) { ci = v / r; }
+                else if (hi && hr) { cv = i * r; }
+
+                if (!isFinite(cr) || cr < 0) { err.textContent = 'Error: R cannot be zero or negative.'; err.style.display = 'block'; resV.textContent = resI.textContent = resR.textContent = resP.textContent = '—'; return; }
+
+                resV.textContent = fmtNum(cv, 'V');
+                resI.textContent = fmtNum(ci, 'A');
+                resR.textContent = fmtNum(cr, 'Ω');
+                resP.textContent = fmtNum(cv * ci, 'W');
+
+                if (!hv) vEl.value = parseFloat(cv.toPrecision(5));
+                if (!hi) iEl.value = parseFloat(ci.toPrecision(5));
+                if (!hr) rEl.value = parseFloat(cr.toPrecision(5));
+            } else {
+                resV.textContent = resI.textContent = resR.textContent = resP.textContent = '—';
+            }
+        }
+
+        [ohm.v, ohm.i, ohm.r].forEach(el => {
+            el.addEventListener('input', () => computeOhm(el.id));
+        });
+
+        // Lock buttons
+        document.querySelectorAll('.ohm-lock-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tid = btn.dataset.target;
+                ohm.locked[tid] = !ohm.locked[tid];
+                const inp = document.getElementById(tid);
+                inp.readOnly = ohm.locked[tid];
+                inp.style.opacity = ohm.locked[tid] ? '0.5' : '1';
+                btn.classList.toggle('locked', ohm.locked[tid]);
+                btn.innerHTML = ohm.locked[tid] ? '<i class="fa-solid fa-lock"></i>' : '<i class="fa-solid fa-lock-open"></i>';
+            });
+        });
+
+        // default compute
+        ohm.v.value = 12; ohm.i.value = 2; computeOhm('ohm-r');
+
+        // ═══════════════════════════════════════════════════════════════════
+        //  REACTANCE & SUSCEPTANCE CALCULATOR
+        // ═══════════════════════════════════════════════════════════════════
+        const rxF = document.getElementById('rx-f');
+        const rxL = document.getElementById('rx-l');
+        const rxC = document.getElementById('rx-c');
+        const rxFVal = document.getElementById('rx-f-val');
+        const rxLVal = document.getElementById('rx-l-val');
+        const rxCVal = document.getElementById('rx-c-val');
+
+        function fmtRx(val, unit = '') {
+            const abs = Math.abs(val);
+            const sign = val < 0 ? '−' : '';
+            if (abs >= 1e6) return sign + (abs / 1e6).toPrecision(3) + ' M' + unit;
+            if (abs >= 1e3) return sign + (abs / 1e3).toPrecision(3) + ' k' + unit;
+            if (abs >= 1) return sign + abs.toPrecision(4) + ' ' + unit;
+            if (abs >= 1e-3) return sign + (abs * 1e3).toPrecision(3) + ' m' + unit;
+            if (abs >= 1e-6) return sign + (abs * 1e6).toPrecision(3) + ' µ' + unit;
+            return sign + (abs * 1e9).toPrecision(3) + ' n' + unit;
+        }
+
+        function computeRx() {
+            const f = parseFloat(rxF.value);       // Hz
+            const L = parseFloat(rxL.value) * 1e-3;  // mH → H
+            const C = parseFloat(rxC.value) * 1e-6;  // µF → F
+
+            rxFVal.textContent = f >= 1000 ? (f / 1000).toFixed(1) + ' kHz' : f + ' Hz';
+            rxLVal.textContent = rxL.value + ' mH';
+            rxCVal.textContent = rxC.value + ' µF';
+
+            const XL = 2 * Math.PI * f * L;
+            const XC = 1 / (2 * Math.PI * f * C);
+            const BL = -1 / (2 * Math.PI * f * L);
+            const BC = 2 * Math.PI * f * C;
+
+            document.getElementById('rx-xl').textContent = fmtRx(XL, 'Ω');
+            document.getElementById('rx-xc').textContent = fmtRx(XC, 'Ω');
+            document.getElementById('rx-bl').textContent = fmtRx(BL, 'S');
+            document.getElementById('rx-bc').textContent = fmtRx(BC, 'S');
+
+            // Resonance frequency insight
+            const f0 = 1 / (2 * Math.PI * Math.sqrt(L * C));
+            const info = document.getElementById('resonance-info');
+            const ratio = f / f0;
+            let msg = '';
+            if (Math.abs(ratio - 1) < 0.05) {
+                msg = `⚡ Near resonance! f₀ ≈ ${fmtRx(f0, 'Hz')} — X<sub>L</sub> ≈ X<sub>C</sub>, circuit impedance is minimised (series) or maximised (parallel). B<sub>L</sub> + B<sub>C</sub> ≈ 0.`;
+            } else if (ratio < 1) {
+                msg = `Below resonance (f₀ = ${fmtRx(f0, 'Hz')}): X<sub>C</sub> > X<sub>L</sub> (capacitive dominant) — B<sub>C</sub> > |B<sub>L</sub>|. Circuit appears capacitive.`;
+            } else {
+                msg = `Above resonance (f₀ = ${fmtRx(f0, 'Hz')}): X<sub>L</sub> > X<sub>C</sub> (inductive dominant) — |B<sub>L</sub>| > B<sub>C</sub>. Circuit appears inductive.`;
+            }
+            info.innerHTML = msg;
+        }
+
+        [rxF, rxL, rxC].forEach(el => el.addEventListener('input', computeRx));
+        computeRx();
+
+        // ═══════════════════════════════════════════════════════════════════
+        //  STICKY NAV ACTIVE SECTION HIGHLIGHT
+        // ═══════════════════════════════════════════════════════════════════
+        const sections = ['cat-dc', 'cat-ac', 'cat-rec', 'cat-pwr', 'calculators'];
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    navLinks.forEach(a => {
+                        a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+                    });
+                }
+            });
+        }, { rootMargin: '-40% 0px -55% 0px' });
+
+        sections.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) observer.observe(el);
+        });
+
+        // ═══════════════════════════════════════════════════════════════════
+        //  GOD-LEVEL EFFECTS (MOUSE GLOW & SCROLL REVEAL)
+        // ═══════════════════════════════════════════════════════════════════
+        
+        // 1. Mouse Glow
+        document.querySelectorAll('.term-card, .calc-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // 2. Scroll Reveal
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.term-card, .calc-card, .section-header').forEach((el, index) => {
+            el.classList.add('reveal');
+            // Stagger delay based on grid position for cards
+            if (el.classList.contains('term-card')) {
+                el.style.transitionDelay = `${(index % 3) * 0.1}s`;
+            }
+            revealObserver.observe(el);
+        });
+    </script>
+</body>
+
+</html>
