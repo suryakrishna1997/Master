@@ -23,7 +23,7 @@
       --accent: #f59e0b;
       --accent2: #06b6d4;
       --accent-glow: rgba(245, 158, 11, 0.18);
-      --sidebar: 260px;
+      --sidebar: 265px;
       --topbar: 58px;
       --radius: 12px;
       --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -44,30 +44,27 @@
       --shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
     }
 
-    *,
-    *::before,
-    *::after {
+    *, *::before, *::after {
       box-sizing: border-box;
       margin: 0;
-      padding: 0
+      padding: 0;
     }
 
-    html,
-    body {
+    html, body {
       height: 100%;
       overflow: hidden;
       font-family: 'Inter', sans-serif;
       background: var(--bg0);
-      color: var(--text1)
+      color: var(--text1);
     }
 
     #app {
       display: flex;
       flex-direction: column;
-      height: 100vh
+      height: 100dvh; /* dynamic viewport height — better on mobile */
     }
 
-    /* TOPBAR */
+    /* ── TOPBAR ──────────────────────────────────────────────── */
     #topbar {
       height: var(--topbar);
       background: var(--bg1);
@@ -75,11 +72,18 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 20px;
+      padding: 0 16px;
       gap: 12px;
       flex-shrink: 0;
       z-index: 100;
-      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3)
+      box-shadow: 0 2px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
     }
 
     .logo {
@@ -88,46 +92,45 @@
       gap: 10px;
       font-family: 'Outfit', sans-serif;
       font-weight: 800;
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       letter-spacing: -0.5px;
       white-space: nowrap;
-      flex-shrink: 0
+      flex-shrink: 0;
     }
 
     .logo-icon {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border-radius: 9px;
       background: linear-gradient(135deg, var(--accent), #d97706);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
-      box-shadow: 0 0 16px var(--accent-glow)
+      font-size: 17px;
+      box-shadow: 0 0 16px var(--accent-glow);
+      flex-shrink: 0;
     }
 
-    .logo span {
-      color: var(--accent)
-    }
+    .logo span { color: var(--accent); }
 
     #menu-btn {
       display: none;
       background: none;
       border: none;
       cursor: pointer;
-      padding: 6px;
+      padding: 7px;
       border-radius: 8px;
-      color: var(--text1)
+      color: var(--text1);
+      flex-shrink: 0;
     }
 
-    #menu-btn:hover {
-      background: var(--accent-glow)
-    }
+    #menu-btn:hover { background: var(--accent-glow); }
 
     .topbar-right {
       display: flex;
       align-items: center;
-      gap: 10px
+      gap: 8px;
+      flex-shrink: 0;
     }
 
     #theme-toggle {
@@ -139,24 +142,27 @@
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text2);
-      transition: all .2s
+      transition: all .2s;
+      font-family: inherit;
+      white-space: nowrap;
     }
 
     #theme-toggle:hover {
       border-color: var(--accent);
-      color: var(--accent)
+      color: var(--accent);
     }
 
-    /* BODY */
+    /* ── BODY ────────────────────────────────────────────────── */
     #body {
       display: flex;
       flex: 1;
-      overflow: hidden
+      overflow: hidden;
+      min-height: 0;
     }
 
-    /* SIDEBAR */
+    /* ── SIDEBAR ─────────────────────────────────────────────── */
     #sidebar {
       width: var(--sidebar);
       background: var(--bg1);
@@ -166,16 +172,16 @@
       flex-shrink: 0;
       transition: transform .25s ease;
       z-index: 50;
-      overflow: hidden
+      overflow: hidden;
     }
 
     .sidebar-header {
-      padding: 16px 16px 10px;
-      font-size: 0.7rem;
+      padding: 14px 16px 8px;
+      font-size: 0.68rem;
       font-weight: 600;
       letter-spacing: 1.2px;
       text-transform: uppercase;
-      color: var(--text3)
+      color: var(--text3);
     }
 
     #module-list {
@@ -183,92 +189,95 @@
       overflow-y: auto;
       padding: 0 8px 12px;
       scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent
+      scrollbar-color: var(--border) transparent;
     }
 
     .module-item {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
+      padding: 9px 11px;
       border-radius: 10px;
       cursor: pointer;
       transition: all .18s;
-      margin-bottom: 3px;
-      border: 1px solid transparent
+      margin-bottom: 2px;
+      border: 1px solid transparent;
     }
 
     .module-item:hover {
       background: var(--accent-glow);
-      border-color: var(--border)
+      border-color: var(--border);
     }
 
     .module-item.active {
       background: var(--accent-glow);
-      border-color: var(--border-active)
+      border-color: var(--border-active);
     }
 
-    .module-item.active .module-name {
-      color: var(--accent)
-    }
+    .module-item.active .module-name { color: var(--accent); }
 
     .module-icon {
-      width: 34px;
-      height: 34px;
+      width: 33px;
+      height: 33px;
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 16px;
-      flex-shrink: 0
+      font-size: 15px;
+      flex-shrink: 0;
     }
 
     .module-info {
       flex: 1;
-      min-width: 0
+      min-width: 0;
     }
 
     .module-name {
-      font-size: 0.87rem;
+      font-size: 0.84rem;
       font-weight: 600;
       color: var(--text1);
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis
+      text-overflow: ellipsis;
     }
 
     .module-sub {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text3);
-      margin-top: 1px
+      margin-top: 1px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .module-badge {
-      font-size: 0.65rem;
+      font-size: 0.62rem;
       font-weight: 700;
       padding: 2px 7px;
       border-radius: 20px;
       background: var(--accent-glow);
       color: var(--accent);
       border: 1px solid var(--border-active);
-      white-space: nowrap
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .sidebar-footer {
-      padding: 12px 16px;
+      padding: 10px 16px;
       border-top: 1px solid var(--border);
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       color: var(--text3);
-      text-align: center
+      text-align: center;
     }
 
-    /* CONTENT */
+    /* ── CONTENT ─────────────────────────────────────────────── */
     #content {
       flex: 1;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background: var(--bg0)
+      background: var(--bg0);
+      min-width: 0;
     }
 
     #content-bar {
@@ -278,31 +287,30 @@
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
-      padding: 0 16px;
-      gap: 12px
+      padding: 0 12px;
+      gap: 8px;
     }
 
     #breadcrumb {
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: var(--text2);
       flex: 1;
       display: flex;
       align-items: center;
-      gap: 6px
+      gap: 5px;
+      min-width: 0;
+      overflow: hidden;
     }
 
-    .crumb-home {
-      color: var(--text3)
-    }
-
-    .crumb-sep {
-      color: var(--text3);
-      font-size: 0.7rem
-    }
+    .crumb-home { color: var(--text3); flex-shrink: 0; }
+    .crumb-sep { color: var(--text3); font-size: 0.68rem; flex-shrink: 0; }
 
     .crumb-cur {
       color: var(--text1);
-      font-weight: 600
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .ctrl-btn {
@@ -311,25 +319,29 @@
       border-radius: 7px;
       padding: 5px 10px;
       cursor: pointer;
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       color: var(--text2);
       display: flex;
       align-items: center;
       gap: 5px;
       transition: all .15s;
       white-space: nowrap;
-      font-family: inherit
+      font-family: inherit;
+      flex-shrink: 0;
     }
 
     .ctrl-btn:hover {
       border-color: var(--accent);
-      color: var(--accent)
+      color: var(--accent);
     }
+
+    /* hide label text on very small screens */
+    .ctrl-label { display: inline; }
 
     #iframe-container {
       flex: 1;
       position: relative;
-      overflow: hidden
+      overflow: hidden;
     }
 
     #iframe-container iframe {
@@ -338,174 +350,170 @@
       width: 100%;
       height: 100%;
       border: none;
-      display: none
+      display: none;
     }
 
-    #iframe-container iframe.visible {
-      display: block
-    }
+    #iframe-container iframe.visible { display: block; }
 
-    /* WELCOME */
+    /* ── WELCOME ─────────────────────────────────────────────── */
     #welcome {
       position: absolute;
       inset: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 20px;
-      padding: 32px;
-      background: var(--bg0)
+      justify-content: flex-start;
+      gap: 18px;
+      padding: 32px 20px;
+      background: var(--bg0);
+      overflow-y: auto;
     }
 
     .welcome-logo {
-      width: 72px;
-      height: 72px;
+      width: 68px;
+      height: 68px;
       border-radius: 18px;
       background: linear-gradient(135deg, var(--accent), #d97706);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 36px;
-      animation: pulse 3s ease-in-out infinite
+      font-size: 34px;
+      animation: pulse 3s ease-in-out infinite;
+      flex-shrink: 0;
     }
 
     @keyframes pulse {
-
-      0%,
-      100% {
-        box-shadow: 0 0 30px var(--accent-glow)
-      }
-
-      50% {
-        box-shadow: 0 0 60px var(--accent-glow), 0 0 20px rgba(245, 158, 11, 0.4)
-      }
+      0%, 100% { box-shadow: 0 0 30px var(--accent-glow); }
+      50%       { box-shadow: 0 0 60px var(--accent-glow), 0 0 20px rgba(245,158,11,0.4); }
     }
 
     .welcome-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 2rem;
+      font-size: 1.9rem;
       font-weight: 800;
-      text-align: center
+      text-align: center;
+      line-height: 1.2;
     }
 
-    .welcome-title span {
-      color: var(--accent)
-    }
+    .welcome-title span { color: var(--accent); }
 
     .welcome-sub {
       color: var(--text2);
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       text-align: center;
-      max-width: 420px;
-      line-height: 1.6
+      max-width: 400px;
+      line-height: 1.6;
     }
+
+    .welcome-count {
+      font-size: 0.75rem;
+      color: var(--text3);
+      background: var(--bg1);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 14px;
+    }
+
+    .welcome-count strong { color: var(--accent); }
 
     .welcome-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+      gap: 10px;
       width: 100%;
-      max-width: 640px;
-      margin-top: 8px
+      max-width: 680px;
     }
 
     .welcome-card {
       background: var(--bg1);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px 14px;
+      padding: 15px 12px;
       cursor: pointer;
       transition: all .2s;
-      text-align: center
+      text-align: center;
     }
 
     .welcome-card:hover {
       border-color: var(--border-active);
       transform: translateY(-2px);
-      box-shadow: var(--shadow)
+      box-shadow: var(--shadow);
     }
 
-    .wc-icon {
-      font-size: 28px;
-      margin-bottom: 8px
-    }
+    .wc-icon { font-size: 26px; margin-bottom: 8px; }
+    .wc-name { font-size: 0.82rem; font-weight: 600; color: var(--text1); line-height: 1.3; }
+    .wc-sub  { font-size: 0.69rem; color: var(--text3); margin-top: 3px; line-height: 1.4; }
 
-    .wc-name {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text1)
-    }
-
-    .wc-sub {
-      font-size: 0.72rem;
-      color: var(--text3);
-      margin-top: 3px
-    }
-
-    /* MOBILE */
+    /* ── MOBILE OVERLAY ──────────────────────────────────────── */
     #sidebar-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 40
+      background: rgba(0, 0, 0, 0.55);
+      z-index: 40;
+      backdrop-filter: blur(2px);
     }
 
-    @media(max-width:768px) {
-      :root {
-        --sidebar: 240px
-      }
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
 
-      #menu-btn {
-        display: flex
-      }
+    /* Tablet (≤900px): shrink sidebar */
+    @media (max-width: 900px) {
+      :root { --sidebar: 220px; }
+    }
+
+    /* Mobile (≤768px): slide-in sidebar */
+    @media (max-width: 768px) {
+      :root { --sidebar: 250px; }
+
+      #menu-btn { display: flex; }
 
       #sidebar {
         position: fixed;
         top: var(--topbar);
         left: 0;
-        height: calc(100vh - var(--topbar));
-        transform: translateX(-100%)
+        height: calc(100dvh - var(--topbar));
+        transform: translateX(-100%);
+        box-shadow: 4px 0 32px rgba(0,0,0,0.5);
       }
 
-      #sidebar.open {
-        transform: translateX(0)
+      #sidebar.open { transform: translateX(0); }
+      #sidebar-overlay.open { display: block; }
+
+      .welcome-title { font-size: 1.45rem; }
+      .welcome-sub   { font-size: 0.85rem; }
+
+      .welcome-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 8px;
       }
 
-      #sidebar-overlay.open {
-        display: block
+      .ctrl-label { display: none; }   /* hide Reload / Fullscreen text */
+    }
+
+    /* Small mobile (≤400px) */
+    @media (max-width: 400px) {
+      .welcome-grid {
+        grid-template-columns: repeat(2, 1fr);
       }
-
-      .welcome-title {
-        font-size: 1.5rem
-      }
+      .logo { font-size: 1.05rem; }
     }
 
-    ::-webkit-scrollbar {
-      width: 5px
-    }
-
-    ::-webkit-scrollbar-track {
-      background: transparent
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 4px
-    }
+    /* ── SCROLLBAR ───────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
   </style>
 </head>
 
 <body>
   <div id="app">
     <header id="topbar">
-      <div style="display:flex;align-items:center;gap:10px">
-        <button id="menu-btn" aria-label="Menu">
+      <div class="topbar-left">
+        <button id="menu-btn" aria-label="Toggle sidebar">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-            <line x1="3" y1="6" x2="21" y2="6" />
-            <line x1="3" y1="12" x2="21" y2="12" />
-            <line x1="3" y1="18" x2="21" y2="18" />
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
         </button>
         <div class="logo">
@@ -513,16 +521,21 @@
         </div>
       </div>
       <div class="topbar-right">
-        <button id="theme-toggle"><span id="theme-icon">☀️</span><span id="theme-label">Light</span></button>
+        <button id="theme-toggle">
+          <span id="theme-icon">☀️</span><span id="theme-label">Light</span>
+        </button>
       </div>
     </header>
+
     <div id="body">
       <div id="sidebar-overlay"></div>
+
       <nav id="sidebar">
         <div class="sidebar-header">Modules</div>
         <div id="module-list"></div>
-        <div class="sidebar-footer">AutoKB · v2.0</div>
+        <div class="sidebar-footer">AutoKB · v2.1</div>
       </nav>
+
       <main id="content">
         <div id="content-bar">
           <div id="breadcrumb">
@@ -532,25 +545,31 @@
           </div>
           <button class="ctrl-btn" id="reload-btn">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="23 4 23 10 17 10" />
-              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
-            </svg> Reload
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+            <span class="ctrl-label">Reload</span>
           </button>
           <button class="ctrl-btn" id="fullscreen-btn">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <polyline points="15 3 21 3 21 9" />
-              <polyline points="9 21 3 21 3 15" />
-              <line x1="21" y1="3" x2="14" y2="10" />
-              <line x1="3" y1="21" x2="10" y2="14" />
-            </svg> Fullscreen
+              <polyline points="15 3 21 3 21 9"/>
+              <polyline points="9 21 3 21 3 15"/>
+              <line x1="21" y1="3" x2="14" y2="10"/>
+              <line x1="3" y1="21" x2="10" y2="14"/>
+            </svg>
+            <span class="ctrl-label">Fullscreen</span>
           </button>
         </div>
+
         <div id="iframe-container">
           <div id="welcome">
             <div class="welcome-logo">🚗</div>
             <div class="welcome-title">Auto<span>KB</span> Master Portal</div>
-            <div class="welcome-sub">Your unified knowledge hub for automotive engineering. Pick a module from the
-              sidebar or click a card below.</div>
+            <div class="welcome-sub">
+              Your unified knowledge hub for automotive engineering.<br>
+              Pick a module from the sidebar or tap a card below.
+            </div>
+            <div class="welcome-count" id="welcome-count"></div>
             <div class="welcome-grid" id="welcome-grid"></div>
           </div>
         </div>
@@ -560,117 +579,127 @@
 
   <script>
     // ═══════════════════════════════════════════════════════════════
-    //  ▼▼▼  ADD NEW MODULES HERE  ▼▼▼
-    //  Just add a new object to this array.
-    //  'file' must match the filename in the same repo folder.
+    //  MODULE REGISTRY — sorted A→Z by name
+    //  To add a module: insert an object below; array auto-sorts.
+    //  'file' must match the exact filename in the same repo folder.
     // ═══════════════════════════════════════════════════════════════
     const MODULES = [
       {
-    id: 'autoproto',
-    name: 'AUTO-X Protocols',
-    sub: 'CAN · UDS · Diagnostics',
-    icon: '🚗',
-    badge: 'Protocol',
-    file: 'Automotive_Protocols.html'
-  },
-  {
-    id: 'btwifi',
-    name: 'CONN-X Connectivity',
-    sub: 'Bluetooth · Wi-Fi · CarPlay',
-    icon: '📡',
-    badge: 'Connectivity',
-    file: 'Bluetooth_wifi.html'
-  },
-  {
-    id: 'linux',
-    name: 'Linux & AOSP Fundamentals',
-    sub: 'WSL · Git · Repo · ADB',
-    icon: '🖥️',
-    badge: 'OS & Build',
-    file: 'Linux_Fundamentals.html'
-  },
-  {
-    id: 'Playwright',
-    name: 'Playwright Mastery',
-    sub: 'Automation · E2E Testing · Python',
-    icon: '🎭',
-    badge: 'Test Framework',
-    file: 'Playwright.html'
-  },
-  {
-    id: 'Full',
-    name: 'Automotive Full Course',
-    sub: 'Infotainment · HIL · ECU · V&V',
-    icon: '🏎️',
-    badge: 'Full Course',
-    file: 'Automotive_full.html'
-  },
-  {
-    id: 'Claude',
-    name: 'Claude AI Mastery',
-    sub: 'Prompting · Agents · Automotive AI',
-    icon: '🤖',
-    badge: 'AI & LLM',
-    file: 'Claude_Full.html'
-  },
-  {
-    id: 'UDS',
-    name: 'UDS Deep Dive',
-    sub: 'ISO 14229 · Services · DTC · ECU',
-    icon: '🔧',
-    badge: 'Diagnostics',
-    file: 'uds.html'
-  },
-  {
-    id: 'Electrical',
-    name: 'Electrical Engineering Essentials',
-    sub: 'DC · AC · Reactance · Power Theory',
-    icon: '⚡',
-    badge: 'Electrical',
-    file: 'electrical.html'
-  },
-{
-    id: 'JavaScript',
-    name: 'Electrical Engineering Essentials',
-    sub: 'DC · AC · Reactance · Power Theory',
-    icon: '⚡',
-    badge: 'JavaScript',
-    file: 'JavaScript.html'
-  },
+        id: 'autoproto',
+        name: 'AUTO-X Protocols',
+        sub: 'CAN · UDS · Diagnostics',
+        icon: '🚗',
+        badge: 'Protocol',
+        file: 'Automotive_Protocols.html'
+      },
       {
-    id: 'Javasriptsss',
-    name: 'Electrical Engineering Essentials',
-    sub: 'DC · AC · Reactance · Power Theory',
-    icon: '⚡',
-    badge: 'JavaScript',
-    file: 'Javascriptsss.html'
-  },
+        id: 'Full',
+        name: 'Automotive Full Course',
+        sub: 'Infotainment · HIL · ECU · V&V',
+        icon: '🏎️',
+        badge: 'Full Course',
+        file: 'Automotive_full.html'
+      },
       {
-    id: 'Javasriptsss999',
-    name: 'Electrical Engineering Essentials',
-    sub: 'DC · AC · Reactance · Power Theory',
-    icon: '⚡',
-    badge: 'JavahScript',
-    file: 'Java.html'
-  },
+        id: 'btwifi',
+        name: 'CONN-X Connectivity',
+        sub: 'Bluetooth · Wi-Fi · CarPlay',
+        icon: '📡',
+        badge: 'Connectivity',
+        file: 'Bluetooth_wifi.html'
+      },
+      {
+        id: 'Claude',
+        name: 'Claude AI Mastery',
+        sub: 'Prompting · Agents · Automotive AI',
+        icon: '🤖',
+        badge: 'AI & LLM',
+        file: 'Claude_Full.html'
+      },
+      {
+        id: 'Electrical',
+        name: 'Electrical Engineering Essentials',
+        sub: 'DC · AC · Reactance · Power Theory',
+        icon: '⚡',
+        badge: 'Electrical',
+        file: 'electrical.html'
+      },
+      {
+        id: 'JavaScript',
+        name: 'JavaScript Mastery',
+        sub: 'Core JS · ES6+ · DOM · Async',
+        icon: '🟨',
+        badge: 'JavaScript',
+        file: 'JavaScript.html'
+      },
+       {
+        id: 'JavaScript',
+        name: 'JavaScript Mastery',
+        sub: 'Core JS · ES6+ · DOM · Async',
+        icon: '🟨',
+        badge: 'JavaScript',
+        file: 'JavaScriptsss.html'
+      },
+      {
+        id: 'JavaScript',
+        name: 'JavaScript Mastery',
+        sub: 'Core JS · ES6+ · DOM · Async',
+        icon: '🟨',
+        badge: 'JavaScript',
+        file: 'Java.html'
+      },
+      {
+        id: 'linux',
+        name: 'Linux & AOSP Fundamentals',
+        sub: 'WSL · Git · Repo · ADB',
+        icon: '🖥️',
+        badge: 'OS & Build',
+        file: 'Linux_Fundamentals.html'
+      },
+      {
+        id: 'Playwright',
+        name: 'Playwright Mastery',
+        sub: 'Automation · E2E Testing · Python',
+        icon: '🎭',
+        badge: 'Test Framework',
+        file: 'Playwright.html'
+      },
+      {
+        id: 'UDS',
+        name: 'UDS Deep Dive',
+        sub: 'ISO 14229 · Services · DTC · ECU',
+        icon: '🔧',
+        badge: 'Diagnostics',
+        file: 'uds.html'
+      },
 
+      // ── Commented-out / future modules ────────────────────────
       // { id: 'capl', name: 'CAPL Scripting', sub: 'Macros & Scripts', icon: '🔧', badge: 'Scripting', file: 'capl.html' },
     ];
     // ═══════════════════════════════════════════════════════════════
 
+    // Sort alphabetically by module name (A→Z)
+    MODULES.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Icon background colours — deterministic per id
     const ICON_COLORS = [
-      'rgba(245,158,11,0.15)', 'rgba(6,182,212,0.15)',
-      'rgba(139,92,246,0.15)', 'rgba(16,185,129,0.15)', 'rgba(239,68,68,0.15)'
+      'rgba(245,158,11,0.15)',
+      'rgba(6,182,212,0.15)',
+      'rgba(139,92,246,0.15)',
+      'rgba(16,185,129,0.15)',
+      'rgba(239,68,68,0.15)'
     ];
+
     function iconBg(id) {
-      let h = 0; for (const c of id) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
+      let h = 0;
+      for (const c of id) h = (h * 31 + c.charCodeAt(0)) & 0xffff;
       return ICON_COLORS[h % ICON_COLORS.length];
     }
 
     let activeId = null;
-    try { activeId = localStorage.getItem('autokb_active') || null; } catch (e) { }
+    try { activeId = localStorage.getItem('autokb_active') || null; } catch(e) {}
 
-    // ── SIDEBAR ────────────────────────────────────────────────────
+    // ── SIDEBAR ──────────────────────────────────────────────────
     function renderSidebar() {
       const list = document.getElementById('module-list');
       list.innerHTML = '';
@@ -678,36 +707,44 @@
         const el = document.createElement('div');
         el.className = 'module-item' + (m.id === activeId ? ' active' : '');
         el.innerHTML = `
-      <div class="module-icon" style="background:${iconBg(m.id)}">${m.icon}</div>
-      <div class="module-info">
-        <div class="module-name">${m.name}</div>
-        <div class="module-sub">${m.sub || ''}</div>
-      </div>
-      ${m.badge ? `<span class="module-badge">${m.badge}</span>` : ''}
-    `;
+          <div class="module-icon" style="background:${iconBg(m.id)}">${m.icon}</div>
+          <div class="module-info">
+            <div class="module-name">${m.name}</div>
+            <div class="module-sub">${m.sub || ''}</div>
+          </div>
+          ${m.badge ? `<span class="module-badge">${m.badge}</span>` : ''}
+        `;
         el.addEventListener('click', () => { activate(m.id); closeSidebar(); });
         list.appendChild(el);
       });
     }
 
-    // ── WELCOME CARDS ──────────────────────────────────────────────
+    // ── WELCOME CARDS ────────────────────────────────────────────
     function renderWelcome() {
       const grid = document.getElementById('welcome-grid');
+      const count = document.getElementById('welcome-count');
       grid.innerHTML = '';
+      count.innerHTML = `<strong>${MODULES.length}</strong> modules available`;
+
       MODULES.forEach(m => {
         const card = document.createElement('div');
         card.className = 'welcome-card';
-        card.innerHTML = `<div class="wc-icon">${m.icon}</div><div class="wc-name">${m.name}</div><div class="wc-sub">${m.sub || ''}</div>`;
+        card.innerHTML = `
+          <div class="wc-icon">${m.icon}</div>
+          <div class="wc-name">${m.name}</div>
+          <div class="wc-sub">${m.sub || ''}</div>
+        `;
         card.addEventListener('click', () => activate(m.id));
         grid.appendChild(card);
       });
     }
 
-    // ── ACTIVATE ───────────────────────────────────────────────────
+    // ── ACTIVATE MODULE ──────────────────────────────────────────
     function activate(id) {
       const m = MODULES.find(x => x.id === id);
       if (!m) return;
       activeId = id;
+
       document.getElementById('welcome').style.display = 'none';
       document.querySelectorAll('#iframe-container iframe').forEach(f => f.classList.remove('visible'));
 
@@ -720,56 +757,72 @@
         document.getElementById('iframe-container').appendChild(frame);
       }
       frame.classList.add('visible');
+
       document.getElementById('crumb-cur').textContent = m.name;
       renderSidebar();
-      try { localStorage.setItem('autokb_active', id); } catch (e) { }
+      try { localStorage.setItem('autokb_active', id); } catch(e) {}
     }
 
-    // ── THEME ──────────────────────────────────────────────────────
+    // ── THEME ────────────────────────────────────────────────────
     let isDark = true;
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-      isDark = !isDark;
-      document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
-      document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
-      document.getElementById('theme-label').textContent = isDark ? 'Light' : 'Dark';
-      try { localStorage.setItem('autokb_theme', isDark ? 'dark' : 'light'); } catch (e) { }
-    });
-    try {
-      if (localStorage.getItem('autokb_theme') === 'light') {
-        isDark = false; document.documentElement.dataset.theme = 'light';
-        document.getElementById('theme-icon').textContent = '🌙';
-        document.getElementById('theme-label').textContent = 'Dark';
-      }
-    } catch (e) { }
 
-    // ── MOBILE ─────────────────────────────────────────────────────
-    document.getElementById('menu-btn').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.toggle('open');
-      document.getElementById('sidebar-overlay').classList.toggle('open');
+    function applyTheme(dark) {
+      isDark = dark;
+      document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      document.getElementById('theme-icon').textContent  = dark ? '☀️' : '🌙';
+      document.getElementById('theme-label').textContent = dark ? 'Light' : 'Dark';
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      applyTheme(!isDark);
+      try { localStorage.setItem('autokb_theme', isDark ? 'dark' : 'light'); } catch(e) {}
     });
-    document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
+
+    try {
+      if (localStorage.getItem('autokb_theme') === 'light') applyTheme(false);
+    } catch(e) {}
+
+    // ── MOBILE SIDEBAR ───────────────────────────────────────────
     function closeSidebar() {
       document.getElementById('sidebar').classList.remove('open');
       document.getElementById('sidebar-overlay').classList.remove('open');
     }
 
-    // ── RELOAD / FULLSCREEN ────────────────────────────────────────
+    document.getElementById('menu-btn').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebar-overlay').classList.toggle('open');
+    });
+
+    document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
+
+    // Close sidebar on swipe-left (touch devices)
+    let touchStartX = 0;
+    document.getElementById('sidebar').addEventListener('touchstart', e => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+
+    document.getElementById('sidebar').addEventListener('touchend', e => {
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (dx < -60) closeSidebar();
+    }, { passive: true });
+
+    // ── RELOAD / FULLSCREEN ──────────────────────────────────────
     document.getElementById('reload-btn').addEventListener('click', () => {
       if (!activeId) return;
       const f = document.getElementById('frame-' + activeId);
       if (f) { const s = f.src; f.src = ''; f.src = s; }
     });
+
     document.getElementById('fullscreen-btn').addEventListener('click', () => {
       const c = document.getElementById('iframe-container');
       if (!document.fullscreenElement) c.requestFullscreen?.();
       else document.exitFullscreen?.();
     });
 
-    // ── INIT ───────────────────────────────────────────────────────
+    // ── INIT ────────────────────────────────────────────────────
     renderSidebar();
     renderWelcome();
     if (activeId && MODULES.find(m => m.id === activeId)) activate(activeId);
   </script>
 </body>
-
 </html>
