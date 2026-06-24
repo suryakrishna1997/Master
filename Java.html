@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript — Deep Dive + Human Explained</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-elevated: #12121a;
+            --bg-card: #1a1a24;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #f59e0b;
+            --accent-soft: rgba(245, 158, 11, 0.1);
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --border: #2a2a3a;
+            --code-bg: #0d0d14;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 4px; }
+
+        /* ── FIX: layout is display:block; sidebar is fixed so grid was collapsing .main ── */
+        .layout {
+            display: block;
+            min-height: 100vh;
+        }
+        .sidebar {
+            background: var(--bg-elevated);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            width: 280px;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 0;
+            z-index: 100;
+        }
+        .sidebar-header { padding: 0 24px 20px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+        .sidebar-title { font-size: 1.25rem; font-weight: 800; color: var(--accent); letter-spacing: -0.5px; }
+        .sidebar-subtitle { font-size: 0.75rem; color: var(--text-muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+        .nav-section { margin-bottom: 8px; }
+        .nav-section-title { padding: 8px 24px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .nav-link { display: block; padding: 8px 24px 8px 32px; color: var(--text-muted); text-decoration: none; font-size: 0.875rem; transition: all 0.2s; border-left: 2px solid transparent; }
+        .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.02); border-left-color: var(--accent); }
+        .nav-link.active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; }
+        .badge { float: right; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; background: var(--accent-green); color: var(--bg); font-weight: 700; }
+        .badge.beta { background: var(--accent-cyan); }
+
+        /* ── FIX: .main now fills the remaining width correctly ── */
+        .main {
+            margin-left: 280px;
+            width: calc(100% - 280px);
+            padding: 48px 64px;
+            box-sizing: border-box;
+        }
+
+        h1 { font-size: 3rem; font-weight: 800; letter-spacing: -1.5px; margin-bottom: 16px; background: linear-gradient(135deg, var(--accent), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 1.8rem; font-weight: 700; margin: 48px 0 20px; padding-bottom: 12px; border-bottom: 2px solid var(--border); color: var(--text); scroll-margin-top: 24px; }
+        h3 { font-size: 1.3rem; font-weight: 600; margin: 32px 0 16px; color: var(--accent); }
+        h4 { font-size: 1.1rem; font-weight: 600; margin: 24px 0 12px; color: var(--text); }
+        p { margin-bottom: 16px; color: var(--text-muted); }
+        strong { color: var(--text); }
+
+        pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; overflow-x: auto; margin: 20px 0; position: relative; }
+        pre::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-purple), var(--accent-blue)); border-radius: 12px 12px 0 0; }
+        code { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.6; }
+        pre code { color: #e2e8f0; }
+        .inline-code { background: var(--bg-card); padding: 2px 8px; border-radius: 4px; font-size: 0.85em; color: var(--accent); border: 1px solid var(--border); font-family: 'JetBrains Mono', monospace; }
+        .kwd { color: #c792ea; }
+        .str { color: #c3e88d; }
+        .num { color: #f78c6c; }
+        .fn  { color: #82aaff; }
+        .cmt { color: #676e95; font-style: italic; }
+        .type { color: #ffcb6b; }
+        .op  { color: #89ddff; }
+        .bool { color: #ff5370; }
+        .attr { color: #f78c6c; }
+
+        .info-box { border-radius: 12px; padding: 20px 24px; margin: 24px 0; border-left: 4px solid; background: var(--bg-card); }
+        .info-box.tip     { border-color: var(--accent-green); }
+        .info-box.warn    { border-color: var(--accent); }
+        .info-box.danger  { border-color: var(--accent-red); }
+        .info-box.info    { border-color: var(--accent-blue); }
+        .info-box.advanced{ border-color: var(--accent-purple); }
+        .info-box-title   { font-weight: 700; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .info-box.tip      .info-box-title { color: var(--accent-green); }
+        .info-box.warn     .info-box-title { color: var(--accent); }
+        .info-box.danger   .info-box-title { color: var(--accent-red); }
+        .info-box.info     .info-box-title { color: var(--accent-blue); }
+        .info-box.advanced .info-box-title { color: var(--accent-purple); }
+        .info-box p:last-child { margin-bottom: 0; }
+
+        .definition { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 20px; padding: 16px 20px; background: var(--bg-card); border-radius: 12px; border-left: 4px solid var(--accent); }
+        .analogy-box { border-radius: 16px; padding: 24px; margin: 24px 0; background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(168,85,247,0.1)); border: 1px solid var(--border); position: relative; }
+        .analogy-box::before { content: '🧠'; font-size: 1.5rem; position: absolute; top: -12px; left: 20px; background: var(--bg); padding: 0 8px; }
+        .analogy-title { font-weight: 700; color: var(--accent-blue); margin-bottom: 12px; font-size: 1.1rem; }
+        .why-box { border-radius: 16px; padding: 24px; margin: 24px 0; background: linear-gradient(135deg, rgba(34,197,94,0.1), rgba(6,182,212,0.1)); border: 1px solid var(--border); position: relative; }
+        .why-box::before { content: '💡'; font-size: 1.5rem; position: absolute; top: -12px; left: 20px; background: var(--bg); padding: 0 8px; }
+        .why-title { font-weight: 700; color: var(--accent-green); margin-bottom: 12px; font-size: 1.1rem; }
+        .warning-box { border-radius: 16px; padding: 24px; margin: 24px 0; background: linear-gradient(135deg, rgba(239,68,68,0.1), rgba(245,158,11,0.1)); border: 1px solid var(--border); position: relative; }
+        .warning-box::before { content: '⚠️'; font-size: 1.5rem; position: absolute; top: -12px; left: 20px; background: var(--bg); padding: 0 8px; }
+        .warning-title { font-weight: 700; color: var(--accent-red); margin-bottom: 12px; font-size: 1.1rem; }
+        .real-world { font-size: 1rem; color: var(--text-muted); margin: 16px 0; padding: 16px 20px; background: var(--bg-elevated); border-radius: 12px; border-left: 4px solid var(--accent-green); }
+        .real-world strong { color: var(--accent-green); }
+
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.9rem; }
+        th { text-align: left; padding: 12px 16px; background: var(--bg-elevated); border-bottom: 2px solid var(--border); font-weight: 600; color: var(--text); }
+        td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+
+        ul, ol { margin: 16px 0 16px 24px; color: var(--text-muted); }
+        li { margin-bottom: 8px; }
+        li::marker { color: var(--accent); }
+        .section-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent); margin: 48px 0; }
+        .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+        .compare-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+        .compare-card h5 { color: var(--accent); margin-bottom: 12px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .signature { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 16px 20px; margin: 16px 0; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; }
+        .signature .name { color: var(--accent); font-weight: 600; }
+        .signature .params { color: var(--text-muted); }
+        .signature .returns { color: var(--accent-green); }
+
+        .back-to-top { position: fixed; bottom: 32px; right: 32px; background: var(--accent); color: var(--bg); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.5rem; box-shadow: 0 4px 20px rgba(245,158,11,0.3); transition: all 0.3s; opacity: 0; pointer-events: none; z-index: 200; }
+        .back-to-top.visible { opacity: 1; pointer-events: all; }
+        .back-to-top:hover { transform: translateY(-4px); }
+
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; width: 100%; padding: 24px; }
+        }
+    </style>
+    <base target="_blank" />
+<base target="_blank">
+</head>
+<body>
+<div class="layout">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">JS Complete</div>
+            <div class="sidebar-subtitle">Deep Dive + Human Explained</div>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Core Concepts</div>
+            <a href="#types" class="nav-link">Types &amp; Coercion</a>
+            <a href="#scope" class="nav-link">Scope &amp; Closures</a>
+            <a href="#hoisting" class="nav-link">Hoisting &amp; TDZ</a>
+            <a href="#this" class="nav-link">this Keyword</a>
+            <a href="#prototypes" class="nav-link">Prototypes</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Language Features</div>
+            <a href="#functions" class="nav-link">Functions Deep Dive</a>
+            <a href="#async" class="nav-link">Async Programming</a>
+            <a href="#iterators" class="nav-link">Iterators &amp; Generators</a>
+            <a href="#modules" class="nav-link">Modules System</a>
+            <a href="#symbols" class="nav-link">Symbols &amp; Well-Knowns</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Built‑ins</div>
+            <a href="#arrays" class="nav-link">Array Mastery</a>
+            <a href="#objects" class="nav-link">Object Deep Dive</a>
+            <a href="#maps" class="nav-link">Map, Set, WeakMap</a>
+            <a href="#regex" class="nav-link">RegExp Advanced</a>
+            <a href="#errors" class="nav-link">Error Handling</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Under the Hood</div>
+            <a href="#memory" class="nav-link">Memory &amp; GC</a>
+            <a href="#eventloop" class="nav-link">Event Loop</a>
+            <a href="#performance" class="nav-link">Performance</a>
+            <a href="#v8" class="nav-link">V8 Internals</a>
+            <a href="#security" class="nav-link">Security Patterns</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Modern (ES2024–2027)</div>
+            <a href="#es2024" class="nav-link">ES2024 Features</a>
+            <a href="#es2025" class="nav-link">ES2025 Features <span class="badge">NEW</span></a>
+            <a href="#es2026" class="nav-link">ES2026 Features <span class="badge beta">BETA</span></a>
+            <a href="#es2027" class="nav-link">ES2027 Proposals</a>
+        </div>
+    
+        <div class="nav-section">
+            <div class="nav-section-title">Paradigms & Patterns</div>
+            <a href="#functional" class="nav-link">Functional Programming</a>
+            <a href="#designpatterns" class="nav-link">Design Patterns</a>
+            <a href="#typescript" class="nav-link">TypeScript Deep Dive</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Browser & Runtime</div>
+            <a href="#dom" class="nav-link">DOM & Browser APIs</a>
+            <a href="#webworkers" class="nav-link">Web Workers</a>
+            <a href="#pwa" class="nav-link">Progressive Web Apps</a>
+            <a href="#wasm" class="nav-link">WebAssembly</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Ecosystem & Tools</div>
+            <a href="#testing" class="nav-link">Testing Strategies</a>
+            <a href="#graphql" class="nav-link">GraphQL & APIs</a>
+            <a href="#state" class="nav-link">State Management</a>
+            <a href="#microfrontends" class="nav-link">Micro-Frontends</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Backend & DevOps</div>
+            <a href="#nodejs" class="nav-link">Node.js Internals</a>
+            <a href="#bundlers" class="nav-link">Build Tools & Bundlers</a>
+            <a href="#monorepos" class="nav-link">Monorepo Strategies</a>
+            <a href="#tooling" class="nav-link">Developer Tooling</a>
+        </div>
+        <div class="nav-section">
+            <div class="nav-section-title">Career</div>
+            <a href="#interview" class="nav-link">Interview Prep</a>
+        </div>
+</nav>
+
+    <main class="main">
+        <h1>JavaScript Complete</h1>
+        <p style="font-size:1.15rem;color:var(--text-muted);margin-bottom:32px;">
+            Every concept explained twice: first with <strong>technical depth</strong> (code, tables, engine internals),
+            then with <strong>human-friendly clarity</strong> (analogies, real-world scenarios, and why it matters).
+        </p>
+
+        <h2 id="types">1. Types &amp; Type Coercion</h2>
+        <div class="definition"><strong>Definition:</strong> A "type" is a category that tells JavaScript what kind of value something is — a number, a string, a boolean, or a container of other values. Types exist so the engine knows what operations are valid and how to store the data efficiently.</div>
+        <h3>The 8 Primitive Types</h3>
+        <table>
+            <tr><th>Type</th><th>typeof</th><th>Example</th><th>Notes</th></tr>
+            <tr><td><code class="inline-code">undefined</code></td><td><code>"undefined"</code></td><td><code>let x;</code></td><td>Absence of value; default for uninitialized variables</td></tr>
+            <tr><td><code class="inline-code">null</code></td><td><code>"object"</code> (bug)</td><td><code>let x = null;</code></td><td>Intentional absence; typeof returns "object" for legacy reasons</td></tr>
+            <tr><td><code class="inline-code">boolean</code></td><td><code>"boolean"</code></td><td><code>true, false</code></td><td>Logical true/false</td></tr>
+            <tr><td><code class="inline-code">number</code></td><td><code>"number"</code></td><td><code>42, 3.14, NaN</code></td><td>IEEE 754 double-precision 64-bit float</td></tr>
+            <tr><td><code class="inline-code">bigint</code></td><td><code>"bigint"</code></td><td><code>9007199254740992n</code></td><td>Arbitrary-precision integers (ES2020)</td></tr>
+            <tr><td><code class="inline-code">string</code></td><td><code>"string"</code></td><td><code>"hello", `template`</code></td><td>UTF-16 encoded, immutable sequences</td></tr>
+            <tr><td><code class="inline-code">symbol</code></td><td><code>"symbol"</code></td><td><code>Symbol('desc')</code></td><td>Unique, non-enumerable property keys</td></tr>
+            <tr><td><code class="inline-code">object</code></td><td><code>"object"</code></td><td><code>{}, [], function(){}</code></td><td>Reference type; mutable and compared by reference</td></tr>
+        </table>
+        <div class="info-box danger"><div class="info-box-title">⚠️ Critical: typeof null === "object"</div><p>This is a <strong>language bug</strong> from the first version of JavaScript that can never be fixed due to backward compatibility. The type tag for objects was 0x00 and null was represented as the NULL pointer (also 0x00).</p></div>
+        <div class="analogy-box"><div class="analogy-title">Analogy: Types Are Like Containers</div><p>Imagine organizing a warehouse. You have small envelopes for letters (primitives) and large bins for collections (objects). Primitives are copied when you hand them to someone — they get their own envelope. Objects are shared — if you hand someone a bin, you're both pointing at the same bin. Change the contents, and everyone sees it.</p></div>
+        <h3>Number Internals: IEEE 754 Double Precision</h3>
+        <pre><code><span class="cmt">// The classic floating point problem</span>
+<span class="num">0.1</span> + <span class="num">0.2</span> === <span class="num">0.3</span>  <span class="cmt">// false — 0.30000000000000004</span>
+
+<span class="cmt">// Solution 1: Use Number.EPSILON</span>
+<span class="kwd">function</span> <span class="fn">isEqual</span>(a, b) {
+  <span class="kwd">return</span> Math.<span class="fn">abs</span>(a - b) &lt; Number.EPSILON;
+}
+
+<span class="cmt">// Solution 2: ES2026 Math.sumPrecise</span>
+Math.<span class="fn">sumPrecise</span>([<span class="num">0.1</span>, <span class="num">0.2</span>, <span class="num">0.3</span>])  <span class="cmt">// 0.6 — exact!</span></code></pre>
+        <div class="why-box"><div class="why-title">Why This Matters in Real Code</div><p>When you write <code class="inline-code">let a = 5; let b = a; b = 10;</code>, <code>a</code> stays 5 because numbers are primitives — copied by value. But when you write <code class="inline-code">let obj1 = {x: 5}; let obj2 = obj1; obj2.x = 10;</code>, <code>obj1.x</code> is now 10 too because both variables point to the same object.</p></div>
+        <div class="real-world"><strong>Real-world scenario:</strong> You're building a form validator. A user leaves a field empty. Is that <code>undefined</code> (they never touched it) or <code>null</code> (they deliberately cleared it)? Your validation logic might treat these differently.</div>
+        <div class="section-divider"></div>
+
+        <h2 id="scope">2. Scope &amp; Closures</h2>
+        <div class="definition"><strong>Definition:</strong> Scope answers the question: "Where can I see and use this variable?" It's like visibility rules in a building — some rooms are private, some are shared, some are public.</div>
+        <h3>Lexical Scope</h3>
+        <p>JavaScript uses <strong>lexical (static) scoping</strong>. A function's scope is determined by where it is <em>defined</em>, not where it is called.</p>
+        <pre><code><span class="kwd">const</span> x = <span class="num">10</span>;
+<span class="kwd">function</span> <span class="fn">outer</span>() {
+  <span class="kwd">const</span> y = <span class="num">20</span>;
+  <span class="kwd">function</span> <span class="fn">inner</span>() {
+    <span class="kwd">const</span> z = <span class="num">30</span>;
+    <span class="kwd">return</span> x + y + z;
+  }
+  <span class="kwd">return</span> inner;
+}
+<span class="kwd">const</span> fn = <span class="fn">outer</span>();
+<span class="fn">fn</span>();  <span class="cmt">// 60 — inner still has access to y via closure</span></code></pre>
+        <div class="analogy-box"><div class="analogy-title">Analogy: Nested Russian Dolls</div><p>Each function is like a Russian doll. The inner doll can see everything in the outer dolls, but the outer dolls can't peek inside.</p></div>
+        <h3>Block Scope: let vs var vs const</h3>
+        <table>
+            <tr><th>Feature</th><th><code>var</code></th><th><code>let</code></th><th><code>const</code></th></tr>
+            <tr><td>Scope</td><td>Function scope</td><td>Block scope {}</td><td>Block scope {}</td></tr>
+            <tr><td>Hoisting</td><td>Yes (initialized undefined)</td><td>Yes (TDZ — uninitialized)</td><td>Yes (TDZ — uninitialized)</td></tr>
+            <tr><td>Reassignment</td><td>Allowed</td><td>Allowed</td><td>Not allowed</td></tr>
+            <tr><td>Redeclaration</td><td>Allowed</td><td>Not allowed</td><td>Not allowed</td></tr>
+            <tr><td>Global object property</td><td>Yes (window.x)</td><td>No</td><td>No</td></tr>
+        </table>
+        <div class="section-divider"></div>
+
+        <h2 id="hoisting">3. Hoisting &amp; Temporal Dead Zone</h2>
+        <div class="definition"><strong>Definition:</strong> Hoisting is JavaScript's behavior of moving variable and function declarations to the top of their scope during compilation — before any code actually runs.</div>
+        <pre><code><span class="cmt">// What you write:</span>
+console.<span class="fn">log</span>(x);  <span class="cmt">// undefined</span>
+<span class="kwd">var</span> x = <span class="num">5</span>;
+
+<span class="cmt">// What the engine sees:</span>
+<span class="kwd">var</span> x;           <span class="cmt">// Declaration hoisted, initialized undefined</span>
+console.<span class="fn">log</span>(x);  <span class="cmt">// undefined</span>
+x = <span class="num">5</span>;           <span class="cmt">// Assignment stays in place</span></code></pre>
+        <div class="analogy-box"><div class="analogy-title">Analogy: The Conference Room Reservation</div><p>With <code>var</code>, the room is reserved but empty until you show up. With <code>let</code> and <code>const</code>, the room is locked until the exact reservation time — try to enter early and security throws you out (ReferenceError).</p></div>
+        <h3>The Temporal Dead Zone (TDZ)</h3>
+        <pre><code><span class="kwd">let</span> x = <span class="num">10</span>;
+<span class="kwd">function</span> <span class="fn">foo</span>() {
+  <span class="cmt">// TDZ starts here for inner x</span>
+  console.<span class="fn">log</span>(x);  <span class="cmt">// ReferenceError!</span>
+  <span class="kwd">let</span> x = <span class="num">20</span>;      <span class="cmt">// TDZ ends here</span>
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="this">4. The <code>this</code> Keyword</h2>
+        <div class="definition"><strong>Definition:</strong> <code>this</code> refers to "the object that is currently responsible for executing this function." It changes based on <em>how</em> the function is called.</div>
+        <table>
+            <tr><th>Rule</th><th>When</th><th>this Value</th></tr>
+            <tr><td><strong>new Binding</strong></td><td><code>new Foo()</code></td><td>The newly created object</td></tr>
+            <tr><td><strong>Explicit Binding</strong></td><td><code>foo.call(obj)</code>, <code>foo.bind(obj)</code></td><td>The specified object</td></tr>
+            <tr><td><strong>Implicit Binding</strong></td><td><code>obj.foo()</code></td><td>The object before the dot</td></tr>
+            <tr><td><strong>Default Binding</strong></td><td><code>foo()</code> standalone</td><td>undefined (strict) or global</td></tr>
+        </table>
+        <div class="analogy-box"><div class="analogy-title">Analogy: An Actor Playing Different Roles</div><p>The script (function) is the same, but who "I" refers to depends on which play (context) it's performed in. That's <code>this</code>.</p></div>
+        <h3>Arrow Functions &amp; Lexical this</h3>
+        <pre><code><span class="kwd">const</span> obj = {
+  name: <span class="str">'Alice'</span>,
+  <span class="fn">regular</span>: <span class="kwd">function</span>() {
+    console.<span class="fn">log</span>(<span class="kwd">this</span>.name);  <span class="cmt">// "Alice"</span>
+  },
+  <span class="fn">arrow</span>: () => {
+    console.<span class="fn">log</span>(<span class="kwd">this</span>.name);  <span class="cmt">// undefined — inherits this from outer scope</span>
+  }
+};</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="prototypes">5. Prototypes &amp; Inheritance</h2>
+        <div class="definition"><strong>Definition:</strong> A prototype is a fallback object. When you ask an object for a property it doesn't have, JavaScript looks at that object's prototype and keeps climbing up the chain until it finds the property or reaches null.</div>
+        <pre><code><span class="kwd">const</span> animal = {
+  <span class="fn">speak</span>: <span class="kwd">function</span>() { console.<span class="fn">log</span>(<span class="kwd">this</span>.sound); }
+};
+<span class="kwd">const</span> dog = { sound: <span class="str">'Woof!'</span>, __proto__: animal };
+dog.<span class="fn">speak</span>();  <span class="cmt">// "Woof!"</span></code></pre>
+        <h3>class Syntax (Syntactic Sugar)</h3>
+        <pre><code><span class="kwd">class</span> <span class="type">Animal</span> {
+  <span class="kwd">constructor</span>(name) { <span class="kwd">this</span>.name = name; }
+  <span class="fn">speak</span>() { console.<span class="fn">log</span>(<span class="str">`${this.name} makes a sound`</span>); }
+}
+<span class="kwd">class</span> <span class="type">Dog</span> <span class="kwd">extends</span> Animal {
+  <span class="fn">speak</span>() { <span class="kwd">super</span>.<span class="fn">speak</span>(); console.<span class="fn">log</span>(<span class="str">`${this.name} barks!`</span>); }
+}</code></pre>
+        <div class="info-box advanced"><div class="info-box-title">🔬 Private Class Fields (ES2022)</div><p>True privacy using <code>#</code> prefix — not accessible outside the class body.</p><pre><code><span class="kwd">class</span> <span class="type">Counter</span> {
+  #count = <span class="num">0</span>;
+  <span class="fn">increment</span>() { <span class="kwd">return</span> ++<span class="kwd">this</span>.#count; }
+}
+<span class="kwd">const</span> c = <span class="kwd">new</span> Counter();
+c.#count;  <span class="cmt">// SyntaxError!</span></code></pre></div>
+        <div class="section-divider"></div>
+
+        <h2 id="functions">6. Functions Deep Dive</h2>
+        <div class="definition"><strong>Definition:</strong> A function in JavaScript is a first-class object — it can be stored in variables, passed as arguments, returned from other functions, and have properties attached to it.</div>
+        <table>
+            <tr><th>Type</th><th>Hoisted</th><th>this</th><th>arguments</th><th>new</th><th>super</th></tr>
+            <tr><td><code>function</code> declaration</td><td>Yes</td><td>Dynamic</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+            <tr><td><code>function</code> expression</td><td>No</td><td>Dynamic</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+            <tr><td>Arrow <code>() => {}</code></td><td>No</td><td>Lexical</td><td>No</td><td>No</td><td>No</td></tr>
+            <tr><td><code>class</code> constructor</td><td>No</td><td>Dynamic</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+            <tr><td><code>method</code> shorthand</td><td>No</td><td>Dynamic</td><td>Yes</td><td>No</td><td>Yes</td></tr>
+        </table>
+        <h3>Rest Parameters vs arguments</h3>
+        <pre><code><span class="cmt">// Old way: arguments object (array-like, not real array)</span>
+<span class="kwd">function</span> <span class="fn">oldSum</span>() {
+  <span class="kwd">return</span> Array.<span class="attr">prototype</span>.<span class="fn">reduce</span>.<span class="fn">call</span>(arguments, (a, b) => a + b);
+}
+<span class="cmt">// Modern way: rest parameters (real array)</span>
+<span class="kwd">function</span> <span class="fn">newSum</span>(...numbers) {
+  <span class="kwd">return</span> numbers.<span class="fn">reduce</span>((a, b) => a + b, <span class="num">0</span>);
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="async">7. Async Programming</h2>
+        <div class="definition"><strong>Definition:</strong> Asynchronous JavaScript means the code doesn't wait for slow operations to finish before moving on. The event loop is the mechanism that checks for completed tasks and runs their callbacks.</div>
+        <h3>The Event Loop: Microtasks vs Macrotasks</h3>
+        <pre><code>console.<span class="fn">log</span>(<span class="str">'1'</span>);
+setTimeout(() => console.<span class="fn">log</span>(<span class="str">'5'</span>), <span class="num">0</span>);  <span class="cmt">// macrotask</span>
+Promise.<span class="fn">resolve</span>().<span class="fn">then</span>(() => console.<span class="fn">log</span>(<span class="str">'3'</span>));  <span class="cmt">// microtask</span>
+console.<span class="fn">log</span>(<span class="str">'2'</span>);
+<span class="cmt">// Output: 1, 2, 3, 5</span></code></pre>
+        <div class="analogy-box"><div class="analogy-title">Analogy: A Restaurant Kitchen</div><p>The chef starts the steak (slow), sets a timer, starts the salad (fast), serves the salad when done. When the steak timer rings, finishes the steak. Single-threaded but managing multiple tasks concurrently.</p></div>
+        <h3>async/await</h3>
+        <pre><code><span class="kwd">async</span> <span class="kwd">function</span> <span class="fn">fetchUser</span>(id) {
+  <span class="kwd">const</span> response = <span class="kwd">await</span> fetch(<span class="str">`/api/users/${id}`</span>);
+  <span class="kwd">return</span> <span class="kwd">await</span> response.<span class="fn">json</span>();
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="iterators">8. Iterators &amp; Generators</h2>
+        <div class="definition"><strong>Definition:</strong> An iterator knows how to access items one at a time. A generator is a special function that can pause execution and yield values on demand.</div>
+        <pre><code><span class="kwd">function</span>* <span class="fn">countUpTo</span>(max) {
+  <span class="kwd">for</span> (<span class="kwd">let</span> i = <span class="num">0</span>; i <= max; i++) { <span class="kwd">yield</span> i; }
+}
+<span class="kwd">const</span> gen = <span class="fn">countUpTo</span>(<span class="num">3</span>);
+gen.<span class="fn">next</span>();  <span class="cmt">// { value: 0, done: false }</span></code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="modules">9. Modules System</h2>
+        <div class="definition"><strong>Definition:</strong> A module is a self-contained unit of code that explicitly declares what it imports and exports. Before modules, all JavaScript shared a single global namespace.</div>
+        <table>
+            <tr><th>Feature</th><th>ESM</th><th>CommonJS</th></tr>
+            <tr><td>Syntax</td><td><code>import</code> / <code>export</code></td><td><code>require</code> / <code>module.exports</code></td></tr>
+            <tr><td>Loading</td><td>Static (compile-time)</td><td>Dynamic (runtime)</td></tr>
+            <tr><td>Tree-shaking</td><td>Yes</td><td>No</td></tr>
+            <tr><td>Top-level await</td><td>Yes</td><td>No</td></tr>
+            <tr><td>Live bindings</td><td>Yes</td><td>Copied values</td></tr>
+        </table>
+        <pre><code><span class="kwd">export</span> <span class="kwd">const</span> PI = <span class="num">3.14159</span>;
+<span class="kwd">export</span> <span class="kwd">function</span> <span class="fn">add</span>(a, b) { <span class="kwd">return</span> a + b; }
+<span class="kwd">import</span> { PI, add } <span class="kwd">from</span> <span class="str">'./math.js'</span>;</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="symbols">10. Symbols &amp; Well-Known Symbols</h2>
+        <div class="definition"><strong>Definition:</strong> A Symbol is a primitive value guaranteed to be unique. Even two symbols with the same description are not equal.</div>
+        <pre><code><span class="kwd">const</span> id = Symbol(<span class="str">'id'</span>);
+<span class="kwd">const</span> user = { name: <span class="str">'Alice'</span>, [id]: <span class="num">123</span> };
+Object.<span class="fn">keys</span>(user);  <span class="cmt">// ["name"] — symbols hidden</span></code></pre>
+        <table>
+            <tr><th>Symbol</th><th>Purpose</th></tr>
+            <tr><td><code>Symbol.iterator</code></td><td>Make object iterable (for...of)</td></tr>
+            <tr><td><code>Symbol.asyncIterator</code></td><td>Make object async iterable</td></tr>
+            <tr><td><code>Symbol.toPrimitive</code></td><td>Custom primitive conversion</td></tr>
+            <tr><td><code>Symbol.toStringTag</code></td><td>Custom toString behavior</td></tr>
+            <tr><td><code>Symbol.hasInstance</code></td><td>Custom instanceof</td></tr>
+            <tr><td><code>Symbol.dispose</code></td><td>Resource cleanup (ES2027)</td></tr>
+        </table>
+        <div class="section-divider"></div>
+
+        <h2 id="arrays">11. Array Mastery</h2>
+        <div class="definition"><strong>Definition:</strong> An array is an ordered list of values with a numeric index. JavaScript arrays are dynamic and can hold mixed types.</div>
+        <table>
+            <tr><th>Mutating (changes original)</th><th>Non-Mutating (returns new)</th></tr>
+            <tr><td><code>push</code>, <code>pop</code>, <code>shift</code>, <code>unshift</code></td><td><code>concat</code>, <code>slice</code>, <code>toSpliced</code> (ES2023)</td></tr>
+            <tr><td><code>splice</code>, <code>sort</code>, <code>reverse</code></td><td><code>toSorted</code>, <code>toReversed</code> (ES2023)</td></tr>
+            <tr><td><code>fill</code>, <code>copyWithin</code></td><td><code>map</code>, <code>filter</code>, <code>reduce</code>, <code>flatMap</code></td></tr>
+        </table>
+        <h3>reduce: The Swiss Army Knife</h3>
+        <pre><code><span class="kwd">const</span> nums = [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>];
+nums.<span class="fn">reduce</span>((sum, n) => sum + n, <span class="num">0</span>);  <span class="cmt">// 15</span>
+
+<span class="cmt">// ES2024: Object.groupBy</span>
+Object.<span class="fn">groupBy</span>(nums, n => n % <span class="num">2</span> === <span class="num">0</span> ? <span class="str">'even'</span> : <span class="str">'odd'</span>);</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="objects">12. Object Deep Dive</h2>
+        <div class="definition"><strong>Definition:</strong> An object is a collection of key-value pairs. Keys are strings or Symbols, values can be anything. Objects are JavaScript's primary data structure.</div>
+        <pre><code><span class="kwd">const</span> obj = {};
+Object.<span class="fn">defineProperty</span>(obj, <span class="str">'name'</span>, {
+  value: <span class="str">'Alice'</span>,
+  writable: <span class="bool">true</span>,
+  enumerable: <span class="bool">true</span>,
+  configurable: <span class="bool">true</span>
+});
+Object.<span class="fn">freeze</span>(obj);  <span class="cmt">// seal + make all non-writable</span></code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="maps">13. Map, Set, WeakMap, WeakSet</h2>
+        <div class="definition"><strong>Definition:</strong> A Map is a key-value store where keys can be any type. A Set is a collection of unique values.</div>
+        <table>
+            <tr><th>Feature</th><th>Map</th><th>Object</th></tr>
+            <tr><td>Key types</td><td>Any value</td><td>String or Symbol only</td></tr>
+            <tr><td>Key order</td><td>Insertion order</td><td>Integer keys sorted, then strings</td></tr>
+            <tr><td>Size</td><td><code>.size</code> property</td><td>Manual count</td></tr>
+            <tr><td>Iteration</td><td>Directly iterable</td><td>Requires Object.keys/entries</td></tr>
+        </table>
+        <h3>Set Operations (ES2025)</h3>
+        <pre><code><span class="kwd">const</span> a = <span class="kwd">new</span> <span class="type">Set</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>]);
+<span class="kwd">const</span> b = <span class="kwd">new</span> <span class="type">Set</span>([<span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>]);
+a.<span class="fn">union</span>(b);              <span class="cmt">// {1, 2, 3, 4, 5, 6}</span>
+a.<span class="fn">intersection</span>(b);       <span class="cmt">// {3, 4}</span>
+a.<span class="fn">difference</span>(b);         <span class="cmt">// {1, 2}</span>
+a.<span class="fn">symmetricDifference</span>(b); <span class="cmt">// {1, 2, 5, 6}</span></code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="regex">14. RegExp Advanced</h2>
+        <div class="definition"><strong>Definition:</strong> A Regular Expression lets you describe text patterns — find emails, replace numbers, validate phone numbers — without writing complex loops.</div>
+        <table>
+            <tr><th>Flag</th><th>Name</th><th>Effect</th></tr>
+            <tr><td><code>g</code></td><td>Global</td><td>Find all matches</td></tr>
+            <tr><td><code>i</code></td><td>Ignore case</td><td>Case-insensitive</td></tr>
+            <tr><td><code>m</code></td><td>Multiline</td><td>^ and $ match line start/end</td></tr>
+            <tr><td><code>s</code></td><td>DotAll</td><td>. matches newlines</td></tr>
+            <tr><td><code>u</code></td><td>Unicode</td><td>Full Unicode support</td></tr>
+            <tr><td><code>v</code></td><td>Unicode Sets (ES2024)</td><td>Set operations in character classes</td></tr>
+            <tr><td><code>d</code></td><td>Indices</td><td>Include match indices</td></tr>
+        </table>
+        <pre><code><span class="cmt">// ES2025: RegExp.escape</span>
+<span class="kwd">const</span> query = <span class="str">"gmail.com"</span>;
+<span class="kwd">const</span> safe = <span class="kwd">new</span> RegExp(RegExp.<span class="fn">escape</span>(query), <span class="str">'i'</span>);
+safe.<span class="fn">test</span>(<span class="str">"My gmail.com address"</span>);  <span class="cmt">// true</span></code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="errors">15. Error Handling</h2>
+        <div class="definition"><strong>Definition:</strong> An Error is JavaScript's way of saying "something went wrong." When thrown, the engine stops and looks for a catch block. If none is found, the program crashes.</div>
+        <pre><code>Error
+├── RangeError        <span class="cmt">// Number out of range</span>
+├── ReferenceError    <span class="cmt">// Invalid reference</span>
+├── SyntaxError       <span class="cmt">// Parse error</span>
+├── TypeError         <span class="cmt">// Value not of expected type</span>
+└── AggregateError    <span class="cmt">// ES2021: Multiple errors</span></code></pre>
+        <h3>Custom Errors</h3>
+        <pre><code><span class="kwd">class</span> <span class="type">ValidationError</span> <span class="kwd">extends</span> Error {
+  <span class="fn">constructor</span>(message, field) {
+    <span class="kwd">super</span>(message);
+    <span class="kwd">this</span>.name = <span class="str">'ValidationError'</span>;
+    <span class="kwd">this</span>.field = field;
+  }
+}
+<span class="kwd">try</span> {
+  <span class="kwd">throw</span> <span class="kwd">new</span> ValidationError(<span class="str">'Invalid email'</span>, <span class="str">'email'</span>);
+} <span class="kwd">catch</span> (err) {
+  <span class="kwd">if</span> (err <span class="kwd">instanceof</span> ValidationError) {
+    console.<span class="fn">error</span>(<span class="str">`Field ${err.field}: ${err.message}`</span>);
+  }
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="memory">16. Memory Management &amp; Garbage Collection</h2>
+        <div class="definition"><strong>Definition:</strong> Memory is divided into the <strong>stack</strong> (fast, temporary for function calls and primitives) and the <strong>heap</strong> (persistent for objects). The GC automatically frees heap memory when nothing references it.</div>
+        <h3>Memory Leaks</h3>
+        <pre><code><span class="cmt">// 1. Accidental globals</span>
+<span class="kwd">function</span> <span class="fn">leak</span>() { leakedVar = <span class="str">'I am global'</span>; }
+
+<span class="cmt">// 2. Forgotten event listeners</span>
+element.<span class="fn">addEventListener</span>(<span class="str">'click'</span>, handler);
+<span class="cmt">// Must removeEventListener when done!</span>
+
+<span class="cmt">// 3. Closures capturing large scopes</span>
+<span class="kwd">function</span> <span class="fn">createLeak</span>() {
+  <span class="kwd">const</span> hugeArray = <span class="kwd">new</span> <span class="type">Array</span>(<span class="num">1000000</span>).<span class="fn">fill</span>(<span class="str">'data'</span>);
+  <span class="kwd">return</span> () => hugeArray[<span class="num">0</span>];  <span class="cmt">// Keeps entire array alive!</span>
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="eventloop">17. Event Loop Deep Dive</h2>
+        <div class="definition"><strong>Definition:</strong> The event loop handles async operations despite JavaScript being single-threaded. It prioritizes microtasks (Promises) over macrotasks (setTimeout, I/O).</div>
+        <pre><code>console.<span class="fn">log</span>(<span class="str">'1'</span>);
+setTimeout(() => console.<span class="fn">log</span>(<span class="str">'5'</span>), <span class="num">0</span>);  <span class="cmt">// macrotask</span>
+Promise.<span class="fn">resolve</span>().<span class="fn">then</span>(() => console.<span class="fn">log</span>(<span class="str">'3'</span>));  <span class="cmt">// microtask</span>
+console.<span class="fn">log</span>(<span class="str">'2'</span>);
+<span class="cmt">// Output: 1, 2, 3, 5</span></code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="performance">18. Performance Optimization</h2>
+        <div class="definition"><strong>Definition:</strong> JavaScript performance is about writing code that matches the engine's assumptions. V8 makes optimizations that break when those assumptions are violated.</div>
+        <pre><code><span class="cmt">// Good: consistent object shape (same hidden class)</span>
+<span class="kwd">function</span> <span class="fn">Point</span>(x, y) { <span class="kwd">this</span>.x = x; <span class="kwd">this</span>.y = y; }
+
+<span class="cmt">// Debounce: fire only after inactivity</span>
+<span class="kwd">function</span> <span class="fn">debounce</span>(fn, delay) {
+  <span class="kwd">let</span> id;
+  <span class="kwd">return</span> <span class="kwd">function</span>(...args) {
+    clearTimeout(id);
+    id = setTimeout(() => fn.<span class="fn">apply</span>(<span class="kwd">this</span>, args), delay);
+  };
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="v8">19. V8 Engine Internals</h2>
+        <div class="definition"><strong>Definition:</strong> V8 compiles JavaScript to machine code through multiple stages, each making different trade-offs between startup speed and execution speed.</div>
+        <ol>
+            <li><strong>Ignition</strong> — Bytecode interpreter, fast startup</li>
+            <li><strong>Sparkplug</strong> — Quick baseline machine code</li>
+            <li><strong>TurboFan</strong> — Speculative optimization, highly optimized machine code</li>
+        </ol>
+        <div class="info-box advanced"><div class="info-box-title">🔬 TurboFan Optimization</div><p>TurboFan uses Sea of Nodes IR and applies inlining, constant folding, dead code elimination, and loop unrolling. If assumptions fail, it <strong>deoptimizes</strong> back to baseline code.</p></div>
+        <div class="section-divider"></div>
+
+        <h2 id="security">20. Security Patterns</h2>
+        <div class="definition"><strong>Definition:</strong> JavaScript security is about preventing malicious code from executing and protecting user data — even when interacting with untrusted input or third-party scripts.</div>
+        <pre><code><span class="cmt">// NEVER: innerHTML with user input</span>
+element.innerHTML = userInput;  <span class="cmt">// XSS vulnerability!</span>
+<span class="cmt">// ALWAYS: textContent</span>
+element.textContent = userInput;  <span class="cmt">// Safe</span>
+
+<span class="cmt">// Prototype pollution guard</span>
+<span class="kwd">function</span> <span class="fn">safeMerge</span>(target, source) {
+  <span class="kwd">for</span> (<span class="kwd">const</span> key <span class="kwd">in</span> source) {
+    <span class="kwd">if</span> (key === <span class="str">'__proto__'</span> || key === <span class="str">'constructor'</span> || key === <span class="str">'prototype'</span>) <span class="kwd">continue</span>;
+    target[key] = source[key];
+  }
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="es2024">21. ES2024 Features</h2>
+        <pre><code><span class="cmt">// Object.groupBy</span>
+Object.<span class="fn">groupBy</span>(inventory, ({ type }) => type);
+
+<span class="cmt">// Non-mutating array methods</span>
+arr.<span class="fn">toSorted</span>();    <span class="cmt">// arr unchanged</span>
+arr.<span class="fn">toReversed</span>();  <span class="cmt">// arr unchanged</span>
+arr.<span class="fn">with</span>(<span class="num">2</span>, <span class="num">99</span>);  <span class="cmt">// arr unchanged</span></code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="es2025">22. ES2025 Features <span class="badge" style="font-size:0.75rem;vertical-align:middle">NEW</span></h2>
+        <pre><code><span class="cmt">// Map.groupBy</span>
+<span class="kwd">const</span> map = Map.<span class="fn">groupBy</span>([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>], x => x % <span class="num">2</span> === <span class="num">0</span> ? <span class="str">'even'</span> : <span class="str">'odd'</span>);
+
+<span class="cmt">// Set methods</span>
+a.<span class="fn">union</span>(b); a.<span class="fn">intersection</span>(b); a.<span class="fn">difference</span>(b);
+
+<span class="cmt">// RegExp.escape</span>
+<span class="kwd">new</span> RegExp(RegExp.<span class="fn">escape</span>(userQuery), <span class="str">'i'</span>);</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="es2026">23. ES2026 Features <span class="badge beta" style="font-size:0.75rem;vertical-align:middle">BETA</span></h2>
+        <pre><code><span class="cmt">// Array.fromAsync</span>
+<span class="kwd">const</span> arr = <span class="kwd">await</span> Array.<span class="fn">fromAsync</span>(<span class="fn">asyncGen</span>());
+
+<span class="cmt">// Math.sumPrecise — no floating point errors</span>
+Math.<span class="fn">sumPrecise</span>([<span class="num">0.1</span>, <span class="num">0.2</span>, <span class="num">0.3</span>]);  <span class="cmt">// 0.6 exact</span>
+
+<span class="cmt">// Map.getOrInsert</span>
+map.<span class="fn">getOrInsert</span>(<span class="str">'key'</span>, <span class="str">'default'</span>);
+
+<span class="cmt">// Iterator helpers</span>
+iter.<span class="fn">map</span>(x => x * <span class="num">2</span>).<span class="fn">filter</span>(x => x > <span class="num">4</span>).<span class="fn
+
+        <h2 id="functional">25. Functional Programming</h2>
+        <div class="definition"><strong>Definition:</strong> Functional programming (FP) is a paradigm where computation is treated as the evaluation of mathematical functions, avoiding changing state and mutable data. In JavaScript, FP emphasizes pure functions, immutability, and function composition.</div>
+
+        <h3>Pure Functions</h3>
+        <p>A pure function always returns the same output for the same input and has no side effects.</p>
+        <pre><code><span class="cmt">// Impure: depends on external state</span>
+<span class="kwd">let</span> count = <span class="num">0</span>;
+<span class="kwd">function</span> <span class="fn">increment</span>() { <span class="kwd">return</span> ++count; }
+
+<span class="cmt">// Pure: same input → same output, no side effects</span>
+<span class="kwd">const</span> <span class="fn">add</span> = (a, b) => a + b;
+<span class="fn">add</span>(<span class="num">2</span>, <span class="num">3</span>);  <span class="cmt">// Always 5</span></code></pre>
+
+        <h3>Currying</h3>
+        <p>Transforms a function with multiple arguments into a sequence of functions, each taking a single argument.</p>
+        <pre><code><span class="kwd">const</span> <span class="fn">multiply</span> = a => b => a * b;
+<span class="kwd">const</span> triple = <span class="fn">multiply</span>(<span class="num">3</span>);
+<span class="fn">triple</span>(<span class="num">4</span>);  <span class="cmt">// 12</span>
+<span class="fn">triple</span>(<span class="num">10</span>); <span class="cmt">// 30</span>
+
+<span class="cmt">// Real-world: pre-configured API client</span>
+<span class="kwd">const</span> <span class="fn">fetchWithBase</span> = baseUrl => endpoint => fetch(baseUrl + endpoint);
+<span class="kwd">const</span> api = <span class="fn">fetchWithBase</span>(<span class="str">'https://api.example.com'</span>);
+<span class="fn">api</span>(<span class="str">'/users'</span>);  <span class="cmt">// fetch('https://api.example.com/users')</span></code></pre>
+
+        <h3>Function Composition</h3>
+        <pre><code><span class="kwd">const</span> <span class="fn">compose</span> = (...fns) => x => fns.<span class="fn">reduceRight</span>((v, f) => <span class="fn">f</span>(v), x);
+<span class="kwd">const</span> <span class="fn">pipe</span> = (...fns) => x => fns.<span class="fn">reduce</span>((v, f) => <span class="fn">f</span>(v), x);
+
+<span class="kwd">const</span> <span class="fn">toUpper</span> = s => s.<span class="fn">toUpperCase</span>();
+<span class="kwd">const</span> <span class="fn">exclaim</span> = s => s + <span class="str">'!'</span>;
+<span class="kwd">const</span> <span class="fn">shout</span> = <span class="fn">pipe</span>(toUpper, exclaim);
+<span class="fn">shout</span>(<span class="str">'hello'</span>);  <span class="cmt">// 'HELLO!'</span></code></pre>
+
+        <h3>Memoization</h3>
+        <pre><code><span class="kwd">function</span> <span class="fn">memoize</span>(fn) {
+  <span class="kwd">const</span> cache = <span class="kwd">new</span> <span class="type">Map</span>();
+  <span class="kwd">return</span> <span class="kwd">function</span>(...args) {
+    <span class="kwd">const</span> key = JSON.<span class="fn">stringify</span>(args);
+    <span class="kwd">if</span> (cache.<span class="fn">has</span>(key)) <span class="kwd">return</span> cache.<span class="fn">get</span>(key);
+    <span class="kwd">const</span> result = fn.<span class="fn">apply</span>(<span class="kwd">this</span>, args);
+    cache.<span class="fn">set</span>(key, result);
+    <span class="kwd">return</span> result;
+  };
+}
+
+<span class="kwd">const</span> <span class="fn">fib</span> = <span class="fn">memoize</span>((n) => n <= <span class="num">1</span> ? n : <span class="fn">fib</span>(n-<span class="num">1</span>) + <span class="fn">fib</span>(n-<span class="num">2</span>));
+<span class="fn">fib</span>(<span class="num">100</span>);  <span class="cmt">// Instant — without memoization this would hang</span></code></pre>
+        <div class="analogy-box"><div class="analogy-title">Analogy: A Recipe with No Surprises</div><p>A pure function is like a recipe that uses only the ingredients you give it — no sneaking into the pantry for extra salt. The result is always predictable, testable, and safe to use anywhere.</p></div>
+        <div class="section-divider"></div>
+
+        <h2 id="designpatterns">26. Design Patterns in JavaScript</h2>
+        <div class="definition"><strong>Definition:</strong> Design patterns are reusable solutions to common software design problems. They provide a shared vocabulary and proven approaches to structuring code.</div>
+
+        <h3>Module Pattern</h3>
+        <pre><code><span class="kwd">const</span> Counter = (<span class="kwd">function</span>() {
+  <span class="kwd">let</span> count = <span class="num">0</span>;  <span class="cmt">// Private</span>
+  <span class="kwd">return</span> {
+    <span class="fn">increment</span>() { <span class="kwd">return</span> ++count; },
+    <span class="fn">decrement</span>() { <span class="kwd">return</span> --count; },
+    <span class="fn">get</span>() { <span class="kwd">return</span> count; }
+  };
+})();
+Counter.<span class="fn">increment</span>();  <span class="cmt">// 1</span>
+Counter.count;            <span class="cmt">// undefined — truly private</span></code></pre>
+
+        <h3>Singleton Pattern</h3>
+        <pre><code><span class="kwd">class</span> <span class="type">Database</span> {
+  <span class="kwd">static</span> #instance = <span class="kwd">null</span>;
+  #connection = <span class="kwd">null</span>;
+  <span class="kwd">constructor</span>() {
+    <span class="kwd">if</span> (Database.#instance) <span class="kwd">return</span> Database.#instance;
+    Database.#instance = <span class="kwd">this</span>;
+  }
+  <span class="kwd">static</span> <span class="fn">getInstance</span>() {
+    <span class="kwd">return</span> Database.#instance ??= <span class="kwd">new</span> Database();
+  }
+}</code></pre>
+
+        <h3>Factory Pattern</h3>
+        <pre><code><span class="kwd">class</span> <span class="type">User</span> { <span class="kwd">constructor</span>(name) { <span class="kwd">this</span>.name = name; } }
+<span class="kwd">class</span> <span class="type">Admin</span> <span class="kwd">extends</span> User { <span class="kwd">constructor</span>(name) { <span class="kwd">super</span>(name); <span class="kwd">this</span>.role = <span class="str">'admin'</span>; } }
+<span class="kwd">class</span> <span class="type">Guest</span> <span class="kwd">extends</span> User { <span class="kwd">constructor</span>(name) { <span class="kwd">super</span>(name); <span class="kwd">this</span>.role = <span class="str">'guest'</span>; } }
+
+<span class="kwd">const</span> <span class="fn">userFactory</span> = (type, name) => {
+  <span class="kwd">const</span> types = { user: User, admin: Admin, guest: Guest };
+  <span class="kwd">return</span> <span class="kwd">new</span> (types[type] || User)(name);
+};
+<span class="fn">userFactory</span>(<span class="str">'admin'</span>, <span class="str">'Alice'</span>);  <span class="cmt">// Admin { name: 'Alice', role: 'admin' }</span></code></pre>
+
+        <h3>Observer Pattern</h3>
+        <pre><code><span class="kwd">class</span> <span class="type">EventEmitter</span> {
+  #listeners = <span class="kwd">new</span> <span class="type">Map</span>();
+  <span class="fn">on</span>(event, cb) {
+    <span class="kwd">if</span> (!<span class="kwd">this</span>.#listeners.<span class="fn">has</span>(event)) <span class="kwd">this</span>.#listeners.<span class="fn">set</span>(event, []);
+    <span class="kwd">this</span>.#listeners.<span class="fn">get</span>(event).<span class="fn">push</span>(cb);
+    <span class="kwd">return</span> () => <span class="kwd">this</span>.<span class="fn">off</span>(event, cb);
+  }
+  <span class="fn">emit</span>(event, data) {
+    <span class="kwd">this</span>.#listeners.<span class="fn">get</span>(event)?.<span class="fn">forEach</span>(cb => <span class="fn">cb</span>(data));
+  }
+  <span class="fn">off</span>(event, cb) {
+    <span class="kwd">const</span> cbs = <span class="kwd">this</span>.#listeners.<span class="fn">get</span>(event) || [];
+    <span class="kwd">this</span>.#listeners.<span class="fn">set</span>(event, cbs.<span class="fn">filter</span>(c => c !== cb));
+  }
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="typescript">27. TypeScript Deep Integration</h2>
+        <div class="definition"><strong>Definition:</strong> TypeScript is a statically typed superset of JavaScript that compiles to plain JS. It adds type safety, better tooling, and self-documenting code — while remaining fully compatible with existing JavaScript.</div>
+
+        <h3>Advanced Generics</h3>
+        <pre><code><span class="cmt">// Constrained generics with defaults</span>
+<span class="kwd">function</span> <span class="fn">pluck</span>&lt;T, K <span class="kwd">extends</span> <span class="kwd">keyof</span> T&gt;(obj: T, keys: K[]): T[K][] {
+  <span class="kwd">return</span> keys.<span class="fn">map</span>(k => obj[k]);
+}
+<span class="kwd">const</span> user = { name: <span class="str">'Alice'</span>, age: <span class="num">30</span> };
+<span class="fn">pluck</span>(user, [<span class="str">'name'</span>]);  <span class="cmt">// string[] — type-safe!</span>
+
+<span class="cmt">// Conditional types</span>
+<span class="kwd">type</span> <span class="type">NonNullable</span>&lt;T&gt; = T <span class="kwd">extends</span> <span class="kwd">null</span> | <span class="kwd">undefined</span> ? <span class="kwd">never</span> : T;
+<span class="kwd">type</span> <span class="type">A</span> = NonNullable&lt;<span class="kwd">string</span> | <span class="kwd">null</span>&gt;;  <span class="cmt">// string</span>
+
+<span class="cmt">// Mapped types</span>
+<span class="kwd">type</span> <span class="type">ReadonlyDeep</span>&lt;T&gt; = {
+  <span class="kwd">readonly</span> [K <span class="kwd">in</span> <span class="kwd">keyof</span> T]: T[K] <span class="kwd">extends</span> <span class="kwd">object</span> ? ReadonlyDeep&lt;T[K]&gt; : T[K]
+};</code></pre>
+
+        <h3>Template Literal Types</h3>
+        <pre><code><span class="kwd">type</span> <span class="type">EventName</span>&lt;T <span class="kwd">extends</span> <span class="kwd">string</span>&gt; = `on${Capitalize&lt;T&gt;}`;
+<span class="kwd">type</span> <span class="type">MouseEvents</span> = EventName&lt;<span class="str">'click'</span> | <span class="str">'dblclick'</span> | <span class="str">'mouseup'</span>&gt;;
+<span class="cmt">// 'onClick' | 'onDblclick' | 'onMouseup'</span></code></pre>
+
+        <h3>Type Guards &amp; Narrowing</h3>
+        <pre><code><span class="kwd">interface</span> <span class="type">Cat</span> { meow(): <span class="kwd">void</span>; }
+<span class="kwd">interface</span> <span class="type">Dog</span> { bark(): <span class="kwd">void</span>; }
+
+<span class="kwd">function</span> <span class="fn">isCat</span>(animal: Cat | Dog): animal <span class="kwd">is</span> Cat {
+  <span class="kwd">return</span> (animal <span class="kwd">as</span> Cat).meow !== <span class="kwd">undefined</span>;
+}
+
+<span class="kwd">function</span> <span class="fn">makeSound</span>(animal: Cat | Dog) {
+  <span class="kwd">if</span> (<span class="fn">isCat</span>(animal)) animal.<span class="fn">meow</span>();
+  <span class="kwd">else</span> animal.<span class="fn">bark</span>();
+}</code></pre>
+        <div class="info-box tip"><div class="info-box-title">💡 TypeScript + JavaScript Interop</div><p>TypeScript's <code class="inline-code">.d.ts</code> declaration files let you add types to any JavaScript library. The <code class="inline-code">@types/</code> ecosystem on npm has type definitions for thousands of packages.</p></div>
+        <div class="section-divider"></div>
+
+        <h2 id="dom">28. DOM Manipulation &amp; Browser APIs</h2>
+        <div class="definition"><strong>Definition:</strong> The Document Object Model (DOM) is the programming interface for web documents. It represents the page as a tree of nodes that JavaScript can read and modify.</div>
+
+        <h3>Modern DOM APIs</h3>
+        <pre><code><span class="cmt">// Querying — prefer querySelector over getElementById</span>
+<span class="kwd">const</span> btn = document.<span class="fn">querySelector</span>(<span class="str">'button[data-action="submit"]'</span>);
+<span class="kwd">const</span> items = document.<span class="fn">querySelectorAll</span>(<span class="str">'.item'</span>);  <span class="cmt">// NodeList, iterable</span>
+
+<span class="cmt">// Efficient batch updates with DocumentFragment</span>
+<span class="kwd">const</span> fragment = document.<span class="fn">createDocumentFragment</span>();
+<span class="kwd">for</span> (<span class="kwd">let</span> i = <span class="num">0</span>; i &lt; <span class="num">1000</span>; i++) {
+  <span class="kwd">const</span> li = document.<span class="fn">createElement</span>(<span class="str">'li'</span>);
+  li.textContent = `Item ${i}`;
+  fragment.<span class="fn">appendChild</span>(li);
+}
+list.<span class="fn">appendChild</span>(fragment);  <span class="cmt">// Single reflow!</span>
+
+<span class="cmt">// Intersection Observer — lazy loading without scroll events</span>
+<span class="kwd">const</span> observer = <span class="kwd">new</span> IntersectionObserver((entries) => {
+  entries.<span class="fn">forEach</span>(entry => {
+    <span class="kwd">if</span> (entry.isIntersecting) {
+      entry.target.src = entry.target.dataset.src;
+      observer.<span class="fn">unobserve</span>(entry.target);
+    }
+  });
+});
+images.<span class="fn">forEach</span>(img => observer.<span class="fn">observe</span>(img));</code></pre>
+
+        <h3>Web APIs Every JS Dev Should Know</h3>
+        <table>
+            <tr><th>API</th><th>Purpose</th><th>Example Use Case</th></tr>
+            <tr><td><code>Fetch API</code></td><td>Network requests</td><td>REST API calls</td></tr>
+            <tr><td><code>WebSocket</code></td><td>Real-time bidirectional communication</td><td>Chat, live updates</td></tr>
+            <tr><td><code>Web Storage</code></td><td>localStorage / sessionStorage</td><td>Persist user preferences</td></tr>
+            <tr><td><code>IndexedDB</code></td><td>Client-side structured storage</td><td>Offline-first apps</td></tr>
+            <tr><td><code>Service Worker</code></td><td>Background scripts, caching</td><td>PWAs, offline support</td></tr>
+            <tr><td><code>Web Workers</code></td><td>Multi-threading in browser</td><td>Heavy computation off main thread</td></tr>
+            <tr><td><code>BroadcastChannel</code></td><td>Cross-tab communication</td><td>Sync login state across tabs</td></tr>
+        </table>
+        <div class="section-divider"></div>
+
+        <h2 id="testing">29. Testing Strategies</h2>
+        <div class="definition"><strong>Definition:</strong> Testing ensures your code behaves as expected. JavaScript testing ranges from unit tests (individual functions) to integration tests (modules working together) to end-to-end tests (full user flows).</div>
+
+        <h3>Test Pyramid</h3>
+        <pre><code><span class="cmt">// Unit Test (Jest)</span>
+describe(<span class="str">'Calculator'</span>, () => {
+  test(<span class="str">'adds two numbers'</span>, () => {
+    expect(<span class="fn">add</span>(<span class="num">2</span>, <span class="num">3</span>)).<span class="fn">toBe</span>(<span class="num">5</span>);
+  });
+  test(<span class="str">'handles negative numbers'</span>, () => {
+    expect(<span class="fn">add</span>(-<span class="num">1</span>, <span class="num">1</span>)).<span class="fn">toBe</span>(<span class="num">0</span>);
+  });
+});
+
+<span class="cmt">// Integration Test</span>
+test(<span class="str">'user registration flow'</span>, <span class="kwd">async</span> () => {
+  <span class="kwd">const</span> user = <span class="kwd">await</span> <span class="fn">register</span>({ email: <span class="str">'test@example.com'</span>, password: <span class="str">'secret'</span> });
+  expect(user.id).<span class="fn">toBeDefined</span>();
+  expect(user.email).<span class="fn">toBe</span>(<span class="str">'test@example.com'</span>);
+});
+
+<span class="cmt">// Mocking dependencies</span>
+jest.<span class="fn">mock</span>(<span class="str">'./api'</span>, () => ({
+  <span class="fn">fetchUser</span>: jest.<span class="fn">fn</span>().<span class="fn">mockResolvedValue</span>({ id: <span class="num">1</span>, name: <span class="str">'Alice'</span> })
+}));
+
+<span class="cmt">// Snapshot testing for UI components</span>
+<span class="kwd">const</span> tree = renderer.<span class="fn">create</span>(&lt;Button label=<span class="str">"Click me"</span> /&gt;).<span class="fn">toJSON</span>();
+expect(tree).<span class="fn">toMatchSnapshot</span>();</code></pre>
+
+        <h3>Testing Best Practices</h3>
+        <ul>
+            <li><strong>AAA Pattern:</strong> Arrange (setup), Act (execute), Assert (verify)</li>
+            <li><strong>One assertion per test</strong> — tests should test one thing</li>
+            <li><strong>Mock at boundaries</strong> — mock external APIs, test your logic</li>
+            <li><strong>Use <code class="inline-code">beforeEach</code></strong> for shared setup, not shared state</li>
+            <li><strong>Test behavior, not implementation</strong> — refactor-friendly tests</li>
+        </ul>
+        <div class="section-divider"></div>
+
+        <h2 id="webworkers">30. Web Workers &amp; Parallelism</h2>
+        <div class="definition"><strong>Definition:</strong> Web Workers allow JavaScript to run scripts in background threads, separate from the main UI thread. This prevents blocking the event loop during heavy computation.</div>
+        <pre><code><span class="cmt">// main.js</span>
+<span class="kwd">const</span> worker = <span class="kwd">new</span> <span class="type">Worker</span>(<span class="str">'worker.js'</span>);
+worker.<span class="fn">postMessage</span>({ action: <span class="str">'fib'</span>, n: <span class="num">40</span> });
+worker.<span class="fn">onmessage</span> = (e) => console.<span class="fn">log</span>(<span class="str">'Result:'</span>, e.data);
+
+<span class="cmt">// worker.js</span>
+self.<span class="fn">onmessage</span> = <span class="kwd">function</span>(e) {
+  <span class="kwd">if</span> (e.data.action === <span class="str">'fib'</span>) {
+    <span class="kwd">const</span> result = <span class="fn">fibonacci</span>(e.data.n);  <span class="cmt">// Heavy computation</span>
+    self.<span class="fn">postMessage</span>(result);
+  }
+};
+
+<span class="cmt">// SharedArrayBuffer for high-performance data sharing</span>
+<span class="kwd">const</span> shared = <span class="kwd">new</span> SharedArrayBuffer(<span class="num">1024</span>);
+<span class="kwd">const</span> view = <span class="kwd">new</span> Int32Array(shared);
+Atomics.<span class="fn">store</span>(view, <span class="num">0</span>, <span class="num">42</span>);  <span class="cmt">// Thread-safe write</span></code></pre>
+        <div class="warning-box"><div class="warning-title">⚠️ SharedArrayBuffer Security</div><p>Due to Spectre vulnerabilities, <code class="inline-code">SharedArrayBuffer</code> requires cross-origin isolation headers (<code class="inline-code">Cross-Origin-Opener-Policy: same-origin</code> and <code class="inline-code">Cross-Origin-Embedder-Policy: require-corp</code>) to be enabled.</p></div>
+        <div class="section-divider"></div>
+
+        <h2 id="pwa">31. Progressive Web Apps (PWA)</h2>
+        <div class="definition"><strong>Definition:</strong> A PWA uses modern web capabilities to deliver an app-like experience — installable, offline-capable, and push-notification-enabled — while remaining a website at its core.</div>
+
+        <h3>Service Worker Lifecycle</h3>
+        <pre><code><span class="cmt">// sw.js — Service Worker</span>
+<span class="kwd">const</span> CACHE_NAME = <span class="str">'v1'</span>;
+<span class="kwd">const</span> urlsToCache = [<span class="str">'/'</span>, <span class="str">'/styles.css'</span>, <span class="str">'/app.js'</span>];
+
+self.<span class="fn">addEventListener</span>(<span class="str">'install'</span>, e => {
+  e.<span class="fn">waitUntil</span>(
+    caches.<span class="fn">open</span>(CACHE_NAME).<span class="fn">then</span>(cache => cache.<span class="fn">addAll</span>(urlsToCache))
+  );
+});
+
+self.<span class="fn">addEventListener</span>(<span class="str">'fetch'</span>, e => {
+  e.<span class="fn">respondWith</span>(
+    caches.<span class="fn">match</span>(e.request).<span class="fn">then</span>(response => {
+      <span class="kwd">return</span> response || fetch(e.request);
+    })
+  );
+});
+
+<span class="cmt">// Register in main app</span>
+<span class="kwd">if</span> (<span class="str">'serviceWorker'</span> <span class="kwd">in</span> navigator) {
+  navigator.serviceWorker.<span class="fn">register</span>(<span class="str">'/sw.js'</span>);
+}</code></pre>
+
+        <h3>Web App Manifest</h3>
+        <pre><code><span class="cmt">// manifest.json</span>
+{
+  <span class="str">"name"</span>: <span class="str">"My App"</span>,
+  <span class="str">"short_name"</span>: <span class="str">"App"</span>,
+  <span class="str">"start_url"</span>: <span class="str">"/"</span>,
+  <span class="str">"display"</span>: <span class="str">"standalone"</span>,
+  <span class="str">"background_color"</span>: <span class="str">"#0a0a0f"</span>,
+  <span class="str">"theme_color"</span>: <span class="str">"#f59e0b"</span>,
+  <span class="str">"icons"</span>: [{ <span class="str">"src"</span>: <span class="str">"/icon.png"</span>, <span class="str">"sizes"</span>: <span class="str">"192x192"</span> }]
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="graphql">32. GraphQL &amp; API Patterns</h2>
+        <div class="definition"><strong>Definition:</strong> GraphQL is a query language for APIs that lets clients request exactly the data they need, reducing over-fetching and under-fetching compared to REST.</div>
+        <pre><code><span class="cmt">// Schema definition</span>
+<span class="kwd">type</span> <span class="type">User</span> {
+  id: ID!
+  name: String!
+  email: String!
+  posts: [Post!]!
+}
+
+<span class="kwd">type</span> <span class="type">Query</span> {
+  user(id: ID!): User
+  users(limit: Int = <span class="num">10</span>): [User!]!
+}
+
+<span class="cmt">// Client query — only fetch what you need</span>
+<span class="kwd">const</span> GET_USER = gql`
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      name
+      posts { title }
+    }
+  }
+`;
+
+<span class="cmt">// Using in React with Apollo</span>
+<span class="kwd">const</span> { data, loading, error } = <span class="fn">useQuery</span>(GET_USER, { variables: { id: <span class="str">'1'</span> } });</code></pre>
+
+        <h3>GraphQL vs REST</h3>
+        <table>
+            <tr><th>Feature</th><th>REST</th><th>GraphQL</th></tr>
+            <tr><td>Data fetching</td><td>Multiple endpoints, fixed shapes</td><td>Single endpoint, client-defined shape</td></tr>
+            <tr><td>Over-fetching</td><td>Common</td><td>Eliminated</td></tr>
+            <tr><td>Versioning</td><td>v1, v2 in URL</td><td>Schema evolution, no versions</td></tr>
+            <tr><td>Caching</td><td>HTTP caching (simple)</td><td>Application-level (complex)</td></tr>
+            <tr><td>Tooling</td><td>Swagger/OpenAPI</td><td>GraphiQL, introspection</td></tr>
+        </table>
+        <div class="section-divider"></div>
+
+        <h2 id="state">33. State Management Patterns</h2>
+        <div class="definition"><strong>Definition:</strong> State management is the art of organizing, accessing, and updating application data in a predictable way. As apps grow, ad-hoc state handling becomes a source of bugs.</div>
+
+        <h3>Flux Architecture</h3>
+        <pre><code><span class="cmt">// Unidirectional data flow: Action → Dispatcher → Store → View</span>
+<span class="kwd">const</span> store = {
+  state: { count: <span class="num">0</span> },
+  listeners: [],
+  <span class="fn">dispatch</span>(action) {
+    <span class="kwd">switch</span> (action.type) {
+      <span class="kwd">case</span> <span class="str">'INCREMENT'</span>: <span class="kwd">this</span>.state.count++; <span class="kwd">break</span>;
+      <span class="kwd">case</span> <span class="str">'DECREMENT'</span>: <span class="kwd">this</span>.state.count--; <span class="kwd">break</span>;
+    }
+    <span class="kwd">this</span>.listeners.<span class="fn">forEach</span>(cb => <span class="fn">cb</span>(<span class="kwd">this</span>.state));
+  },
+  <span class="fn">subscribe</span>(cb) { <span class="kwd">this</span>.listeners.<span class="fn">push</span>(cb); }
+};
+
+store.<span class="fn">subscribe</span>(state => console.<span class="fn">log</span>(state.count));
+store.<span class="fn">dispatch</span>({ type: <span class="str">'INCREMENT'</span> });  <span class="cmt">// Logs: 1</span></code></pre>
+
+        <h3>State Management Comparison</h3>
+        <table>
+            <tr><th>Library</th><th>Size</th><th>Approach</th><th>Best For</th></tr>
+            <tr><td>Redux</td><td>~7KB</td><td>Centralized, immutable</td><td>Large, complex apps</td></tr>
+            <tr><td>Zustand</td><td>~1KB</td><td>Minimal, hooks-based</td><td>Medium apps, simplicity</td></tr>
+            <tr><td>Jotai</td><td>~3KB</td><td>Atomic, bottom-up</td><td>Granular reactivity</td></tr>
+            <tr><td>Valtio</td><td>~3KB</td><td>Proxy-based, mutable</td><td>Imperative style fans</td></tr>
+            <tr><td>XState</td><td>~7KB</td><td>Finite state machines</td><td>Complex state logic</td></tr>
+        </table>
+        <div class="section-divider"></div>
+
+        <h2 id="microfrontends">34. Micro-Frontends</h2>
+        <div class="definition"><strong>Definition:</strong> Micro-frontends extend the microservices concept to the frontend — breaking a monolithic UI into independently deployable, technology-agnostic pieces that compose into a unified user experience.</div>
+
+        <h3>Integration Approaches</h3>
+        <table>
+            <tr><th>Approach</th><th>How It Works</th><th>Trade-offs</th></tr>
+            <tr><td><strong>Build-time</strong></td><td>NPM packages imported at build</td><td>Coupled releases, simpler</td></tr>
+            <tr><td><strong>Run-time (iframes)</strong></td><td>Each micro-frontend in its own iframe</td><td>Strong isolation, harder communication</td></tr>
+            <tr><td><strong>Run-time (Web Components)</strong></td><td>Custom elements from each team</td><td>Native standard, good isolation</td></tr>
+            <tr><td><strong>Run-time (Module Federation)</strong></td><td>Webpack/Vite shares modules at runtime</td><td>Most flexible, complex setup</td></tr>
+        </table>
+
+        <h3>Module Federation Example</h3>
+        <pre><code><span class="cmt">// Host app (webpack.config.js)</span>
+<span class="kwd">const</span> { ModuleFederationPlugin } = <span class="fn">require</span>(<span class="str">'webpack'</span>);
+module.exports = {
+  plugins: [
+    <span class="kwd">new</span> ModuleFederationPlugin({
+      name: <span class="str">'host'</span>,
+      remotes: {
+        <span class="str">'checkout'</span>: <span class="str">'checkout@https://checkout.app/remoteEntry.js'</span>,
+        <span class="str">'product'</span>: <span class="str">'product@https://product.app/remoteEntry.js'</span>
+      }
+    })
+  ]
+};
+
+<span class="cmt">// Using a remote component</span>
+<span class="kwd">const</span> ProductDetail = React.<span class="fn">lazy</span>(() => <span class="fn">import</span>(<span class="str">'product/ProductDetail'</span>));
+<span class="cmt">// &lt;ProductDetail id={123} /&gt;</span></code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="wasm">35. WebAssembly (WASM) Integration</h2>
+        <div class="definition"><strong>Definition:</strong> WebAssembly is a binary instruction format that runs at near-native speed in the browser. It enables running C, C++, Rust, and other languages alongside JavaScript.</div>
+        <pre><code><span class="cmt">// Load and instantiate a WASM module</span>
+<span class="kwd">async function</span> <span class="fn">initWasm</span>() {
+  <span class="kwd">const</span> response = <span class="kwd">await</span> fetch(<span class="str">'/math.wasm'</span>);
+  <span class="kwd">const</span> bytes = <span class="kwd">await</span> response.<span class="fn">arrayBuffer</span>();
+  <span class="kwd">const</span> { instance } = <span class="kwd">await</span> WebAssembly.<span class="fn">instantiate</span>(bytes, {
+    env: {
+      <span class="fn">memory</span>: <span class="kwd">new</span> WebAssembly.<span class="fn">Memory</span>({ initial: <span class="num">256</span> }),
+      <span class="fn">log</span>: (n) => console.<span class="fn">log</span>(n)
+    }
+  });
+  <span class="kwd">return</span> instance.exports;
+}
+
+<span class="cmt">// Using WASM functions</span>
+<span class="kwd">const</span> wasm = <span class="kwd">await</span> <span class="fn">initWasm</span>();
+<span class="fn">wasm</span>.<span class="fn">fibonacci</span>(<span class="num">40</span>);  <span class="cmt">// Near-native speed!</span></code></pre>
+
+        <h3>When to Use WASM</h3>
+        <ul>
+            <li><strong>Image/video processing</strong> — codecs, filters, compression</li>
+            <li><strong>Game engines</strong> — physics, rendering pipelines</li>
+            <li><strong>Cryptography</strong> — encryption, hashing algorithms</li>
+            <li><strong>Scientific computing</strong> — simulations, data analysis</li>
+            <li><strong>Not for:</strong> DOM manipulation, I/O, typical business logic</li>
+        </ul>
+        <div class="section-divider"></div>
+
+        <h2 id="nodejs">36. Node.js Internals</h2>
+        <div class="definition"><strong>Definition:</strong> Node.js is a JavaScript runtime built on Chrome's V8 engine that enables server-side execution. Understanding its internals helps write efficient, scalable backend code.</div>
+
+        <h3>The Node.js Architecture</h3>
+        <pre><code><span class="cmt">// Event-driven, non-blocking I/O</span>
+<span class="kwd">const</span> fs = <span class="fn">require</span>(<span class="str">'fs'</span>);
+
+<span class="cmt">// Non-blocking (async) — preferred</span>
+fs.<span class="fn">readFile</span>(<span class="str">'file.txt'</span>, <span class="str">'utf8'</span>, (err, data) => {
+  <span class="kwd">if</span> (err) <span class="kwd">throw</span> err;
+  console.<span class="fn">log</span>(data);
+});
+
+<span class="cmt">// Blocking (sync) — avoid in production servers</span>
+<span class="kwd">const</span> data = fs.<span class="fn">readFileSync</span>(<span class="str">'file.txt'</span>, <span class="str">'utf8'</span>);
+console.<span class="fn">log</span>(data);</code></pre>
+
+        <h3>Stream Processing</h3>
+        <pre><code><span class="kwd">const</span> fs = <span class="fn">require</span>(<span class="str">'fs'</span>);
+<span class="kwd">const</span> zlib = <span class="fn">require</span>(<span class="str">'zlib'</span>);
+
+<span class="cmt">// Pipeline: read → compress → write (memory efficient)</span>
+fs.<span class="fn">createReadStream</span>(<span class="str">'input.txt'</span>)
+  .<span class="fn">pipe</span>(zlib.<span class="fn">createGzip</span>())
+  .<span class="fn">pipe</span>(fs.<span class="fn">createWriteStream</span>(<span class="str">'input.txt.gz'</span>));
+
+<span class="cmt">// Backpressure handling</span>
+readable.<span class="fn">on</span>(<span class="str">'data'</span>, (chunk) => {
+  <span class="kwd">if</span> (!writable.<span class="fn">write</span>(chunk)) readable.<span class="fn">pause</span>();
+});
+writable.<span class="fn">on</span>(<span class="str">'drain'</span>, () => readable.<span class="fn">resume</span>());</code></pre>
+
+        <h3>Cluster Module</h3>
+        <pre><code><span class="kwd">const</span> cluster = <span class="fn">require</span>(<span class="str">'cluster'</span>);
+<span class="kwd">const</span> os = <span class="fn">require</span>(<span class="str">'os'</span>);
+
+<span class="kwd">if</span> (cluster.isMaster) {
+  <span class="kwd">for</span> (<span class="kwd">let</span> i = <span class="num">0</span>; i &lt; os.<span class="fn">cpus</span>().length; i++) {
+    cluster.<span class="fn">fork</span>();  <span class="cmt">// One worker per CPU core</span>
+  }
+} <span class="kwd">else</span> {
+  <span class="fn">require</span>(<span class="str">'./server.js'</span>);  <span class="cmt">// Each worker runs the server</span>
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="bundlers">37. Build Tools &amp; Bundlers</h2>
+        <div class="definition"><strong>Definition:</strong> Bundlers transform and combine your source code, dependencies, and assets into optimized files for production. Modern tools also handle transpilation, tree-shaking, and hot module replacement.</div>
+
+        <table>
+            <tr><th>Tool</th><th>Speed</th><th>Config</th><th>Key Feature</th></tr>
+            <tr><td>Webpack</td><td>Medium</td><td>Verbose</td><td>Mature ecosystem, loaders</td></tr>
+            <tr><td>Vite</td><td>Fast (native ESM)</td><td>Minimal</td><td>Instant HMR, Rollup for prod</td></tr>
+            <tr><td>esbuild</td><td>Very fast (Go)</td><td>Minimal</td><td>Lightning-fast builds</td></tr>
+            <tr><td>Rollup</td><td>Fast</td><td>Moderate</td><td>Best tree-shaking, library builds</td></tr>
+            <tr><td>Turbopack</td><td>Very fast (Rust)</td><td>Minimal</td><td>Webpack successor, Next.js</td></tr>
+            <tr><td>Parcel</td><td>Fast</td><td>Zero-config</td><td>Batteries included</td></tr>
+        </table>
+
+        <h3>Vite Configuration Example</h3>
+        <pre><code><span class="cmt">// vite.config.js</span>
+<span class="kwd">import</span> { defineConfig } <span class="kwd">from</span> <span class="str">'vite'</span>;
+<span class="kwd">import</span> react <span class="kwd">from</span> <span class="str">'@vitejs/plugin-react'</span>;
+
+<span class="kwd">export default</span> <span class="fn">defineConfig</span>({
+  plugins: [<span class="fn">react</span>()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: [<span class="str">'react'</span>, <span class="str">'react-dom'</span>],
+          ui: [<span class="str">'@mui/material'</span>]
+        }
+      }
+    }
+  },
+  server: {
+    proxy: {
+      <span class="str">'/api'</span>: <span class="str">'http://localhost:3000'</span>
+    }
+  }
+});</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="monorepos">38. Monorepo Strategies</h2>
+        <div class="definition"><strong>Definition:</strong> A monorepo is a single repository containing multiple related projects. It enables code sharing, atomic changes across packages, and unified tooling.</div>
+
+        <h3>Turborepo / Nx / Lerna</h3>
+        <pre><code><span class="cmt">// turbo.json — task orchestration</span>
+{
+  <span class="str">"pipeline"</span>: {
+    <span class="str">"build"</span>: {
+      <span class="str">"dependsOn"</span>: [<span class="str">"^build"</span>],
+      <span class="str">"outputs"</span>: [<span class="str">"dist/**"</span>]
+    },
+    <span class="str">"test"</span>: {
+      <span class="str">"dependsOn"</span>: [<span class="str">"build"</span>],
+      <span class="str">"outputs"</span>: []
+    },
+    <span class="str">"lint"</span>: {
+      <span class="str">"outputs"</span>: []
+    }
+  }
+}
+
+<span class="cmt">// Run tasks with caching</span>
+<span class="cmt">// turbo run build test lint — parallel with dependency graph</span></code></pre>
+
+        <h3>Workspace Configuration (pnpm)</h3>
+        <pre><code><span class="cmt">// pnpm-workspace.yaml</span>
+packages:
+  - <span class="str">'packages/*'</span>
+  - <span class="str">'apps/*'</span>
+
+<span class="cmt">// package.json — shared scripts</span>
+{
+  <span class="str">"scripts"</span>: {
+    <span class="str">"dev"</span>: <span class="str">"turbo run dev"</span>,
+    <span class="str">"build"</span>: <span class="str">"turbo run build"</span>,
+    <span class="str">"test"</span>: <span class="str">"turbo run test"</span>
+  }
+}</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="tooling">39. Developer Tooling &amp; DX</h2>
+        <div class="definition"><strong>Definition:</strong> Developer Experience (DX) is the quality of interactions developers have with tools, libraries, and workflows. Great DX means faster iteration, fewer bugs, and happier teams.</div>
+
+        <h3>Essential Tooling Stack</h3>
+        <table>
+            <tr><th>Category</th><th>Tool</th><th>Purpose</th></tr>
+            <tr><td>Linter</td><td>ESLint</td><td>Catch code issues, enforce style</td></tr>
+            <tr><td>Formatter</td><td>Prettier</td><td>Consistent code formatting</td></tr>
+            <tr><td>Type Checker</td><td>TypeScript</td><td>Compile-time type safety</td></tr>
+            <tr><td>Test Runner</td><td>Vitest / Jest</td><td>Unit and integration tests</td></tr>
+            <tr><td>E2E Testing</td><td>Playwright / Cypress</td><td>Browser automation tests</td></tr>
+            <tr><td>Git Hooks</td><td>Husky + lint-staged</td><td>Pre-commit checks</td></tr>
+            <tr><td>CI/CD</td><td>GitHub Actions</td><td>Automated testing &amp; deployment</td></tr>
+        </table>
+
+        <h3>ESLint Configuration</h3>
+        <pre><code><span class="cmt">// eslint.config.js (flat config)</span>
+<span class="kwd">import</span> js <span class="kwd">from</span> <span class="str">'@eslint/js'</span>;
+<span class="kwd">import</span> tseslint <span class="kwd">from</span> <span class="str">'typescript-eslint'</span>;
+
+<span class="kwd">export default</span> tseslint.<span class="fn">config</span>(
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    rules: {
+      <span class="str">'no-console'</span>: <span class="str">'warn'</span>,
+      <span class="str">'@typescript-eslint/no-explicit-any'</span>: <span class="str">'error'</span>,
+      <span class="str">'prefer-const'</span>: <span class="str">'error'</span>
+    }
+  }
+);</code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="interview">40. Interview Prep &amp; Problem Solving</h2>
+        <div class="definition"><strong>Definition:</strong> JavaScript interviews test not just syntax knowledge, but deep understanding of the language, problem-solving ability, and code quality awareness.</div>
+
+        <h3>Common Patterns</h3>
+        <pre><code><span class="cmt">// Debounce</span>
+<span class="kwd">function</span> <span class="fn">debounce</span>(fn, delay) {
+  <span class="kwd">let</span> timer;
+  <span class="kwd">return</span> <span class="kwd">function</span>(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.<span class="fn">apply</span>(<span class="kwd">this</span>, args), delay);
+  };
+}
+
+<span class="cmt">// Throttle</span>
+<span class="kwd">function</span> <span class="fn">throttle</span>(fn, limit) {
+  <span class="kwd">let</span> inThrottle;
+  <span class="kwd">return</span> <span class="kwd">function</span>(...args) {
+    <span class="kwd">if</span> (!inThrottle) {
+      fn.<span class="fn">apply</span>(<span class="kwd">this</span>, args);
+      inThrottle = <span class="kwd">true</span>;
+      setTimeout(() => inThrottle = <span class="kwd">false</span>, limit);
+    }
+  };
+}
+
+<span class="cmt">// Deep Clone</span>
+<span class="kwd">function</span> <span class="fn">deepClone</span>(obj, hash = <span class="kwd">new</span> <span class="type">WeakMap</span>()) {
+  <span class="kwd">if</span> (Object(obj) !== obj) <span class="kwd">return</span> obj;
+  <span class="kwd">if</span> (hash.<span class="fn">has</span>(obj)) <span class="kwd">return</span> hash.<span class="fn">get</span>(obj);
+  <span class="kwd">const</span> result = Array.<span class="fn">isArray</span>(obj) ? [] : {};
+  hash.<span class="fn">set</span>(obj, result);
+  <span class="kwd">return</span> Object.<span class="fn">assign</span>(result, ...Object.<span class="fn">keys</span>(obj).<span class="fn">map</span>(key => ({
+    [key]: <span class="fn">deepClone</span>(obj[key], hash)
+  })));
+}
+
+<span class="cmt">// Flatten Array</span>
+<span class="kwd">const</span> <span class="fn">flatten</span> = arr => arr.<span class="fn">reduce</span>((flat, item) =>
+  flat.<span class="fn">concat</span>(Array.<span class="fn">isArray</span>(item) ? <span class="fn">flatten</span>(item) : item), []);
+
+<span class="cmt">// Promise.all with concurrency limit</span>
+<span class="kwd">async function</span> <span class="fn">asyncPool</span>(concurrency, iterable, iteratorFn) {
+  <span class="kwd">const</span> ret = [];
+  <span class="kwd">const</span> executing = <span class="kwd">new</span> <span class="type">Set</span>();
+  <span class="kwd">for</span> (<span class="kwd">const</span> item <span class="kwd">of</span> iterable) {
+    <span class="kwd">const</span> p = Promise.<span class="fn">resolve</span>().<span class="fn">then</span>(() => <span class="fn">iteratorFn</span>(item));
+    ret.<span class="fn">push</span>(p);
+    executing.<span class="fn">add</span>(p);
+    <span class="kwd">const</span> clean = () => executing.<span class="fn">delete</span>(p);
+    p.<span class="fn">then</span>(clean, clean);
+    <span class="kwd">if</span> (executing.size &gt;= concurrency) <span class="kwd">await</span> Promise.<span class="fn">race</span>(executing);
+  }
+  <span class="kwd">return</span> Promise.<span class="fn">all</span>(ret);
+}</code></pre>
+
+        <h3>Algorithm Complexity Cheat Sheet</h3>
+        <table>
+            <tr><th>Operation</th><th>Array</th><th>Object/Map</th><th>Set</th></tr>
+            <tr><td>Access</td><td>O(1)</td><td>O(1)</td><td>N/A</td></tr>
+            <tr><td>Search</td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+            <tr><td>Insert</td><td>O(1)* / O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+            <tr><td>Delete</td><td>O(n)</td><td>O(1)</td><td>O(1)</td></tr>
+        </table>
+        <p style="font-size:0.85rem;color:var(--text-muted);">* Amortized; may trigger resize</p>
+
+        <div class="info-box tip"><div class="info-box-title">💡 Interview Strategy</div><p>When solving problems, always: (1) Clarify requirements and constraints, (2) Start with brute force, (3) Optimize with data structures, (4) Consider edge cases, (5) Analyze time/space complexity, (6) Write clean, readable code.</p></div>
+">take</span>(<span class="num">2</span>).<span class="fn">toArray</span>();
+
+<span class="cmt">// Error.isError — works across realms</span>
+Error.<span class="fn">isError</span>(err);  <span class="cmt">// true even for cross-iframe errors</span></code></pre>
+        <div class="section-divider"></div>
+
+        <h2 id="es2027">24. ES2027 Proposals (Stage 3)</h2>
+        <pre><code><span class="cmt">// Explicit Resource Management</span>
+<span class="kwd">class</span> <span class="type">FileHandle</span> {
+  [Symbol.<span class="fn">dispose</span>]() { fs.<span class="fn">closeSync</span>(<span class="kwd">this</span>.handle); }
+}
+<span class="kwd">using</span> file = <span class="kwd">new</span> FileHandle(<span class="str">'data.txt'</span>);
+<span class="cmt">// auto-closed when block exits</span>
+
+<span class="cmt">// Pattern Matching</span>
+<span class="kwd">const</span> result = <span class="kwd">match</span> (response) {
+  <span class="kwd">when</span> { status: <span class="num">200</span>, data: <span class="kwd">let</span> data } -> data,
+  <span class="kwd">when</span> { status: <span class="num">404</span> } -> <span class="kwd">throw</span> <span class="kwd">new</span> Error(<span class="str">'Not found'</span>),
+  <span class="kwd">default</span> -> <span class="kwd">throw</span> <span class="kwd">new</span> Error(<span class="str">'Unknown'</span>)
+};
+
+<span class="cmt">// Records & Tuples (immutable)</span>
+<span class="kwd">const</span> record = #{ x: <span class="num">1</span>, y: <span class="num">2</span> };
+#{ a: <span class="num">1</span> } === #{ a: <span class="num">1</span> };  <span class="cmt">// true — deep equality!</span></code></pre>
+
+        <div class="section-divider"></div>
+        <footer style="text-align:center;padding:40px;color:var(--text-muted);border-top:1px solid var(--border);margin-top:60px;">
+            <p style="font-size:1.2rem;margin-bottom:10px;">JavaScript Complete</p>
+            <p>Technical depth + human clarity, side by side.</p>
+            <p style="margin-top:20px;font-size:0.85rem;">Built for serious developers who also want to understand <em>why</em>.</p>
+        </footer>
+    </main>
+</div>
+
+<div class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<script>
+    const sections = document.querySelectorAll('h2[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const backToTop = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(s => { if (scrollY >= s.offsetTop - 100) current = s.getAttribute('id'); });
+        navLinks.forEach(l => {
+            l.classList.remove('active');
+            if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+        });
+        backToTop.classList.toggle('visible', scrollY > 500);
+    });
+</script>
+</body>
+</html>
