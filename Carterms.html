@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vehicle Systems Bus — Modern Car Architecture Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0A0D12;
+    --surface:#12161D;
+    --surface-2:#181D26;
+    --border:#232A35;
+    --text:#E7ECF2;
+    --text-dim:#8D97A6;
+    --text-faint:#5B6472;
+    --amber:#FF8C42;
+    --amber-dim:#7A4B2A;
+    --cyan:#4FD1E8;
+    --cyan-dim:#1F4C55;
+    --green:#7FD68A;
+    --red:#E8626F;
+    --radius:10px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(79,209,232,0.06), transparent 60%),
+      radial-gradient(1000px 500px at 90% 10%, rgba(255,140,66,0.05), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.65;
+    min-height:100vh;
+  }
+  ::selection{ background:var(--cyan-dim); color:var(--text); }
+
+  h1,h2,h3,.disp{ font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+
+  a{ color:inherit; }
+
+  /* ===== Top bus header ===== */
+  header.busbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(10,13,18,0.92);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .busbar-inner{
+    max-width:1280px; margin:0 auto; padding:14px 24px;
+    display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+  }
+  .brand{
+    display:flex; align-items:baseline; gap:10px; margin-right:auto;
+  }
+  .brand .mark{
+    color:var(--amber); font-size:13px; letter-spacing:0.14em; font-family:'JetBrains Mono';
+  }
+  .brand h1{ font-size:17px; font-weight:600; }
+
+  nav.busnodes{
+    display:flex; align-items:center; gap:2px; overflow-x:auto;
+    padding:4px 0;
+  }
+  nav.busnodes a{
+    text-decoration:none; white-space:nowrap;
+    font-size:12.5px; color:var(--text-dim);
+    padding:7px 12px; border-radius:20px;
+    border:1px solid transparent;
+    transition:all .15s ease;
+    font-family:'JetBrains Mono';
+  }
+  nav.busnodes a:hover{ color:var(--text); border-color:var(--border); background:var(--surface); }
+  nav.busnodes a.active{ color:var(--cyan); border-color:var(--cyan-dim); background:rgba(79,209,232,0.08); }
+
+  /* signature: animated bus line */
+  .bus-line{
+    height:2px; width:100%; position:relative; overflow:hidden;
+    background:linear-gradient(90deg, transparent, var(--border) 10%, var(--border) 90%, transparent);
+  }
+  .bus-line .pulse{
+    position:absolute; top:0; left:-8%; width:8%; height:100%;
+    background:linear-gradient(90deg, transparent, var(--cyan), transparent);
+    animation:travel 4.5s linear infinite;
+    filter:drop-shadow(0 0 6px var(--cyan));
+  }
+  @keyframes travel{ to{ left:108%; } }
+
+  /* ===== Hero ===== */
+  .hero{ max-width:1280px; margin:0 auto; padding:64px 24px 40px; }
+  .hero .eyebrow{
+    font-family:'JetBrains Mono'; font-size:12px; color:var(--amber);
+    letter-spacing:0.16em; text-transform:uppercase; margin-bottom:16px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .eyebrow::before{ content:''; width:7px; height:7px; border-radius:50%; background:var(--amber); box-shadow:0 0 8px var(--amber); }
+  .hero h2{ font-size:clamp(30px,4.4vw,50px); font-weight:700; max-width:820px; line-height:1.12; }
+  .hero h2 span{ color:var(--cyan); }
+  .hero p.lede{
+    margin-top:20px; max-width:680px; color:var(--text-dim); font-size:16px;
+  }
+  .hero-stats{
+    margin-top:36px; display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;
+    max-width:760px;
+  }
+  .stat{ background:var(--surface); padding:16px 18px; }
+  .stat .num{ font-family:'Space Grotesk'; font-size:26px; font-weight:700; color:var(--cyan); }
+  .stat .label{ font-size:11.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.08em; margin-top:4px; }
+
+  .search-wrap{ max-width:1280px; margin:0 auto; padding:0 24px 20px; }
+  #search{
+    width:100%; max-width:420px; background:var(--surface); border:1px solid var(--border);
+    color:var(--text); padding:11px 14px; border-radius:8px; font-family:'JetBrains Mono'; font-size:13px;
+    outline:none; transition:border-color .15s;
+  }
+  #search::placeholder{ color:var(--text-faint); }
+  #search:focus{ border-color:var(--cyan-dim); }
+
+  /* ===== Layout ===== */
+  main{ max-width:1280px; margin:0 auto; padding:0 24px 100px; display:grid; grid-template-columns:220px 1fr; gap:36px; }
+
+  .toc{ position:sticky; top:78px; align-self:start; height:calc(100vh - 100px); overflow-y:auto; padding-right:8px; }
+  .toc-group{ margin-bottom:22px; }
+  .toc-group .tg-title{
+    font-family:'JetBrains Mono'; font-size:10.5px; color:var(--text-faint);
+    text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px;
+  }
+  .toc-group a{
+    display:block; font-size:13px; color:var(--text-dim); text-decoration:none;
+    padding:5px 0 5px 12px; border-left:2px solid var(--border);
+    transition:all .15s;
+  }
+  .toc-group a:hover, .toc-group a.active{ color:var(--text); border-left-color:var(--cyan); }
+
+  section.sys-section{ padding-top:26px; scroll-margin-top:80px; }
+  .sys-section > .intro{
+    display:flex; gap:16px; align-items:flex-start; margin-bottom:22px;
+    padding-bottom:18px; border-bottom:1px solid var(--border);
+  }
+  .sys-section > .intro .idx{
+    font-family:'JetBrains Mono'; font-size:12px; color:var(--amber);
+    background:rgba(255,140,66,0.08); border:1px solid var(--amber-dim);
+    padding:4px 9px; border-radius:6px; flex-shrink:0; margin-top:4px;
+  }
+  .sys-section h2{ font-size:23px; font-weight:600; margin-bottom:6px; }
+  .sys-section .intro p{ color:var(--text-dim); font-size:14.5px; max-width:760px; }
+
+  .card-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+
+  .card{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:18px 20px; transition:border-color .15s, transform .15s;
+  }
+  .card:hover{ border-color:var(--cyan-dim); transform:translateY(-2px); }
+  .card .card-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px; }
+  .card h3{ font-size:15px; font-weight:600; }
+  .card .tag{
+    font-family:'JetBrains Mono'; font-size:10px; color:var(--cyan);
+    background:rgba(79,209,232,0.08); border:1px solid var(--cyan-dim);
+    padding:2px 8px; border-radius:20px; white-space:nowrap;
+  }
+  .card p{ font-size:13.5px; color:var(--text-dim); }
+  .card p + p{ margin-top:10px; }
+  .card .extra{ color:var(--text-faint); font-style:italic; }
+
+  /* flow diagram */
+  .flow{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+    padding:24px; margin-top:8px;
+  }
+  .flow-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .flow-node{
+    font-family:'JetBrains Mono'; font-size:12px; padding:8px 14px; border-radius:8px;
+    background:var(--surface-2); border:1px solid var(--border); color:var(--text);
+  }
+  .flow-node.hot{ border-color:var(--amber-dim); color:var(--amber); }
+  .flow-arrow{ color:var(--text-faint); font-size:16px; }
+
+  .callout{
+    margin-top:26px; background:var(--surface-2); border-left:3px solid var(--cyan);
+    padding:16px 20px; border-radius:0 8px 8px 0; font-size:14px; color:var(--text-dim);
+  }
+  .callout b{ color:var(--text); }
+
+  footer{
+    max-width:1280px; margin:0 auto; padding:30px 24px 60px; color:var(--text-faint); font-size:12px;
+    border-top:1px solid var(--border); margin-top:20px;
+  }
+
+  mark{ background:rgba(255,140,66,0.28); color:var(--text); border-radius:3px; padding:0 2px; }
+  .hidden{ display:none !important; }
+
+  @media (max-width:900px){
+    main{ grid-template-columns:1fr; }
+    .toc{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="busbar">
+  <div class="busbar-inner">
+    <div class="brand">
+      <span class="mark">AUTOKB //</span>
+      <h1>Vehicle Systems Bus</h1>
+    </div>
+    <nav class="busnodes" id="busnodes">
+      <a href="#vision">Vision</a>
+      <a href="#sensing">Radar/LiDAR</a>
+      <a href="#infotainment">Infotainment</a>
+      <a href="#body">Body/Chassis</a>
+      <a href="#network">Network</a>
+      <a href="#together">Integration</a>
+      <a href="#validation">Validation</a>
+    </nav>
+  </div>
+  <div class="bus-line"><div class="pulse"></div></div>
+</header>
+
+<div class="hero">
+  <div class="eyebrow">29 Modules · 6 Domains · 1 Vehicle</div>
+  <h2>Every module in a modern car, mapped like the <span>network</span> that actually connects them.</h2>
+  <p class="lede">Modern vehicles aren't one computer — they're a distributed system of 70–150 small computers (ECUs) talking over a handful of shared buses. This reference walks through the sensing layer, the infotainment layer, the control layer, and the wiring that ties them together, the same way you'd trace a signal on the bench.</p>
+  <div class="hero-stats">
+    <div class="stat"><div class="num">7</div><div class="label">Camera types</div></div>
+    <div class="stat"><div class="num">4</div><div class="label">Ranging sensors</div></div>
+    <div class="stat"><div class="num">7</div><div class="label">Body/chassis ECUs</div></div>
+    <div class="stat"><div class="num">5</div><div class="label">Network buses</div></div>
+  </div>
+</div>
+
+<div class="search-wrap">
+  <input type="text" id="search" class="mono" placeholder="Filter modules — try 'radar', 'CAN', 'camera'...">
+</div>
+
+<main>
+  <aside class="toc" id="toc">
+    <div class="toc-group">
+      <div class="tg-title">01 · Vision</div>
+      <a href="#rvc">RVC</a>
+      <a href="#rwc">RWC</a>
+      <a href="#mvc">MVC / SVC</a>
+      <a href="#lanewatch">LaneWatch</a>
+      <a href="#fvc">FVC</a>
+      <a href="#dms">DMS</a>
+      <a href="#oms">OMS</a>
+    </div>
+    <div class="toc-group">
+      <div class="tg-title">02 · Radar / LiDAR</div>
+      <a href="#mrr-srr">MRR / SRR</a>
+      <a href="#lrr">LRR</a>
+      <a href="#uss">USS</a>
+      <a href="#lidar">LiDAR</a>
+    </div>
+    <div class="toc-group">
+      <div class="tg-title">03 · Infotainment</div>
+      <a href="#hu">HU</a>
+      <a href="#tcu">TCU</a>
+      <a href="#btwifi">BT / Wi-Fi</a>
+      <a href="#dab">DAB / Tuner</a>
+      <a href="#amp">Amp / DSP</a>
+      <a href="#displays">CID/Cluster/HUD</a>
+      <a href="#rse">RSE</a>
+    </div>
+    <div class="toc-group">
+      <div class="tg-title">04 · Body / Chassis</div>
+      <a href="#bcm">BCM</a>
+      <a href="#ecm">ECM / PCM</a>
+      <a href="#tcm">TCM</a>
+      <a href="#absesc">ABS / ESC</a>
+      <a href="#srs">SRS / Airbag</a>
+      <a href="#peps">PEPS</a>
+      <a href="#gateway">Gateway</a>
+    </div>
+    <div class="toc-group">
+      <div class="tg-title">05 · Network</div>
+      <a href="#can">CAN / CAN-FD</a>
+      <a href="#lin">LIN</a>
+      <a href="#ethernet">Ethernet</a>
+      <a href="#flexray">FlexRay</a>
+      <a href="#most">MOST</a>
+    </div>
+  </aside>
+
+  <div id="content">
+
+    <!-- ================= VISION ================= -->
+    <section class="sys-section" id="vision">
+      <div class="intro">
+        <span class="idx">01</span>
+        <div>
+          <h2>Camera & Vision Systems</h2>
+          <p>The eyes of the vehicle. Each camera feeds an ADAS ECU, a domain controller, or a zonal controller depending on the platform, typically over GMSL, FPD-Link, or Automotive Ethernet. None of these are "just a camera" — each is a full sensing pipeline: optics, image sensor, image signal processing, time synchronization, power management, self-diagnostics, and calibration all have to work together before a single frame reaches the driver's screen. A camera that is perfectly sharp but even a few milliseconds out of sync with the rest of the system can still fail validation.</p>
+        </div>
+      </div>
+      <div class="card-grid">
+        <div class="card" id="rvc">
+          <div class="card-head"><h3>RVC — Rear View Camera</h3><span class="tag">reverse</span></div>
+          <p>The standard backup camera used while reversing. It shows a fairly normal (non-wide) field of view directly behind the bumper, so the driver can judge close obstacles accurately.</p>
+          <p>It's usually triggered automatically the instant reverse gear is engaged, and it appears on the head unit with parking guidelines and dynamic trajectory lines overlaid on top.</p>
+          <p class="extra">Think of it as the baseline safety camera — every other rear camera variant is really a wider or smarter version of this one.</p>
+        </div>
+        <div class="card" id="rwc">
+          <div class="card-head"><h3>RWC — Rear Wide Camera</h3><span class="tag">reverse</span></div>
+          <p>A wider-angle rear camera. Compared to a standard RVC it captures more of the area behind the car, which helps a lot when reversing out of tight spots or scanning for cross-traffic.</p>
+          <p>Some OEMs treat RWC and RVC as two separate, distinctly named functions; others use the terms almost interchangeably for the same physical camera with a wider lens fitted.</p>
+          <p class="extra">The tradeoff is coverage versus distortion — a wider lens sees more, but the edges of the image bend more too, so overlay graphics have to be calibrated carefully.</p>
+        </div>
+        <div class="card" id="mvc">
+          <div class="card-head"><h3>MVC / SVC — Surround View</h3><span class="tag">360°</span></div>
+          <p>The bird's-eye 360° system built from four fisheye cameras — front, rear, and both door mirrors — stitched into one top-down composite view for parking and low-speed maneuvers.</p>
+          <p>The real engineering challenge isn't the stitching algorithm alone; it's calibration accuracy, frame-timing alignment across four separate sensors, and blending the seams so the result looks like one continuous image rather than four overlapping ones.</p>
+          <p class="extra">This is a textbook case of a system that lives or dies on synchronized sensor-to-ECU communication — even small timing drift between cameras shows up as a visible "ghost line" in the stitched view.</p>
+        </div>
+        <div class="card" id="lanewatch">
+          <div class="card-head"><h3>LaneWatch Camera</h3><span class="tag">Honda</span></div>
+          <p>Honda's passenger-side blind-spot camera, mounted near the side mirror. It is camera-based, not radar-based — it shows a live video feed of the passenger lane instead of just beeping.</p>
+          <p>It typically activates when the turn signal is used or a dedicated mirror button is pressed, giving the driver visual confirmation of traffic or cyclists before changing lanes.</p>
+          <p class="extra">Its main limitation is one-sidedness: it only covers the passenger side, so it complements — rather than replaces — a full blind-spot monitoring system.</p>
+        </div>
+        <div class="card" id="fvc">
+          <div class="card-head"><h3>FVC — Front View Camera</h3><span class="tag">forward</span></div>
+          <p>The forward-facing camera behind the windshield, used for lane detection, traffic sign recognition, object detection, and sometimes traffic-light recognition — arguably the single most important vision input for driver-assist perception.</p>
+          <p>It usually works in tandem with front radar: the camera classifies what an object is, and the radar measures how far away it is and how fast it's closing, which is a more reliable combination than either sensor alone.</p>
+          <p class="extra">Because it sits near the rear-view mirror, a cracked or dirty windshield in that exact spot can knock out lane-keeping and forward-collision warning even if nothing else on the car is wrong.</p>
+        </div>
+        <div class="card" id="dms">
+          <div class="card-head"><h3>DMS — Driver Monitoring</h3><span class="tag">in-cabin</span></div>
+          <p>Watches the driver, not the road. An in-cabin camera — often infrared-assisted so it still works at night — tracks gaze direction, eyelid closure, head pose, and distraction or drowsiness cues.</p>
+          <p>This matters because even fairly advanced driver-assist systems still legally and practically require an attentive supervising driver, so DMS is what keeps that assumption honest.</p>
+          <p class="extra">On a fault, it typically escalates gradually — a soft chime first, then a visual warning, then in some systems a request for the driver to physically confirm they're still in control.</p>
+        </div>
+        <div class="card" id="oms">
+          <div class="card-head"><h3>OMS — Occupant Monitoring</h3><span class="tag">in-cabin</span></div>
+          <p>Monitors who and what is inside the cabin — seat occupancy, child presence, posture, and seatbelt-related checks — rather than watching only the driver.</p>
+          <p>Depending on the OEM it may directly influence airbag deployment logic, working closely with the SRS module so a child seat or an empty seat doesn't get treated the same as an adult occupant.</p>
+          <p class="extra">Like DMS it can use visible light, infrared, or a blend of both, and privacy/lighting constraints usually decide which approach a given OEM picks.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RADAR / LIDAR ================= -->
+    <section class="sys-section" id="sensing">
+      <div class="intro">
+        <span class="idx">02</span>
+        <div>
+          <h2>Radar, Ultrasonic & LiDAR</h2>
+          <p>Where cameras classify, these sensors measure — distance, closing speed, and object presence, and they do it reliably in rain, fog, glare, and darkness where a camera alone struggles. In a real ADAS stack, radar range/velocity data and camera classification are fused together so the system isn't fully dependent on either sensor type; that redundancy is exactly why false positives drop sharply once fusion is added.</p>
+        </div>
+      </div>
+      <div class="card-grid">
+        <div class="card" id="mrr-srr">
+          <div class="card-head"><h3>MRR / SRR — Mid & Short Range Radar</h3><span class="tag">corners</span></div>
+          <p>Used for blind-spot monitoring, lane-change assist, and rear cross-traffic alert. SRR units usually sit in the rear (and sometimes front) corners, exactly where adjacent-lane and crossing traffic is easiest to catch.</p>
+          <p>MRR extends that range a little further and contributes to more advanced side-looking perception, while SRR stays focused on the tighter, closer-in cases.</p>
+          <p class="extra">Radar's real superpower here is relative speed — it measures closing velocity accurately even in conditions where a camera's classification confidence would normally drop.</p>
+        </div>
+        <div class="card" id="lrr">
+          <div class="card-head"><h3>LRR — Long-Range Radar</h3><span class="tag">forward</span></div>
+          <p>Powers adaptive cruise control and forward collision support by looking much farther down the road than SRR/MRR, focused specifically on vehicles in the ego lane at highway speed.</p>
+          <p>Its core outputs are range, velocity, and sometimes angle — enough for the control system to hold a safe following distance and react before the driver would notice a change.</p>
+          <p class="extra">Paired with the FVC, LRR goes from "there's something ahead" to "that's a car, four lanes over, closing at 12 km/h" — the fusion is what makes the system trustworthy.</p>
+        </div>
+        <div class="card" id="uss">
+          <div class="card-head"><h3>USS — Ultrasonic Sensors</h3><span class="tag">parking</span></div>
+          <p>The short-range "parking ears" mounted around the bumpers. Cheap, simple, and very good at detecting nearby objects at low speed — exactly the job parking assist needs.</p>
+          <p>They're strong for stall detection, wall distance, and curb detection, but they're not built for long range or high-speed perception, so you won't find them doing highway-speed work.</p>
+          <p class="extra">Their one real weakness is soft or angled surfaces — a foam bollard or a shallow curb can return a weaker echo than a flat wall, which is a classic USS validation edge case.</p>
+        </div>
+        <div class="card" id="lidar">
+          <div class="card-head"><h3>LiDAR</h3><span class="tag">3D map</span></div>
+          <p>Uses laser pulses to build a high-resolution 3D map of the environment, giving much finer spatial detail than radar can offer, at the cost of higher price and tighter packaging constraints.</p>
+          <p>In high-end ADAS and autonomous stacks it's valued specifically for object shape and depth understanding — telling a pedestrian's silhouette apart from a signpost, for example.</p>
+          <p class="extra">It's rarely used as the only perception sensor; it's almost always one voice in a larger sensor-fusion stack alongside camera and radar.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INFOTAINMENT ================= -->
+    <section class="sys-section" id="infotainment">
+      <div class="intro">
+        <span class="idx">03</span>
+        <div>
+          <h2>Infotainment & Connectivity</h2>
+          <p>This layer is about experience and connectivity — media, navigation, smartphone projection, emergency calling, remote commands, and OTA services. In most modern platforms the head unit and telematics unit are tightly woven into the vehicle's broader network architecture, not bolted on as an afterthought, which is why an infotainment freeze can sometimes ripple into camera display or even connectivity-diagnostics symptoms.</p>
+        </div>
+      </div>
+      <div class="card-grid">
+        <div class="card" id="hu">
+          <div class="card-head"><h3>HU — Head Unit</h3><span class="tag">central</span></div>
+          <p>The central infotainment computer running the display, audio control, navigation UI, and most user-facing functions, usually communicating with the rest of the vehicle over CAN or Ethernet.</p>
+          <p>It typically runs Android Automotive, Linux, QNX, or a proprietary OEM stack, and it's also where RVC/surround-view video and phone integration actually get displayed to the driver.</p>
+          <p class="extra">In practical terms, the HU is the driver's single gateway into the vehicle — most of what "feels like the car's software" is really the HU's UI layer.</p>
+        </div>
+        <div class="card" id="tcu">
+          <div class="card-head"><h3>TCU — Telematics Control Unit</h3><span class="tag">cellular</span></div>
+          <p>Provides cellular connectivity and remote services: eCall/emergency response, remote lock/unlock, vehicle tracking, diagnostics upload, and OTA-related backend communication.</p>
+          <p>It usually bundles GNSS and modem management too, and it talks to the gateway or a central ECU to fetch or push vehicle data as needed.</p>
+          <p class="extra">Because it's the vehicle's bridge to the outside internet, the TCU is one of the most security-sensitive modules in the whole architecture.</p>
+        </div>
+        <div class="card" id="btwifi">
+          <div class="card-head"><h3>BT / Wi-Fi Module</h3><span class="tag">A2DP·AVRCP·HFP</span></div>
+          <p>Handles Bluetooth and Wi-Fi to external devices. Bluetooth covers A2DP (audio streaming), AVRCP (media control), HFP (hands-free calling), and PBAP (phonebook access); Wi-Fi typically carries hotspot, CarPlay, Android Auto, diagnostics, or software-update traffic.</p>
+          <p>In most platforms this isn't a standalone box — it's baked directly into the infotainment SoC rather than existing as a separate physical module.</p>
+          <p class="extra">Given your Bluetooth validation background, this is the module where profile-level regression testing (HFP call handoff, A2DP dropout under Wi-Fi coexistence) tends to matter most.</p>
+        </div>
+        <div class="card" id="dab">
+          <div class="card-head"><h3>DAB / Radio Tuner</h3><span class="tag">RF</span></div>
+          <p>The broadcast reception block for digital and conventional radio — it receives RF, demodulates it, and passes audio or metadata to the infotainment system.</p>
+          <p>It's a separate signal chain from the speakers themselves but closely tied to the HU's UI, and in some architectures the tuner is an external module reached over a digital audio link or Ethernet rather than being built into the HU.</p>
+        </div>
+        <div class="card" id="amp">
+          <div class="card-head"><h3>Amplifier / DSP</h3><span class="tag">audio</span></div>
+          <p>The amplifier drives the speakers; the DSP handles equalization, delay alignment, surround effects, loudness compensation, and often active noise cancellation support.</p>
+          <p>In premium systems the amplifier is a smart, addressable node on the vehicle network rather than a dumb analog box — it can accept compressed digital streams and apply cabin-specific tuning on the fly.</p>
+          <p class="extra">This block quietly does more for perceived cabin "quality" than the speakers themselves usually get credit for.</p>
+        </div>
+        <div class="card" id="displays">
+          <div class="card-head"><h3>CID / Cluster / HUD</h3><span class="tag">displays</span></div>
+          <p>CID is the center info display, Cluster is the instrument cluster, and HUD projects critical information straight into the driver's line of sight — three displays, often three different content sources.</p>
+          <p>These need synchronized graphics and fast, safety-aware updates, and important ADAS or camera alerts frequently need to appear on more than one display at once so the driver can't miss them.</p>
+        </div>
+        <div class="card" id="rse">
+          <div class="card-head"><h3>RSE — Rear Seat Entertainment</h3><span class="tag">rear</span></div>
+          <p>Entertainment screens for rear passengers — media playback, phone mirroring, streaming apps, and sometimes independent audio zones.</p>
+          <p>Depending on the architecture it may hang off the main infotainment system or run semi-independently, and its network traffic is mostly media/control rather than anything real-time-safety-critical.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BODY / CHASSIS ================= -->
+    <section class="sys-section" id="body">
+      <div class="intro">
+        <span class="idx">04</span>
+        <div>
+          <h2>Body & Chassis ECUs</h2>
+          <p>The operational backbone of the car: powertrain, braking, access, and safety, all constantly talking over CAN, CAN-FD, LIN, and increasingly Ethernet, usually mediated by a gateway or zonal controller so no single ECU has to know every other ECU by name.</p>
+        </div>
+      </div>
+      <div class="card-grid">
+        <div class="card" id="bcm">
+          <div class="card-head"><h3>BCM — Body Control Module</h3><span class="tag">comfort</span></div>
+          <p>Manages lighting, wipers, central locking, power windows, mirrors, interior lights, and most other comfort features — one of the most universally present ECUs in any vehicle.</p>
+          <p>It often acts as the local coordinator for many low-speed devices and also handles diagnostics and wake/sleep behavior for the body electronics domain.</p>
+          <p class="extra">In newer zonal architectures many "BCM functions" migrate to zone controllers, but the logical role — coordinating body-level devices — survives the rename.</p>
+        </div>
+        <div class="card" id="ecm">
+          <div class="card-head"><h3>ECM / PCM</h3><span class="tag">powertrain</span></div>
+          <p>Controls engine and powertrain operation: fuel injection, ignition, throttle, torque requests, emissions, and often hybrid coordination — the module responsible for actually producing motion efficiently and safely.</p>
+          <p>It takes driver inputs and higher-level system commands and reports back status, torque, and fault data continuously.</p>
+          <p class="extra">In EV/hybrid platforms the naming shifts (sometimes to a "vehicle control unit"), but the core responsibility — turning a torque request into motion — stays the same.</p>
+        </div>
+        <div class="card" id="tcm">
+          <div class="card-head"><h3>TCM — Transmission Control</h3><span class="tag">gearing</span></div>
+          <p>Manages gear selection, shift timing, clutch control, and overall transmission behavior, coordinating constantly with the engine/powertrain controller for smooth, efficient acceleration.</p>
+          <p>In automatic and dual-clutch systems it's heavily software- and calibration-dependent, exchanging frequent status frames over CAN/CAN-FD — and in some vehicles it's folded into a broader powertrain controller entirely.</p>
+        </div>
+        <div class="card" id="absesc">
+          <div class="card-head"><h3>ABS / ESC Module</h3><span class="tag">stability</span></div>
+          <p>Controls braking stability, wheel-slip management, and electronic stability behavior using wheel-speed sensors to modulate individual brake pressure during hard braking or cornering.</p>
+          <p>It's also a critical data source for ADAS: lane-keeping and stability-aware driver-assist functions lean on ABS/ESC vehicle-dynamics data to know exactly what the car is currently doing.</p>
+        </div>
+        <div class="card" id="srs">
+          <div class="card-head"><h3>SRS — Airbag Control</h3><span class="tag">safety</span></div>
+          <p>Monitors crash sensors, seatbelt signals, and occupant status to decide whether and how airbags should deploy — a genuinely safety-critical ECU with strict timing and fault-handling requirements.</p>
+          <p>It often interfaces directly with OMS or seat-occupancy logic so deployment strategy can adapt to whether a seat holds an adult, a child, or nothing at all.</p>
+          <p class="extra">Because incorrect deployment is a serious risk either way (firing or not firing), this module is one of the most heavily regulated pieces of software in the entire car.</p>
+        </div>
+        <div class="card" id="peps">
+          <div class="card-head"><h3>PEPS</h3><span class="tag">keyless</span></div>
+          <p>Passive Entry Passive Start — enables keyless entry and keyless engine start by detecting the key fob through short-range communication with vehicle-side antennas.</p>
+          <p>It typically coordinates with the BCM, gateway/security logic, and immobilizer functions to unlock or start the car without the driver ever touching a physical key.</p>
+          <p class="extra">It's a convenience feature on the surface, but underneath it carries real cybersecurity weight — relay-attack resistance is a standard PEPS validation concern.</p>
+        </div>
+        <div class="card" id="gateway">
+          <div class="card-head"><h3>Gateway ECU</h3><span class="tag">router</span></div>
+          <p>The traffic hub between networks — bridging CAN, LIN, Ethernet, and sometimes legacy buses, filtering messages and enforcing routing and security rules.</p>
+          <p>It's what prevents every single ECU from needing to know every other ECU directly, and its importance only grows as vehicles move toward zonal architectures with mixed-speed networks.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= NETWORK ================= -->
+    <section class="sys-section" id="network">
+      <div class="intro">
+        <span class="idx">05</span>
+        <div>
+          <h2>Vehicle Networking Backbone</h2>
+          <p>The communication fabric connecting everything above. The choice of bus is a tradeoff between latency, bandwidth, cost, topology, reliability, diagnostics, and security — and as sensor data volume keeps growing, Ethernet is increasingly the one carrying camera and domain-controller traffic while CAN and LIN quietly hold down control and legacy duties.</p>
+        </div>
+      </div>
+      <div class="card-grid">
+        <div class="card" id="can">
+          <div class="card-head"><h3>CAN / CAN-FD</h3><span class="tag">control</span></div>
+          <p>The classic automotive control network: robust, deterministic, simple. Excellent for low-to-medium bandwidth messages like door status, engine requests, switch signals, and most diagnostic interactions.</p>
+          <p>CAN-FD extends payload size and bitrate for heavier control data, but even in the newest cars, plain CAN remains everywhere simply because it's cheap and thoroughly proven.</p>
+        </div>
+        <div class="card" id="lin">
+          <div class="card-head"><h3>LIN</h3><span class="tag">low-cost</span></div>
+          <p>A low-cost, low-speed network for simple devices — mirror motors, seats, rain sensors, small body actuators — anywhere the traffic is predictable and bandwidth needs stay low.</p>
+          <p>LIN typically hangs off a more capable node like a BCM or zone controller; its whole reason for existing is cost, not speed.</p>
+        </div>
+        <div class="card" id="ethernet">
+          <div class="card-head"><h3>Automotive Ethernet</h3><span class="tag">high-BW</span></div>
+          <p>Now the backbone for high-bandwidth applications — cameras, ADAS sensors, infotainment, and zonal networking — carrying much higher data rates than CAN, including video, radar data, and synchronized sensor traffic.</p>
+          <p>For camera systems especially, latency, synchronization, switching behavior, and security become the real design challenges, which is exactly why network architecture choices matter so much for vision quality.</p>
+        </div>
+        <div class="card" id="flexray">
+          <div class="card-head"><h3>FlexRay</h3><span class="tag">legacy</span></div>
+          <p>A legacy deterministic network used for time-critical control before Ethernet matured, offering more determinism than CAN — attractive for certain chassis and powertrain use cases in its day.</p>
+          <p>It's much less common in new designs now, but still turns up in older premium or safety-oriented architectures.</p>
+        </div>
+        <div class="card" id="most">
+          <div class="card-head"><h3>MOST</h3><span class="tag">legacy</span></div>
+          <p>A legacy network built mainly for multimedia transport in older infotainment systems — audio/video distribution and device coordination within the cabin.</p>
+          <p>Ethernet has largely replaced it in modern vehicles because it scales far better and fits more naturally alongside the rest of the vehicle network.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INTEGRATION ================= -->
+    <section class="sys-section" id="together">
+      <div class="intro">
+        <span class="idx">06</span>
+        <div>
+          <h2>How These Blocks Work Together</h2>
+          <p>A modern vehicle is a distributed system, not a single computer — nothing here works in isolation. Sensors perceive, ECUs decide, actuators act, and the network connects all of it into something that behaves like one coordinated machine even though it's really dozens of small ones cooperating.</p>
+        </div>
+      </div>
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-node hot">Reverse gear selected</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">BCM detects reverse state</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">RVC wakes up</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-node">Video → HU / surround-view ECU</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node">USS measures close obstacles</div>
+          <span class="flow-arrow">→</span>
+          <div class="flow-node hot">Guidelines overlaid on display</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-node">Gateway</div>
+          <span class="flow-arrow">↔</span>
+          <div class="flow-node">Right status frames reach the right nodes</div>
+        </div>
+      </div>
+      <div class="callout">
+        <b>Mental model:</b> sensors perceive, ADAS/domain ECUs interpret the scene, body/chassis/powertrain controllers execute the action, and the gateway plus in-vehicle networks make it all read as one coordinated system rather than dozens of independent parts. A reverse-parking scenario like the one above is a good end-to-end example to hold in your head — it's much easier to remember than isolated definitions.
+      </div>
+    </section>
+
+    <!-- ================= VALIDATION ================= -->
+    <section class="sys-section" id="validation">
+      <div class="intro">
+        <span class="idx">07</span>
+        <div>
+          <h2>What Matters in Validation</h2>
+          <p>From a V&V perspective, the highest-value things to check are almost always field of view, latency, startup time, synchronization, fault behavior, network load, and diagnostics — not just "does the feature work."</p>
+        </div>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-head"><h3>Cameras</h3><span class="tag">vision</span></div>
+          <p>Image delay, stitching quality (for MVC/SVC), brightness adaptation, and calibration drift over time and temperature.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Radar & Ultrasonic</h3><span class="tag">ranging</span></div>
+          <p>Detection range accuracy, object classification confidence, and false-positive / false-negative behavior across weather and lighting conditions.</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>ECUs & Networking</h3><span class="tag">bus</span></div>
+          <p>Message timing, wake/sleep transitions, gateway filtering correctness, DTC behavior, and fail-safe reactions under fault injection.</p>
+        </div>
+      </div>
+      <div class="callout">
+        <b>Study tip:</b> trace one real scenario end to end — like the reverse-parking flow above — instead of memorizing module names in isolation. Following the signal from gear selection through the camera, the display, and back through the gateway makes the whole architecture click into place far faster than a flat glossary ever will.
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  Vehicle Systems Bus — reference build · Vision, Radar/LiDAR, Infotainment, Body/Chassis, and Network domains, traced end to end. · <span class="mono">v1.0</span>
+</footer>
+
+<script>
+  // Active nav highlighting on scroll
+  const sections = document.querySelectorAll('.sys-section');
+  const navLinks = document.querySelectorAll('#toc a, #busnodes a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const id = entry.target.id;
+        navLinks.forEach(l => {
+          l.classList.toggle('active', l.getAttribute('href') === '#' + id);
+        });
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Search / filter across cards
+  const searchInput = document.getElementById('search');
+  const allCards = document.querySelectorAll('.card');
+
+  function clearHighlights(el){
+    el.querySelectorAll('mark').forEach(m => {
+      m.replaceWith(document.createTextNode(m.textContent));
+    });
+  }
+
+  searchInput.addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+
+    allCards.forEach(card => {
+      const text = card.textContent.toLowerCase();
+      const match = q === '' || text.includes(q);
+      card.classList.toggle('hidden', !match);
+    });
+
+    document.querySelectorAll('.sys-section').forEach(section => {
+      const visibleCards = section.querySelectorAll('.card:not(.hidden)');
+      const hasCards = section.querySelectorAll('.card').length > 0;
+      if(hasCards){
+        section.classList.toggle('hidden', visibleCards.length === 0);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
