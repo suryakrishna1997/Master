@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AutoKB — Master Knowledge Portal</title>
+  <title>SuryaKB — Automotive Knowledge Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -114,7 +114,7 @@
     .logo span { color: var(--accent); }
 
     #menu-btn {
-      display: none;
+      display: flex;
       background: none;
       border: none;
       cursor: pointer;
@@ -170,9 +170,17 @@
       display: flex;
       flex-direction: column;
       flex-shrink: 0;
-      transition: transform .25s ease;
+      transition: transform .25s ease, width .25s ease, border-color .25s ease;
       z-index: 50;
       overflow: hidden;
+    }
+
+    /* Desktop collapse (hamburger toggles this on wide screens) */
+    @media (min-width: 769px) {
+      #sidebar.collapsed {
+        width: 0;
+        border-right-color: transparent;
+      }
     }
 
     .sidebar-header {
@@ -182,6 +190,7 @@
       letter-spacing: 1.2px;
       text-transform: uppercase;
       color: var(--text3);
+      white-space: nowrap;
     }
 
     #module-list {
@@ -202,6 +211,7 @@
       transition: all .18s;
       margin-bottom: 2px;
       border: 1px solid transparent;
+      white-space: nowrap;
     }
 
     .module-item:hover {
@@ -268,6 +278,7 @@
       font-size: 0.7rem;
       color: var(--text3);
       text-align: center;
+      white-space: nowrap;
     }
 
     /* ── CONTENT ─────────────────────────────────────────────── */
@@ -465,8 +476,6 @@
     @media (max-width: 768px) {
       :root { --sidebar: 250px; }
 
-      #menu-btn { display: flex; }
-
       #sidebar {
         position: fixed;
         top: var(--topbar);
@@ -517,7 +526,7 @@
           </svg>
         </button>
         <div class="logo">
-          <div class="logo-icon">🚗</div>Auto<span>KB</span>
+          <div class="logo-icon">☀️</div>Surya<span>KB</span>
         </div>
       </div>
       <div class="topbar-right">
@@ -533,13 +542,13 @@
       <nav id="sidebar">
         <div class="sidebar-header">Modules</div>
         <div id="module-list"></div>
-        <div class="sidebar-footer">AutoKB · v2.1</div>
+        <div class="sidebar-footer">SuryaKB · v2.2</div>
       </nav>
 
       <main id="content">
         <div id="content-bar">
           <div id="breadcrumb">
-            <span class="crumb-home">AutoKB</span>
+            <span class="crumb-home">SuryaKB</span>
             <span class="crumb-sep">›</span>
             <span class="crumb-cur" id="crumb-cur">Home</span>
           </div>
@@ -563,8 +572,8 @@
 
         <div id="iframe-container">
           <div id="welcome">
-            <div class="welcome-logo">🚗</div>
-            <div class="welcome-title">Auto<span>KB</span> Master Portal</div>
+            <div class="welcome-logo">☀️</div>
+            <div class="welcome-title">Surya<span>KB</span> Knowledge Portal</div>
             <div class="welcome-sub">
               Your unified knowledge hub for automotive engineering.<br>
               Pick a module from the sidebar or tap a card below.
@@ -601,6 +610,14 @@
         file: 'Automotive_full.html'
       },
       {
+        id: 'Carterms',
+        name: 'Automotive Glossary',
+        sub: 'Car Terms & Definitions',
+        icon: '📖',
+        badge: 'Glossary',
+        file: 'Carterms.html'
+      },
+      {
         id: 'btwifi',
         name: 'CONN-X Connectivity',
         sub: 'Bluetooth · Wi-Fi · CarPlay',
@@ -632,18 +649,18 @@
         badge: 'JavaScript',
         file: 'JavaScript.html'
       },
-       {
+      {
         id: 'JavaScript2',
-        name: 'JavaScript Mastery',
-        sub: 'Core JS · ES6+ · DOM · Async',
+        name: 'JavaScript Sandbox',
+        sub: 'Practice Drills · Snippets',
         icon: '🟨',
         badge: 'JavaScript',
         file: 'Javascriptsss.html'
       },
       {
         id: 'JavaScript3',
-        name: 'JavaScript Mastery',
-        sub: 'Core JS · ES6+ · DOM · Async',
+        name: 'JavaScript Quick Reference',
+        sub: 'Cheatsheet · Syntax Lookup',
         icon: '🟨',
         badge: 'JavaScript',
         file: 'Java.html'
@@ -672,14 +689,6 @@
         badge: 'Diagnostics',
         file: 'uds.html'
       },
-       {
-        id: 'Carterms',
-        name: 'Carterms',
-        sub: 'Cartemrs',
-        icon: '🔧',
-        badge: 'Diagnostics',
-        file: 'Carterms.html'
-      },
 
       // ── Commented-out / future modules ────────────────────────
       // { id: 'capl', name: 'CAPL Scripting', sub: 'Macros & Scripts', icon: '🔧', badge: 'Scripting', file: 'capl.html' },
@@ -705,7 +714,7 @@
     }
 
     let activeId = null;
-    try { activeId = localStorage.getItem('autokb_active') || null; } catch(e) {}
+    try { activeId = localStorage.getItem('suryakb_active') || null; } catch(e) {}
 
     // ── SIDEBAR ──────────────────────────────────────────────────
     function renderSidebar() {
@@ -768,7 +777,7 @@
 
       document.getElementById('crumb-cur').textContent = m.name;
       renderSidebar();
-      try { localStorage.setItem('autokb_active', id); } catch(e) {}
+      try { localStorage.setItem('suryakb_active', id); } catch(e) {}
     }
 
     // ── THEME ────────────────────────────────────────────────────
@@ -783,35 +792,57 @@
 
     document.getElementById('theme-toggle').addEventListener('click', () => {
       applyTheme(!isDark);
-      try { localStorage.setItem('autokb_theme', isDark ? 'dark' : 'light'); } catch(e) {}
+      try { localStorage.setItem('suryakb_theme', isDark ? 'dark' : 'light'); } catch(e) {}
     });
 
     try {
-      if (localStorage.getItem('autokb_theme') === 'light') applyTheme(false);
+      if (localStorage.getItem('suryakb_theme') === 'light') applyTheme(false);
     } catch(e) {}
 
-    // ── MOBILE SIDEBAR ───────────────────────────────────────────
+    // ── HAMBURGER MENU (works on both desktop & mobile) ──────────
+    const sidebarEl  = document.getElementById('sidebar');
+    const overlayEl  = document.getElementById('sidebar-overlay');
+    const menuBtn    = document.getElementById('menu-btn');
+
+    function isMobile() { return window.innerWidth <= 768; }
+
     function closeSidebar() {
-      document.getElementById('sidebar').classList.remove('open');
-      document.getElementById('sidebar-overlay').classList.remove('open');
+      sidebarEl.classList.remove('open');
+      overlayEl.classList.remove('open');
     }
 
-    document.getElementById('menu-btn').addEventListener('click', () => {
-      document.getElementById('sidebar').classList.toggle('open');
-      document.getElementById('sidebar-overlay').classList.toggle('open');
+    menuBtn.addEventListener('click', () => {
+      if (isMobile()) {
+        // Mobile: slide the sidebar in/out as an overlay
+        sidebarEl.classList.toggle('open');
+        overlayEl.classList.toggle('open');
+      } else {
+        // Desktop: collapse/expand the sidebar in place
+        sidebarEl.classList.toggle('collapsed');
+      }
     });
 
-    document.getElementById('sidebar-overlay').addEventListener('click', closeSidebar);
+    overlayEl.addEventListener('click', closeSidebar);
 
-    // Close sidebar on swipe-left (touch devices)
+    // If the window is resized across the mobile/desktop boundary,
+    // reset any toggle state so the sidebar doesn't get stuck.
+    window.addEventListener('resize', () => {
+      if (isMobile()) {
+        sidebarEl.classList.remove('collapsed');
+      } else {
+        closeSidebar();
+      }
+    });
+
+    // Close sidebar on swipe-left (touch devices, mobile overlay only)
     let touchStartX = 0;
-    document.getElementById('sidebar').addEventListener('touchstart', e => {
+    sidebarEl.addEventListener('touchstart', e => {
       touchStartX = e.touches[0].clientX;
     }, { passive: true });
 
-    document.getElementById('sidebar').addEventListener('touchend', e => {
+    sidebarEl.addEventListener('touchend', e => {
       const dx = e.changedTouches[0].clientX - touchStartX;
-      if (dx < -60) closeSidebar();
+      if (dx < -60 && isMobile()) closeSidebar();
     }, { passive: true });
 
     // ── RELOAD / FULLSCREEN ──────────────────────────────────────
