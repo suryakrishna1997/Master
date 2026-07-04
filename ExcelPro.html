@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shortcuts.xlsx</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE7D6;
+    --paper-2:#E3DCC7;
+    --ink:#20241F;
+    --ink-soft:#5B5A4E;
+    --line:#CFC6A9;
+    --teal:#2F6F62;
+    --teal-soft:#E1EBE5;
+    --gold:#B98A1E;
+    --gold-soft:#F2E7C9;
+    --rust:#AD5330;
+    --rust-soft:#F1DED2;
+    --navy:#2B3A56;
+    --navy-soft:#DEE3EC;
+    --white:#FBF9F1;
+    --shadow: 0 1px 0 rgba(32,36,31,0.06);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .workbook{
+    max-width:1180px;
+    margin:0 auto;
+    padding:28px 24px 80px;
+  }
+
+  /* ===== Title bar ===== */
+  .titlebar{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+    padding-bottom:18px;
+    border-bottom:2px solid var(--ink);
+    margin-bottom:0;
+    flex-wrap:wrap;
+  }
+  .titlebar h1{
+    font-family:'Fraunces',serif;
+    font-optical-sizing:auto;
+    font-weight:700;
+    font-size:clamp(28px,4vw,42px);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  .titlebar h1 .ext{ color:var(--teal); font-weight:500; font-style:italic; }
+  .titlebar p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14px;
+    max-width:360px;
+    line-height:1.5;
+  }
+
+  /* ===== Formula bar ===== */
+  .formula-bar{
+    display:flex;
+    align-items:stretch;
+    margin-top:16px;
+    border:1px solid var(--line);
+    background:var(--white);
+    box-shadow:var(--shadow);
+  }
+  .name-box{
+    width:96px;
+    flex:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:13px;
+    color:var(--teal);
+    border-right:1px solid var(--line);
+    background:var(--teal-soft);
+    letter-spacing:0.02em;
+  }
+  .fx{
+    width:40px;
+    flex:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-style:italic;
+    font-family:'Fraunces',serif;
+    color:var(--ink-soft);
+    border-right:1px solid var(--line);
+    font-size:15px;
+  }
+  #search{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:0 14px;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    color:var(--ink);
+    outline:none;
+  }
+  #search::placeholder{ color:#9A957F; }
+  .result-count{
+    flex:none;
+    display:flex;
+    align-items:center;
+    padding:0 16px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    border-left:1px solid var(--line);
+    white-space:nowrap;
+  }
+
+  /* ===== level chips ===== */
+  .levels{
+    display:flex;
+    gap:8px;
+    margin-top:14px;
+    flex-wrap:wrap;
+  }
+  .chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    font-weight:600;
+    padding:6px 12px;
+    border-radius:2px;
+    border:1px solid var(--line);
+    background:var(--white);
+    color:var(--ink-soft);
+    cursor:pointer;
+    user-select:none;
+    transition:transform .12s ease;
+  }
+  .chip:hover{ transform:translateY(-1px); }
+  .chip[data-level="basic"].active{ background:var(--teal); border-color:var(--teal); color:var(--white); }
+  .chip[data-level="intermediate"].active{ background:var(--gold); border-color:var(--gold); color:var(--white); }
+  .chip[data-level="advanced"].active{ background:var(--rust); border-color:var(--rust); color:var(--white); }
+  .chip[data-level="pro"].active{ background:var(--navy); border-color:var(--navy); color:var(--white); }
+  .chip[data-level="all"].active{ background:var(--ink); border-color:var(--ink); color:var(--white); }
+
+  /* ===== Sheet tabs ===== */
+  .sheet-tabs{
+    display:flex;
+    gap:2px;
+    margin-top:22px;
+    overflow-x:auto;
+    scrollbar-width:none;
+    border-bottom:1px solid var(--line);
+  }
+  .sheet-tabs::-webkit-scrollbar{ display:none; }
+  .tab{
+    flex:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:13px;
+    padding:10px 18px 9px;
+    background:var(--paper-2);
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    border-bottom:none;
+    border-radius:6px 6px 0 0;
+    cursor:pointer;
+    white-space:nowrap;
+    position:relative;
+    top:1px;
+  }
+  .tab.active{
+    background:var(--white);
+    color:var(--ink);
+    border-bottom:1px solid var(--white);
+  }
+
+  /* ===== Grid of shortcut cells ===== */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(270px,1fr));
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    margin-top:0;
+  }
+  .cell{
+    background:var(--white);
+    padding:16px 16px 18px;
+    position:relative;
+    min-height:150px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    outline:1px solid transparent;
+    outline-offset:-2px;
+  }
+  .cell:hover{
+    outline:2px solid var(--teal);
+    z-index:1;
+  }
+  .cell:hover::after{
+    content:"";
+    position:absolute;
+    width:7px; height:7px;
+    right:-1px; bottom:-1px;
+    background:var(--teal);
+    border:1px solid var(--white);
+  }
+  .cell-ref{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.03em;
+  }
+  .cell-ref.basic{ color:var(--teal); }
+  .cell-ref.intermediate{ color:var(--gold); }
+  .cell-ref.advanced{ color:var(--rust); }
+  .cell-ref.pro{ color:var(--navy); }
+
+  .keys{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    align-items:center;
+  }
+  kbd{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    font-weight:600;
+    background:var(--paper-2);
+    border:1px solid var(--line);
+    border-bottom-width:2px;
+    padding:3px 8px;
+    border-radius:4px;
+    color:var(--ink);
+  }
+  .plus{ color:var(--ink-soft); font-size:12px; }
+
+  .name{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:16.5px;
+    line-height:1.25;
+    margin:0;
+  }
+  .desc{
+    font-size:13px;
+    line-height:1.5;
+    color:var(--ink-soft);
+    margin:0;
+  }
+
+  .empty{
+    grid-column:1/-1;
+    background:var(--white);
+    padding:60px 20px;
+    text-align:center;
+    color:var(--ink-soft);
+    font-family:'Fraunces',serif;
+    font-size:18px;
+    font-style:italic;
+  }
+
+  /* ===== Legend / footer ===== */
+  .legend{
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    margin-top:26px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+  }
+  .legend span{ display:flex; align-items:center; gap:6px; }
+  .dot{ width:9px; height:9px; border-radius:50%; display:inline-block; }
+  .dot.basic{ background:var(--teal); }
+  .dot.intermediate{ background:var(--gold); }
+  .dot.advanced{ background:var(--rust); }
+  .dot.pro{ background:var(--navy); }
+
+  .footnote{
+    margin-top:38px;
+    padding-top:16px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+  }
+  .footnote b{ color:var(--ink); }
+
+  @media (max-width:520px){
+    .name-box{ width:72px; font-size:11px; }
+    .titlebar{ flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+<div class="workbook">
+
+  <div class="titlebar">
+    <h1>Shortcuts<span class="ext">.xlsx</span></h1>
+    <p>Every keyboard shortcut worth knowing — from your first <kbd style="font-size:11px;padding:2px 5px;">Ctrl+C</kbd> to the ones power users take for granted. Sorted by what it's actually for.</p>
+  </div>
+
+  <div class="formula-bar">
+    <div class="name-box" id="rangeLabel">ALL</div>
+    <div class="fx">fx</div>
+    <input type="text" id="search" placeholder="Type to search a shortcut, key, or what it's for… e.g. &quot;lock reference&quot;, &quot;F4&quot;, &quot;pivot&quot;">
+    <div class="result-count" id="resultCount">55 results</div>
+  </div>
+
+  <div class="levels" id="levels">
+    <div class="chip active" data-level="all">ALL LEVELS</div>
+    <div class="chip" data-level="basic">● BASIC</div>
+    <div class="chip" data-level="intermediate">● INTERMEDIATE</div>
+    <div class="chip" data-level="advanced">● ADVANCED</div>
+    <div class="chip" data-level="pro">● PRO</div>
+  </div>
+
+  <div class="sheet-tabs" id="tabs"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="legend">
+    <span><span class="dot basic"></span> Basic — daily typing &amp; editing</span>
+    <span><span class="dot intermediate"></span> Intermediate — formatting &amp; structure</span>
+    <span><span class="dot advanced"></span> Advanced — formulas &amp; data tools</span>
+    <span><span class="dot pro"></span> Pro — the ones that make people ask "wait, how did you do that?"</span>
+  </div>
+
+  <div class="footnote">
+    <b>Reading a cell reference:</b> the code in the corner (like <b>A12</b>) works just like a real spreadsheet cell — the letter is the difficulty column, the number is just its position in that list. It's not a ranking, just a map.<br>
+    <b>On a Mac:</b> swap <kbd style="font-size:11px;padding:2px 5px;">Ctrl</kbd> for <kbd style="font-size:11px;padding:2px 5px;">Cmd</kbd> in almost every shortcut below — a handful (like Paste Special) live under <kbd style="font-size:11px;padding:2px 5px;">Cmd+Ctrl+V</kbd> instead.
+  </div>
+
+</div>
+
+<script>
+const DATA = [
+  // ---------------- NAVIGATION & SELECTION ----------------
+  {cat:"nav", level:"basic", keys:["Ctrl","Home"], name:"Jump to A1", desc:"Snaps you back to the very first cell — the fastest way to reset your position in a huge sheet."},
+  {cat:"nav", level:"basic", keys:["Ctrl","End"], name:"Jump to last used cell", desc:"Finds the true bottom-right edge of your data, so you know exactly how big the sheet really is."},
+  {cat:"nav", level:"basic", keys:["Ctrl","Space"], name:"Select entire column", desc:"Selects the whole column of the active cell — no dragging the mouse to the top and bottom."},
+  {cat:"nav", level:"basic", keys:["Shift","Space"], name:"Select entire row", desc:"Selects the whole row instantly — pairs with Ctrl+Space for full column/row control."},
+  {cat:"nav", level:"intermediate", keys:["Ctrl","Arrow"], name:"Jump to edge of data", desc:"Leaps to the last filled cell in that direction — skip scrolling through thousands of rows."},
+  {cat:"nav", level:"intermediate", keys:["Ctrl","Shift","Arrow"], name:"Select to edge of data", desc:"Highlights everything from where you are to the end of the data block, in one move."},
+  {cat:"nav", level:"intermediate", keys:["Ctrl","A"], name:"Select current data region", desc:"Press once to select the connected table around your cursor; press again to select the whole sheet."},
+  {cat:"nav", level:"advanced", keys:["F5"], name:"Go To", desc:"Type any cell reference, named range, or address and jump there directly — faster than scrolling."},
+  {cat:"nav", level:"advanced", keys:["Ctrl","PageDown"], name:"Next sheet tab", desc:"Switches to the next worksheet without touching the mouse — Ctrl+PageUp goes back."},
+  {cat:"nav", level:"pro", keys:["Alt",";"], name:"Select visible cells only", desc:"When rows are filtered or hidden, this selects only what you can see — prevents accidentally copying hidden data."},
+
+  // ---------------- EDITING & ENTRY ----------------
+  {cat:"editing", level:"basic", keys:["Ctrl","C"], name:"Copy", desc:"Copies the selected cell or range so you can paste it elsewhere."},
+  {cat:"editing", level:"basic", keys:["Ctrl","V"], name:"Paste", desc:"Pastes whatever you last copied or cut into the active cell."},
+  {cat:"editing", level:"basic", keys:["Ctrl","Z"], name:"Undo", desc:"Reverses your last action — the most-used shortcut in any spreadsheet, full stop."},
+  {cat:"editing", level:"basic", keys:["Tab"], name:"Confirm & move right", desc:"Enters your value and moves one cell right — the natural way to fill a row left to right."},
+  {cat:"editing", level:"basic", keys:["Enter"], name:"Confirm & move down", desc:"Enters your value and drops to the cell below — the natural way to fill a column top to bottom."},
+  {cat:"editing", level:"basic", keys:["Esc"], name:"Cancel edit", desc:"Backs out of whatever you were typing without changing the cell — undo before you even commit."},
+  {cat:"editing", level:"intermediate", keys:["F2"], name:"Edit active cell", desc:"Drops your cursor straight into the cell's content instead of overwriting it — good for small tweaks."},
+  {cat:"editing", level:"intermediate", keys:["Alt","Enter"], name:"New line inside a cell", desc:"Adds a line break within the same cell instead of moving to the next one — for multi-line notes."},
+  {cat:"editing", level:"intermediate", keys:["Ctrl","D"], name:"Fill down", desc:"Copies the cell above into the current selection — quick way to repeat a formula or value down a column."},
+  {cat:"editing", level:"intermediate", keys:["Ctrl","R"], name:"Fill right", desc:"Copies the cell to the left across the current selection — same idea as Fill Down, sideways."},
+  {cat:"editing", level:"intermediate", keys:["Ctrl",";"], name:"Insert today's date", desc:"Drops a static date stamp into the cell — handy for logs and timestamps that shouldn't change."},
+  {cat:"editing", level:"advanced", keys:["Ctrl","Enter"], name:"Fill all selected cells at once", desc:"Type once, then Ctrl+Enter — the same value or formula fills every selected cell simultaneously, not just one."},
+  {cat:"editing", level:"pro", keys:["F4"], name:"Repeat last action", desc:"Reapplies whatever you just did — a formatting change, a delete, an insert — to a new cell instantly. Massive for repetitive cleanup."},
+
+  // ---------------- FORMATTING ----------------
+  {cat:"format", level:"basic", keys:["Ctrl","B"], name:"Bold", desc:"Toggles bold on the selected text or cell — same as most other software."},
+  {cat:"format", level:"basic", keys:["Ctrl","1"], name:"Format Cells dialog", desc:"Opens full control over number format, borders, alignment, and fonts in one window — the one shortcut worth memorizing first."},
+  {cat:"format", level:"intermediate", keys:["Ctrl","Shift","$"], name:"Apply currency format", desc:"Instantly formats the selection as currency, no menu digging required."},
+  {cat:"format", level:"intermediate", keys:["Ctrl","Shift","%"], name:"Apply percentage format", desc:"Turns 0.25 into 25% on the spot — a small thing that saves constant re-formatting."},
+  {cat:"format", level:"intermediate", keys:["Ctrl","Shift","#"], name:"Apply date format", desc:"Formats the selected numbers as dates — useful after pasting raw date values from another source."},
+  {cat:"format", level:"intermediate", keys:["Ctrl","Shift","~"], name:"Apply general format", desc:"Strips special number formatting back to plain numbers — the fastest way to undo an accidental format."},
+  {cat:"format", level:"advanced", keys:["Ctrl","Shift","&"], name:"Apply outline border", desc:"Draws a border around the selected range in one keystroke — great for boxing off a summary table."},
+  {cat:"format", level:"advanced", keys:["Ctrl","Shift","_"], name:"Remove borders", desc:"Clears all borders from the selection instantly."},
+  {cat:"format", level:"pro", keys:["Ctrl","Shift","L"], name:"Toggle filters", desc:"Turns column filter arrows on or off for your data range without visiting the ribbon — a habit worth building."},
+
+  // ---------------- FORMULAS & FUNCTIONS ----------------
+  {cat:"formulas", level:"basic", keys:["="], name:"Start a formula", desc:"Tells Excel that whatever comes next is a calculation, not text — the starting point of everything formulas can do."},
+  {cat:"formulas", level:"intermediate", keys:["Alt","="], name:"AutoSum", desc:"Detects the numbers around your cell and inserts a SUM formula automatically — no typing the range by hand."},
+  {cat:"formulas", level:"intermediate", keys:["Shift","F3"], name:"Insert Function dialog", desc:"Opens a searchable list of every function with a description — useful when you know what you want but not the exact name."},
+  {cat:"formulas", level:"advanced", keys:["F4"], name:"Toggle absolute reference", desc:"While editing a formula, cycles a reference through A1 → $A$1 → A$1 → $A1. Locks rows/columns so formulas don't shift when you drag or copy them — one of the most important shortcuts for anyone writing formulas."},
+  {cat:"formulas", level:"advanced", keys:["Ctrl","`"], name:"Show formulas, not values", desc:"Flips the whole sheet to display the actual formulas in every cell — the fastest way to audit someone else's spreadsheet."},
+  {cat:"formulas", level:"advanced", keys:["F9"], name:"Evaluate part of a formula", desc:"Highlight a piece of a formula in the formula bar and press F9 to see just that piece calculated — brilliant for debugging a nested formula step by step."},
+  {cat:"formulas", level:"pro", keys:["Ctrl","Shift","Enter"], name:"Enter an array formula", desc:"Confirms a formula as an array (legacy CSE formula), letting it operate across multiple values or return multiple results at once."},
+  {cat:"formulas", level:"pro", keys:["Ctrl","["], name:"Trace precedents", desc:"Jumps to the cell(s) that feed into the current formula — trace exactly where a number is coming from without hunting manually."},
+
+  // ---------------- ROWS, COLUMNS & SHEETS ----------------
+  {cat:"structure", level:"basic", keys:["Ctrl","+"], name:"Insert row/column", desc:"Inserts a new row, column, or cell at the current selection — the plus key doubles as 'add'."},
+  {cat:"structure", level:"basic", keys:["Ctrl","–"], name:"Delete row/column", desc:"Removes the selected row, column, or cell — the minus key doubles as 'remove'."},
+  {cat:"structure", level:"intermediate", keys:["Ctrl","9"], name:"Hide row", desc:"Hides the selected row without deleting its data — good for tidying a view temporarily."},
+  {cat:"structure", level:"intermediate", keys:["Ctrl","0"], name:"Hide column", desc:"Same idea as hiding a row, but for columns."},
+  {cat:"structure", level:"intermediate", keys:["Ctrl","Shift","9"], name:"Unhide rows", desc:"Brings back any hidden rows within your selection."},
+  {cat:"structure", level:"advanced", keys:["Shift","F11"], name:"Insert new worksheet", desc:"Adds a fresh sheet tab instantly, without right-clicking the tab bar."},
+
+  // ---------------- DATA TOOLS & ANALYSIS ----------------
+  {cat:"data", level:"advanced", keys:["Ctrl","T"], name:"Convert to Table", desc:"Turns a plain range into a structured Excel Table — auto-formatting, auto-expanding rows, and formulas that reference column names instead of cell letters."},
+  {cat:"data", level:"advanced", keys:["Ctrl","F3"], name:"Open Name Manager", desc:"Shows every named range in the workbook in one place — rename, edit, or delete them without hunting through formulas."},
+  {cat:"data", level:"pro", keys:["Ctrl","Shift","F3"], name:"Create names from selection", desc:"Turns your header row labels into named ranges automatically — instantly write formulas like =Revenue-Costs instead of =B2-C2."},
+  {cat:"data", level:"pro", keys:["Alt","D","P"], name:"PivotTable Wizard (legacy)", desc:"A sequential key combo (press Alt, then D, then P) that opens the classic PivotTable/PivotChart Wizard — still works in modern Excel and is faster for advanced pivot setups."},
+  {cat:"data", level:"pro", keys:["Ctrl","\\"], name:"Compare cells in a row", desc:"Selects cells in a row that differ from the value in the active column — a built-in way to spot inconsistent entries across a dataset."},
+
+  // ---------------- POWER USER / PRO WIZARDRY ----------------
+  {cat:"power", level:"pro", keys:["Ctrl","Alt","V"], name:"Paste Special", desc:"Opens a menu to paste only values, only formulas, only formatting, or to transpose rows into columns — the shortcut that separates casual users from everyone else."},
+  {cat:"power", level:"pro", keys:["Alt","↓"], name:"Auto-complete dropdown", desc:"Shows a dropdown of every existing entry already used in that column, so you can pick instead of retyping — great for repeated categories or names."},
+  {cat:"power", level:"pro", keys:["Ctrl","K"], name:"Insert hyperlink", desc:"Adds a clickable link to a cell — a webpage, an email, or even another cell in the workbook."},
+  {cat:"power", level:"pro", keys:["Alt","F11"], name:"Open the VBA editor", desc:"Opens the macro-editing environment behind Excel — the entry point for automating anything Excel can't do with formulas alone."},
+  {cat:"power", level:"pro", keys:["Alt","F8"], name:"Run a macro", desc:"Opens the list of recorded or written macros so you can run one immediately, without going through the ribbon."},
+  {cat:"power", level:"pro", keys:["Ctrl","Shift","O"], name:"Select all commented cells", desc:"Instantly selects every cell in the sheet that has a comment attached — useful for reviewing feedback across a large sheet."},
+  {cat:"power", level:"pro", keys:["Ctrl","/"], name:"Select current array formula", desc:"Selects the full range covered by an array formula that contains the active cell — helpful since array formulas can't be edited partially."},
+];
+
+const CATEGORIES = [
+  {id:"all", label:"All Shortcuts"},
+  {id:"nav", label:"Navigation"},
+  {id:"editing", label:"Editing"},
+  {id:"format", label:"Formatting"},
+  {id:"formulas", label:"Formulas"},
+  {id:"structure", label:"Rows & Sheets"},
+  {id:"data", label:"Data Tools"},
+  {id:"power", label:"Power User"},
+];
+
+const LEVEL_LETTER = { basic:"B", intermediate:"I", advanced:"A", pro:"P" };
+const LEVEL_LABEL = { basic:"Basic", intermediate:"Intermediate", advanced:"Advanced", pro:"Pro" };
+
+let state = { cat:"all", level:"all", query:"" };
+
+const tabsEl = document.getElementById("tabs");
+const gridEl = document.getElementById("grid");
+const searchEl = document.getElementById("search");
+const rangeLabel = document.getElementById("rangeLabel");
+const resultCount = document.getElementById("resultCount");
+const levelsEl = document.getElementById("levels");
+
+function buildTabs(){
+  tabsEl.innerHTML = CATEGORIES.map(c =>
+    `<div class="tab ${c.id===state.cat?'active':''}" data-cat="${c.id}">${c.label}</div>`
+  ).join("");
+  tabsEl.querySelectorAll(".tab").forEach(t=>{
+    t.addEventListener("click", ()=>{
+      state.cat = t.dataset.cat;
+      buildTabs();
+      render();
+    });
+  });
+}
+
+levelsEl.querySelectorAll(".chip").forEach(c=>{
+  c.addEventListener("click", ()=>{
+    state.level = c.dataset.level;
+    levelsEl.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+    c.classList.add("active");
+    render();
+  });
+});
+
+searchEl.addEventListener("input", (e)=>{
+  state.query = e.target.value.trim().toLowerCase();
+  render();
+});
+
+function matches(item){
+  if(state.cat !== "all" && item.cat !== state.cat) return false;
+  if(state.level !== "all" && item.level !== state.level) return false;
+  if(state.query){
+    const haystack = (item.name + " " + item.desc + " " + item.keys.join(" ")).toLowerCase();
+    if(!haystack.includes(state.query)) return false;
+  }
+  return true;
+}
+
+function render(){
+  const filtered = DATA.filter(matches);
+
+  // assign cell references per level, counted over the *filtered visible order*
+  const counters = { basic:0, intermediate:0, advanced:0, pro:0 };
+
+  rangeLabel.textContent = state.cat === "all" ? "ALL" : state.cat.toUpperCase();
+  resultCount.textContent = filtered.length + (filtered.length===1 ? " result" : " results");
+
+  if(filtered.length === 0){
+    gridEl.innerHTML = `<div class="empty">No matches — that combination doesn't exist yet (or your search is too specific). Try clearing a filter.</div>`;
+    return;
+  }
+
+  gridEl.innerHTML = filtered.map(item=>{
+    counters[item.level]++;
+    const ref = LEVEL_LETTER[item.level] + counters[item.level];
+    const keysHtml = item.keys.map((k,i)=>
+      (i>0 ? '<span class="plus">+</span>' : '') + `<kbd>${k}</kbd>`
+    ).join("");
+    return `
+      <div class="cell">
+        <div class="cell-ref ${item.level}">${ref} · ${LEVEL_LABEL[item.level]}</div>
+        <div class="keys">${keysHtml}</div>
+        <p class="name">${item.name}</p>
+        <p class="desc">${item.desc}</p>
+      </div>
+    `;
+  }).join("");
+}
+
+buildTabs();
+render();
+</script>
+</body>
+</html>
