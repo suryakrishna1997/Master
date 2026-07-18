@@ -1,0 +1,2769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embedded V&V Mastery — Revision Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#060912;
+    --bg-2:#0a0f1c;
+    --surface:#0f1525;
+    --surface-2:#141c33;
+    --border:#1e2740;
+    --border-bright:#2c3a5e;
+    --text:#e6edf7;
+    --text-dim:#9aa7c2;
+    --text-muted:#5d6b8a;
+    --accent:#00ff9d;
+    --accent-2:#00d4ff;
+    --accent-3:#ffb020;
+    --accent-4:#ff3d71;
+    --grid:rgba(0,255,157,0.04);
+    --glow:0 0 24px rgba(0,255,157,0.25);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth;scroll-padding-top:80px}
+  body{
+    font-family:'Manrope',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.6;
+    overflow-x:hidden;
+    background-image:
+      linear-gradient(var(--grid) 1px,transparent 1px),
+      linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:48px 48px;
+  }
+  /* Scrollbar */
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-track{background:var(--bg-2)}
+  ::-webkit-scrollbar-thumb{background:var(--border-bright);border-radius:4px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+  
+  /* Typography */
+  h1,h2,h3,h4{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:-0.02em}
+  code,pre,.mono{font-family:'JetBrains Mono',monospace}
+  
+  /* ===== HERO ===== */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    padding:0 24px;
+  }
+  #circuit-canvas{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    z-index:0;
+  }
+  .hero::before{
+    content:"";
+    position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 60%,transparent 0%,rgba(6,9,18,0.7) 60%,var(--bg) 100%);
+    z-index:1;
+  }
+  .hero-content{
+    position:relative;z-index:2;
+    max-width:1100px;
+    text-align:center;
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 14px;
+    border:1px solid var(--border-bright);
+    border-radius:100px;
+    background:rgba(0,255,157,0.06);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--accent);
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    margin-bottom:28px;
+  }
+  .badge .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--accent);
+    box-shadow:0 0 12px var(--accent);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+  
+  .hero h1{
+    font-size:clamp(40px,7vw,88px);
+    font-weight:700;
+    line-height:0.95;
+    margin-bottom:24px;
+    background:linear-gradient(180deg,#fff 0%,#9aa7c2 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+  }
+  .hero h1 .accent{
+    background:linear-gradient(135deg,var(--accent) 0%,var(--accent-2) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    font-style:italic;
+  }
+  .hero p{
+    font-size:clamp(15px,1.6vw,19px);
+    color:var(--text-dim);
+    max-width:680px;
+    margin:0 auto 40px;
+  }
+  .hero-stats{
+    display:flex;gap:32px;justify-content:center;flex-wrap:wrap;
+    margin-bottom:48px;
+  }
+  .stat{
+    text-align:left;
+    padding:14px 22px;
+    border-left:2px solid var(--accent);
+    background:linear-gradient(90deg,rgba(0,255,157,0.05),transparent);
+  }
+  .stat .num{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:32px;font-weight:700;
+    color:var(--accent);
+    line-height:1;
+  }
+  .stat .lbl{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:0.15em;
+    margin-top:4px;
+  }
+  .search-wrap{
+    max-width:560px;margin:0 auto;
+    position:relative;
+  }
+  .search-wrap input{
+    width:100%;
+    padding:14px 18px 14px 48px;
+    background:var(--surface);
+    border:1px solid var(--border-bright);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'JetBrains Mono',monospace;
+    font-size:14px;
+    transition:all 0.2s;
+  }
+  .search-wrap input:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(0,255,157,0.1);
+  }
+  .search-wrap svg{
+    position:absolute;left:16px;top:50%;
+    transform:translateY(-50%);
+    color:var(--text-muted);
+    width:18px;height:18px;
+  }
+  .scroll-hint{
+    position:absolute;bottom:30px;left:50%;
+    transform:translateX(-50%);
+    z-index:2;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--text-muted);
+    letter-spacing:0.2em;
+    text-transform:uppercase;
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+  }
+  .scroll-hint .line{
+    width:1px;height:32px;
+    background:linear-gradient(180deg,var(--accent),transparent);
+    animation:scrollLine 2s ease-in-out infinite;
+  }
+  @keyframes scrollLine{0%,100%{transform:scaleY(0.3);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}}
+  
+  /* ===== NAV ===== */
+  .topnav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(6,9,18,0.85);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    padding:12px 24px;
+  }
+  .topnav-inner{
+    max-width:1400px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;gap:24px;
+  }
+  .logo{
+    display:flex;align-items:center;gap:10px;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    white-space:nowrap;
+  }
+  .logo-mark{
+    width:28px;height:28px;
+    border:1.5px solid var(--accent);
+    border-radius:6px;
+    display:grid;place-items:center;
+    color:var(--accent);
+    background:rgba(0,255,157,0.05);
+  }
+  .nav-links{
+    display:flex;gap:4px;flex:1;justify-content:center;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a{
+    padding:7px 12px;
+    font-size:12px;
+    font-family:'JetBrains Mono',monospace;
+    color:var(--text-dim);
+    text-decoration:none;
+    border-radius:6px;
+    white-space:nowrap;
+    transition:all 0.15s;
+    border:1px solid transparent;
+  }
+  .nav-links a:hover{
+    color:var(--accent);
+    background:rgba(0,255,157,0.06);
+    border-color:var(--border-bright);
+  }
+  .progress-pill{
+    display:flex;align-items:center;gap:10px;
+    padding:6px 14px;
+    background:var(--surface);
+    border:1px solid var(--border-bright);
+    border-radius:100px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    white-space:nowrap;
+  }
+  .progress-bar{
+    width:60px;height:4px;
+    background:var(--bg-2);
+    border-radius:2px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    transition:width 0.4s ease;
+    box-shadow:0 0 8px var(--accent);
+  }
+  
+  /* ===== LAYOUT ===== */
+  main{max-width:1400px;margin:0 auto;padding:0 24px}
+  
+  section.topic{
+    padding:80px 0 40px;
+    border-bottom:1px solid var(--border);
+    scroll-margin-top:80px;
+  }
+  .topic-head{
+    display:grid;
+    grid-template-columns:80px 1fr;
+    gap:24px;
+    margin-bottom:40px;
+    align-items:start;
+  }
+  .topic-num{
+    width:80px;height:80px;
+    border:1.5px solid var(--accent);
+    border-radius:14px;
+    display:grid;place-items:center;
+    background:linear-gradient(135deg,rgba(0,255,157,0.08),transparent);
+    position:relative;
+  }
+  .topic-num::before{
+    content:"";
+    position:absolute;
+    inset:-1.5px;
+    border-radius:14px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    opacity:0.3;
+    z-index:-1;
+    filter:blur(8px);
+  }
+  .topic-num svg{
+    width:36px;height:36px;
+    color:var(--accent);
+    stroke-width:1.5;
+  }
+  .topic-num .n{
+    position:absolute;
+    top:-8px;right:-8px;
+    width:24px;height:24px;
+    background:var(--bg);
+    border:1.5px solid var(--accent);
+    border-radius:50%;
+    display:grid;place-items:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--accent);
+    font-weight:700;
+  }
+  .topic-head h2{
+    font-size:clamp(28px,4vw,44px);
+    font-weight:700;
+    line-height:1.05;
+    margin-bottom:8px;
+  }
+  .topic-head .tagline{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--accent);
+    text-transform:uppercase;
+    letter-spacing:0.15em;
+    margin-bottom:14px;
+  }
+  .topic-head p{
+    color:var(--text-dim);
+    font-size:15px;
+    max-width:780px;
+  }
+  
+  /* ===== CARD GRIDS ===== */
+  .card-grid{
+    display:grid;
+    gap:16px;
+    margin-bottom:32px;
+  }
+  .card-grid.cols-2{grid-template-columns:repeat(auto-fit,minmax(340px,1fr))}
+  .card-grid.cols-3{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:22px;
+    transition:all 0.25s;
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    top:0;left:0;
+    width:100%;height:1px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);
+    opacity:0;
+    transition:opacity 0.3s;
+  }
+  .card:hover{
+    border-color:var(--border-bright);
+    background:var(--surface-2);
+    transform:translateY(-2px);
+  }
+  .card:hover::before{opacity:1}
+  .card h4{
+    font-size:16px;
+    margin-bottom:8px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .card h4 .ic{
+    width:24px;height:24px;
+    border-radius:6px;
+    background:rgba(0,255,157,0.1);
+    color:var(--accent);
+    display:grid;place-items:center;
+    font-size:12px;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+  }
+  .card p{color:var(--text-dim);font-size:13.5px;line-height:1.55}
+  .card ul{margin-top:10px;padding-left:0;list-style:none}
+  .card ul li{
+    padding:5px 0 5px 18px;
+    font-size:13px;
+    color:var(--text-dim);
+    position:relative;
+  }
+  .card ul li::before{
+    content:"▸";
+    position:absolute;left:0;
+    color:var(--accent);
+    font-size:11px;
+  }
+  .card ul li strong{color:var(--text);font-weight:600}
+  .card ul li code{
+    background:var(--bg);
+    padding:1px 6px;
+    border-radius:4px;
+    font-size:12px;
+    color:var(--accent-2);
+    border:1px solid var(--border);
+  }
+  
+  /* Code block */
+  .code-block{
+    background:#050811;
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+    margin:16px 0;
+  }
+  .code-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 14px;
+    background:var(--surface);
+    border-bottom:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--text-muted);
+  }
+  .code-head .dots{display:flex;gap:6px}
+  .code-head .dots span{width:10px;height:10px;border-radius:50%}
+  .code-head .dots .r{background:#ff5f57}
+  .code-head .dots .y{background:#ffbd2e}
+  .code-head .dots .g{background:#28ca42}
+  .code-head .file{color:var(--accent-2)}
+  .code-block pre{
+    padding:16px 18px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12.5px;
+    line-height:1.6;
+    overflow-x:auto;
+    color:var(--text);
+  }
+  .code-block pre .kw{color:#ff79c6}
+  .code-block pre .fn{color:var(--accent-2)}
+  .code-block pre .str{color:var(--accent)}
+  .code-block pre .num{color:var(--accent-3)}
+  .code-block pre .cmt{color:var(--text-muted);font-style:italic}
+  .code-block pre .var{color:#ffb86c}
+  
+  /* Tables */
+  .compare-table{
+    width:100%;
+    border-collapse:collapse;
+    margin:16px 0;
+    font-size:13px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:10px;
+    overflow:hidden;
+  }
+  .compare-table th{
+    background:var(--surface-2);
+    padding:12px 14px;
+    text-align:left;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--accent);
+    border-bottom:1px solid var(--border);
+  }
+  .compare-table td{
+    padding:12px 14px;
+    border-bottom:1px solid var(--border);
+    color:var(--text-dim);
+    vertical-align:top;
+  }
+  .compare-table tr:last-child td{border-bottom:none}
+  .compare-table tr:hover td{background:var(--surface-2)}
+  .compare-table td:first-child{
+    color:var(--text);
+    font-weight:600;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+  }
+  
+  /* Protocol Visualizations */
+  .proto-viz{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:24px;
+    margin:20px 0;
+  }
+  .proto-viz h4{
+    font-size:15px;
+    margin-bottom:16px;
+    display:flex;align-items:center;gap:10px;
+    color:var(--text);
+  }
+  .proto-viz h4 .pill{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    padding:2px 8px;
+    background:rgba(0,255,157,0.1);
+    border:1px solid var(--accent);
+    color:var(--accent);
+    border-radius:100px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+  }
+  
+  .frame-viz{
+    display:flex;
+    align-items:stretch;
+    gap:2px;
+    padding:14px;
+    background:var(--bg);
+    border-radius:8px;
+    border:1px solid var(--border);
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    overflow-x:auto;
+    min-height:90px;
+  }
+  .frame-bit{
+    flex:1;min-width:36px;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    padding:8px 4px;
+    border-radius:4px;
+    text-align:center;
+    transition:all 0.2s;
+  }
+  .frame-bit .label{font-size:9px;opacity:0.7;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.05em}
+  .frame-bit .val{font-size:11px;font-weight:700}
+  .frame-bit.start{background:rgba(0,212,255,0.15);border:1px solid var(--accent-2);color:var(--accent-2)}
+  .frame-bit.data{background:rgba(0,255,157,0.1);border:1px solid var(--accent);color:var(--accent)}
+  .frame-bit.parity{background:rgba(255,176,32,0.12);border:1px solid var(--accent-3);color:var(--accent-3)}
+  .frame-bit.stop{background:rgba(255,61,113,0.12);border:1px solid var(--accent-4);color:var(--accent-4)}
+  .frame-bit.idle{background:rgba(93,107,138,0.1);border:1px dashed var(--text-muted);color:var(--text-muted)}
+  .frame-bit:hover{transform:translateY(-2px)}
+  
+  /* Signal waveform */
+  .waveform{
+    height:120px;
+    background:var(--bg);
+    border-radius:8px;
+    border:1px solid var(--border);
+    position:relative;
+    overflow:hidden;
+    margin-top:12px;
+  }
+  
+  /* V-Model */
+  .vmodel{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin:16px 0;
+  }
+  .vmodel-side{
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .vmodel-step{
+    padding:10px 14px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:12px;
+    position:relative;
+    transition:all 0.2s;
+  }
+  .vmodel-step:hover{border-color:var(--accent);transform:translateX(2px)}
+  .vmodel-step.left{border-left:3px solid var(--accent-2)}
+  .vmodel-step.right{border-right:3px solid var(--accent)}
+  .vmodel-step .title{font-weight:600;color:var(--text);font-size:13px}
+  .vmodel-step .desc{color:var(--text-muted);font-size:11px;margin-top:2px;font-family:'JetBrains Mono',monospace}
+  
+  /* Tabs */
+  .tabs{
+    display:flex;gap:4px;
+    border-bottom:1px solid var(--border);
+    margin:20px 0 16px;
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .tabs::-webkit-scrollbar{display:none}
+  .tab-btn{
+    padding:10px 16px;
+    background:none;
+    border:none;
+    color:var(--text-dim);
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    transition:all 0.2s;
+    white-space:nowrap;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+  }
+  .tab-btn:hover{color:var(--text)}
+  .tab-btn.active{
+    color:var(--accent);
+    border-bottom-color:var(--accent);
+  }
+  .tab-pane{display:none}
+  .tab-pane.active{display:block;animation:fadeIn 0.3s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  
+  /* Callout */
+  .callout{
+    background:linear-gradient(135deg,rgba(0,255,157,0.05),rgba(0,212,255,0.03));
+    border:1px solid var(--border-bright);
+    border-left:3px solid var(--accent);
+    border-radius:8px;
+    padding:16px 20px;
+    margin:16px 0;
+    font-size:13.5px;
+  }
+  .callout.warn{
+    border-left-color:var(--accent-3);
+    background:linear-gradient(135deg,rgba(255,176,32,0.05),transparent);
+  }
+  .callout.danger{
+    border-left-color:var(--accent-4);
+    background:linear-gradient(135deg,rgba(255,61,113,0.05),transparent);
+  }
+  .callout .title{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--accent);
+    margin-bottom:6px;
+    font-weight:700;
+  }
+  .callout.warn .title{color:var(--accent-3)}
+  .callout.danger .title{color:var(--accent-4)}
+  .callout p{color:var(--text-dim);font-size:13.5px}
+  
+  /* Checkpoint Quiz */
+  .checkpoint{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 22px;
+    margin:24px 0;
+  }
+  .checkpoint .label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    color:var(--accent-3);
+    text-transform:uppercase;
+    letter-spacing:0.15em;
+    margin-bottom:8px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .checkpoint .label::before{
+    content:"";width:14px;height:14px;
+    background:var(--accent-3);
+    -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3' stroke='currentColor'/%3E%3Cpath d='M12 17h.01' stroke='currentColor'/%3E%3C/svg%3E") center/contain no-repeat;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3' stroke='currentColor'/%3E%3Cpath d='M12 17h.01' stroke='currentColor'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+  .checkpoint .q{
+    font-weight:600;
+    margin-bottom:14px;
+    font-size:15px;
+  }
+  .options{display:flex;flex-direction:column;gap:8px}
+  .opt{
+    padding:10px 14px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    cursor:pointer;
+    font-size:13px;
+    transition:all 0.15s;
+    display:flex;align-items:center;gap:10px;
+  }
+  .opt:hover{border-color:var(--border-bright);background:var(--surface-2)}
+  .opt .key{
+    width:22px;height:22px;
+    border:1px solid var(--border-bright);
+    border-radius:5px;
+    display:grid;place-items:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    flex-shrink:0;
+  }
+  .opt.correct{border-color:var(--accent);background:rgba(0,255,157,0.08)}
+  .opt.correct .key{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+  .opt.wrong{border-color:var(--accent-4);background:rgba(255,61,113,0.06)}
+  .opt.wrong .key{background:var(--accent-4);color:#fff;border-color:var(--accent-4)}
+  .feedback{
+    margin-top:12px;
+    padding:12px 14px;
+    background:var(--bg);
+    border-left:3px solid var(--accent);
+    border-radius:6px;
+    font-size:12.5px;
+    color:var(--text-dim);
+    display:none;
+  }
+  .feedback.show{display:block;animation:fadeIn 0.3s}
+  
+  /* Quiz Section */
+  .quiz-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:16px;
+    margin-top:20px;
+  }
+  
+  /* Final Quiz Section */
+  .final-quiz{
+    background:linear-gradient(135deg,rgba(0,255,157,0.04),rgba(0,212,255,0.02));
+    border:1px solid var(--border-bright);
+    border-radius:16px;
+    padding:40px;
+    margin:40px 0;
+  }
+  .final-quiz h3{
+    font-size:28px;
+    margin-bottom:8px;
+  }
+  .final-quiz .sub{
+    color:var(--text-dim);
+    margin-bottom:24px;
+    font-size:14px;
+  }
+  .quiz-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:24px;
+    margin-bottom:14px;
+  }
+  .quiz-card .qnum{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--accent);
+    margin-bottom:8px;
+    letter-spacing:0.1em;
+  }
+  .quiz-card .qtext{
+    font-size:16px;
+    font-weight:600;
+    margin-bottom:14px;
+  }
+  .score-display{
+    display:flex;align-items:center;gap:24px;
+    padding:20px 24px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    margin-top:20px;
+  }
+  .score-num{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:42px;
+    font-weight:700;
+    color:var(--accent);
+    line-height:1;
+  }
+  .score-label{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+  }
+  
+  /* Footer */
+  footer{
+    border-top:1px solid var(--border);
+    padding:40px 24px;
+    text-align:center;
+    color:var(--text-muted);
+    font-size:13px;
+  }
+  footer .mono{font-family:'JetBrains Mono',monospace}
+  footer .accent{color:var(--accent)}
+  
+  /* Animated entrance */
+  .reveal{opacity:0;transform:translateY(20px);transition:opacity 0.6s ease,transform 0.6s ease}
+  .reveal.in{opacity:1;transform:translateY(0)}
+  
+  /* Responsive */
+  @media(max-width:768px){
+    .topic-head{grid-template-columns:1fr;gap:14px}
+    .topic-num{width:60px;height:60px}
+    .topic-num svg{width:28px;height:28px}
+    .vmodel{grid-template-columns:1fr}
+    .hero-stats{gap:16px}
+    .stat{padding:10px 16px}
+    .stat .num{font-size:24px}
+    .final-quiz{padding:24px}
+  }
+  
+  /* SPI Mode visualizer */
+  .spi-modes{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+    margin-top:12px;
+  }
+  .spi-mode{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:14px;
+    transition:all 0.2s;
+    cursor:pointer;
+  }
+  .spi-mode:hover{border-color:var(--accent)}
+  .spi-mode.active{border-color:var(--accent);background:rgba(0,255,157,0.04)}
+  .spi-mode .mh{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:10px;
+  }
+  .spi-mode .mh .mn{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent)}
+  .spi-mode .mh .cfg{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-muted)}
+  
+  /* Tool buttons */
+  .tool-row{
+    display:flex;flex-wrap:wrap;gap:8px;
+    margin:12px 0;
+  }
+  .tool-tag{
+    padding:6px 12px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:6px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--text-dim);
+    transition:all 0.15s;
+  }
+  .tool-tag:hover{border-color:var(--accent);color:var(--accent)}
+  
+  /* Pin diagram */
+  .pin-diagram{
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+    background:var(--bg);
+    border-radius:8px;
+    border:1px solid var(--border);
+    margin:12px 0;
+  }
+  
+  /* Pipeline */
+  .pipeline{
+    display:flex;
+    gap:0;
+    margin:16px 0;
+    border-radius:8px;
+    overflow:hidden;
+    border:1px solid var(--border);
+  }
+  .pipeline-stage{
+    flex:1;
+    padding:14px 8px;
+    background:var(--surface);
+    border-right:1px solid var(--border);
+    text-align:center;
+    transition:all 0.3s;
+    position:relative;
+  }
+  .pipeline-stage:last-child{border-right:none}
+  .pipeline-stage:hover{background:var(--surface-2)}
+  .pipeline-stage .stage-n{
+    font-family:'JetBrains Mono',monospace;
+    font-size:10px;
+    color:var(--accent);
+    margin-bottom:4px;
+  }
+  .pipeline-stage .stage-name{
+    font-size:12px;
+    font-weight:600;
+  }
+  .pipeline-stage .stage-desc{
+    font-size:10px;
+    color:var(--text-muted);
+    margin-top:2px;
+  }
+  .pipeline-stage::after{
+    content:"→";
+    position:absolute;
+    right:-7px;top:50%;
+    transform:translateY(-50%);
+    color:var(--accent);
+    z-index:2;
+    background:var(--bg);
+    width:14px;height:14px;
+    display:grid;place-items:center;
+    font-size:12px;
+  }
+  .pipeline-stage:last-child::after{display:none}
+  
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<section class="hero">
+  <canvas id="circuit-canvas"></canvas>
+  <div class="hero-content">
+    <div class="badge"><span class="dot"></span>SYSTEM READY · v2.4.1</div>
+    <h1>Embedded V&amp;V<br><span class="accent">Mastery Hub</span></h1>
+    <p>A deep-dive revision atlas for software validation &amp; verification across RTOS, RT-Linux, multi-threaded systems, 32-bit ARM/RISC-V platforms, comms protocols, and the full embedded testing toolchain.</p>
+    <div class="hero-stats">
+      <div class="stat"><div class="num">08</div><div class="lbl">Core Modules</div></div>
+      <div class="stat"><div class="num">40+</div><div class="lbl">Concepts</div></div>
+      <div class="stat"><div class="num">12</div><div class="lbl">Code Samples</div></div>
+      <div class="stat"><div class="num">10</div><div class="lbl">Quiz Items</div></div>
+    </div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="search" placeholder="Search concepts, e.g. 'priority inversion', 'CPOL', 'JTAG'...">
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>SCROLL · ENGAGE</span>
+    <div class="line"></div>
+  </div>
+</section>
+
+<!-- ==================== NAV ==================== -->
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="logo">
+      <div class="logo-mark">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/></svg>
+      </div>
+      <span>V&amp;V<span style="color:var(--accent)">.HUB</span></span>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <a href="#vandv">01 · V&amp;V</a>
+      <a href="#arch">02 · ARM/RISC-V</a>
+      <a href="#comms">03 · Protocols</a>
+      <a href="#hmi">04 · Linux HMI</a>
+      <a href="#frameworks">05 · Frameworks</a>
+      <a href="#hw">06 · HW Setup</a>
+      <a href="#debug">07 · Debug</a>
+      <a href="#tools">08 · Tools</a>
+      <a href="#quiz">Quiz</a>
+    </div>
+    <div class="progress-pill">
+      <span>PROGRESS</span>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <span id="progressTxt">0%</span>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- ==================== 01 · V&V ==================== -->
+<section class="topic" id="vandv">
+  <div class="topic-head reveal">
+    <div class="topic-num">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c1.66 0 3.22.45 4.56 1.24"/><path d="M19 4v4h-4"/></svg>
+      <span class="n">01</span>
+    </div>
+    <div>
+      <div class="tagline">// Validation · Verification · V-Model</div>
+      <h2>Validation &amp; Verification Fundamentals</h2>
+      <p>Verification answers "Are we building the product right?" — checks conformance to specifications. Validation answers "Are we building the right product?" — checks it meets user needs. Embedded V&amp;V adds real-time, concurrency, and hardware-software boundary concerns.</p>
+    </div>
+  </div>
+
+  <div class="tabs reveal">
+    <button class="tab-btn active" data-tab="vv-model">V-Model</button>
+    <button class="tab-btn" data-tab="vv-rtos">RTOS Concerns</button>
+    <button class="tab-btn" data-tab="vv-linux">RT-Linux</button>
+    <button class="tab-btn" data-tab="vv-mt">Multi-threading</button>
+  </div>
+
+  <div class="tab-pane active" data-pane="vv-model">
+    <div class="vmodel">
+      <div class="vmodel-side">
+        <div class="vmodel-step left"><div class="title">Requirements Analysis</div><div class="desc">→ Acceptance Testing</div></div>
+        <div class="vmodel-step left"><div class="title">System Design</div><div class="desc">→ System Testing</div></div>
+        <div class="vmodel-step left"><div class="title">Architecture / Subsystem</div><div class="desc">→ Integration Testing</div></div>
+        <div class="vmodel-step left"><div class="title">Module Design</div><div class="desc">→ Unit Testing</div></div>
+        <div class="vmodel-step left"><div class="title">Coding</div><div class="desc">Implementation</div></div>
+      </div>
+      <div class="vmodel-side">
+        <div class="vmodel-step right"><div class="title">Acceptance Testing</div><div class="desc">User scenarios, field conditions</div></div>
+        <div class="vmodel-step right"><div class="title">System Testing</div><div class="desc">End-to-end on target HW</div></div>
+        <div class="vmodel-step right"><div class="title">Integration Testing</div><div class="desc">Module interfaces, comms</div></div>
+        <div class="vmodel-step right"><div class="title">Unit Testing</div><div class="desc">Functions, modules in isolation</div></div>
+        <div class="vmodel-step right"><div class="title">Static Analysis</div><div class="desc">MISRA, lint, code review</div></div>
+      </div>
+    </div>
+
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">V</span>Verification Techniques</h4>
+        <ul>
+          <li><strong>Static:</strong> code reviews, walk-throughs, lint, MISRA-C, static analyzers (Polyspace, Coverity)</li>
+          <li><strong>Unit tests:</strong> function-level, mock hardware dependencies</li>
+          <li><strong>Integration:</strong> verify module interfaces &amp; data flow</li>
+          <li><strong>Coverage:</strong> MC/DC for safety-critical (DO-178C)</li>
+          <li><strong>Regression:</strong> automated, runs on every commit</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">V</span>Validation Techniques</h4>
+        <ul>
+          <li><strong>System tests:</strong> on target hardware, real peripherals</li>
+          <li><strong>HIL:</strong> Hardware-in-the-Loop with plant models</li>
+          <li><strong>SIL:</strong> Software-in-the-Loop simulation</li>
+          <li><strong>Field tests:</strong> environmental, EMC, longevity</li>
+          <li><strong>Acceptance:</strong> against user/contract requirements</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="vv-rtos">
+    <p style="color:var(--text-dim);margin-bottom:16px">RTOS verification focuses on determinism, schedulability, and concurrency correctness. A missed deadline in a hard real-time system is a failure, not a slowdown.</p>
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">R</span>Core Concepts to Verify</h4>
+        <ul>
+          <li><strong>Task scheduling:</strong> preemptive priority, round-robin</li>
+          <li><strong>Priority inversion:</strong> test with high/low priority + shared resource</li>
+          <li><strong>Deadlocks:</strong> circular wait on mutexes</li>
+          <li><strong>Starvation:</strong> low-priority task never runs</li>
+          <li><strong>ISR latency:</strong> time from IRQ to first ISR instruction</li>
+          <li><strong>Context switch time:</strong> measured in cycles</li>
+          <li><strong>Timer jitter:</strong> variation in periodic task start</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">R</span>Verification Approaches</h4>
+        <ul>
+          <li><strong>WCET analysis:</strong> worst-case execution time, static + measured</li>
+          <li><strong>CPU load monitoring:</strong> idle task run-time, &lt; 70% target</li>
+          <li><strong>Stack watermark:</strong> paint pattern, check high-water mark</li>
+          <li><strong>Trace:</strong> Segger SystemView, Tracealyzer, ITM/SWO</li>
+          <li><strong>Stress:</strong> flood queues, overrun buffers, watch recovery</li>
+          <li><strong>Watchdog:</strong> verify kick pattern, timeout behavior</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout danger">
+      <div class="title">Classic Bug · Priority Inversion</div>
+      <p>Low-priority task L holds mutex → high-priority task H blocks → medium task M preempts L → H is effectively starved by M. <strong>Fix:</strong> priority inheritance (mutex) or priority ceiling protocol. Famous case: Mars Pathfinder (1997).</p>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">priority_inversion_test.c</span><span>RTOS</span></div>
+      <pre><span class="cmt">// Test: verify priority inheritance on a mutex</span>
+<span class="kw">void</span> <span class="fn">test_prio_inheritance</span>(<span class="kw">void</span>) {
+    <span class="var">osMutexId_t</span> mtx = <span class="fn">osMutexNew</span>(&amp;(<span class="var">osMutexAttr_t</span>){
+        .attr_bits = <span class="var">osMutexPrioInherit</span>  <span class="cmt">// critical</span>
+    });
+    <span class="fn">create_task</span>(low_task,  <span class="var">PRIO_LOW</span>,  <span class="str">"low"</span>);
+    <span class="fn">create_task</span>(high_task, <span class="var">PRIO_HIGH</span>, <span class="str">"high"</span>);
+    <span class="cmt">// low grabs mutex, high preempts &amp; blocks,
+       // medium must NOT starve high — measure H's wakeup latency</span>
+    <span class="fn">TEST_ASSERT_LT</span>(<span class="fn">latency_us</span>(), <span class="num">500</span>);
+}</pre>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="vv-linux">
+    <p style="color:var(--text-dim);margin-bottom:16px">RT-Linux (PREEMPT_RT) converts the standard GPL kernel into a fully preemptive kernel. Verification focuses on worst-case latency and determinism under load.</p>
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">L</span>PREEMPT_RT Patch</h4>
+        <ul>
+          <li>Makes kernel fully preemptible (except raw IRQs)</li>
+          <li>High-resolution timers (hrtimer)</li>
+          <li>Threaded IRQ handlers</li>
+          <li>Priority inheritance on rt_mutex</li>
+          <li>Spinlocks → rt_mutexes (sleepable)</li>
+          <li>Check: <code>uname -a</code> contains <code>PREEMPT RT</code></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">L</span>Latency Measurement Tools</h4>
+        <ul>
+          <li><strong>cyclictest:</strong> measures scheduling jitter</li>
+          <li><strong>hackbench:</strong> stress scheduler</li>
+          <li><strong>ftrace / trace-cmd:</strong> kernel function tracing</li>
+          <li><strong>perf:</strong> profiling, hardware counters</li>
+          <li><strong>rt-tests suite:</strong> pi_stress, signaltest</li>
+          <li><strong>BPF / bpftrace:</strong> modern observability</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">latency_check.sh</span><span>RT-Linux</span></div>
+      <pre><span class="cmt"># Run cyclictest for 1M cycles, 5kHz, prio 80</span>
+sudo cyclictest -l <span class="num">1000000</span> -p <span class="num">80</span> -t <span class="num">5</span> -a -i <span class="num">200</span> -h <span class="num">400</span>
+
+<span class="cmt"># Typical acceptable results (BeagleBone Black, RT):</span>
+<span class="cmt"># Avg: &lt; 50 µs   Max: &lt; 200 µs</span>
+
+<span class="cmt"># Verify PREEMPT_RT kernel</span>
+uname -a | grep -q <span class="str">"PREEMPT RT"</span> &amp;&amp; <span class="fn">echo</span> <span class="str">"RT OK"</span> || <span class="fn">echo</span> <span class="str">"STANDARD KERNEL"</span>
+
+<span class="cmt"># Isolate CPU for RT task</span>
+sudo <span class="fn">tuna</span> --cpus=<span class="num">3</span> --isolate
+sudo chrt -f <span class="num">99</span> ./my_rt_app</pre>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="vv-mt">
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">M</span>Concurrency Hazards</h4>
+        <ul>
+          <li><strong>Race condition:</strong> shared data, unsynchronized access</li>
+          <li><strong>Data race:</strong> ≥1 write, no synchronization, UB</li>
+          <li><strong>Deadlock:</strong> 4 conditions (mutual exclusion, hold &amp; wait, no preemption, circular wait)</li>
+          <li><strong>Livelock:</strong> threads active, no progress</li>
+          <li><strong>Lost wakeup:</strong> signal before wait</li>
+          <li><strong>Aba:</strong> compare-and-swap, value reused</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">M</span>Verification Approaches</h4>
+        <ul>
+          <li><strong>ThreadSanitizer (TSan):</strong> data race detection</li>
+          <li><strong>Helgrind:</strong> Valgrind's error detector</li>
+          <li><strong>Stress tests:</strong> millions of iterations</li>
+          <li><strong>Mock random scheduling:</strong> chaos testing</li>
+          <li><strong>Formal verification:</strong> TLA+, SPIN model checker</li>
+          <li><strong>Coverage with concurrency:</strong> line + branch + mutex states</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout warn">
+      <div class="title">Heisenbug Warning</div>
+      <p>Concurrency bugs reproduce rarely. Run tests under load, vary CPU counts, inject delays, use stress-ng. A test passing once proves nothing — run it 100k times.</p>
+    </div>
+  </div>
+
+  <div class="checkpoint reveal">
+    <div class="label">Checkpoint</div>
+    <div class="q">1. A high-priority task blocks waiting for a mutex held by a low-priority task. A medium-priority task then preempts the low task. What is this called?</div>
+    <div class="options" data-correct="b">
+      <div class="opt" data-key="a"><span class="key">A</span>Deadlock</div>
+      <div class="opt" data-key="b"><span class="key">B</span>Priority inversion</div>
+      <div class="opt" data-key="c"><span class="key">C</span>Starvation</div>
+      <div class="opt" data-key="d"><span class="key">D</span>Livelock</div>
+    </div>
+    <div class="feedback">Priority inversion. The medium task indirectly blocks the high task. Mitigated by priority inheritance where the low task temporarily inherits the high priority until it releases the mutex.</div>
+  </div>
+</section>
+
+<!-- ==================== 02 · ARCH ==================== -->
+<section class="topic" id="arch">
+  <div class="topic-head reveal">
+    <div class="topic-num">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3"/></svg>
+      <span class="n">02</span>
+    </div>
+    <div>
+      <div class="tagline">// 32-bit · ARM Cortex · RISC-V · Architecture</div>
+      <h2>ARM &amp; RISC-V Platforms</h2>
+      <p>Modern embedded computing runs on ARM Cortex-M (microcontroller class), Cortex-A (application class with MMU/Linux), and increasingly RISC-V. Knowing the register model, exception handling, and memory map is essential for low-level debugging and verification.</p>
+    </div>
+  </div>
+
+  <div class="tabs reveal">
+    <button class="tab-btn active" data-tab="arch-cortexm">ARM Cortex-M</button>
+    <button class="tab-btn" data-tab="arch-cortexa">ARM Cortex-A</button>
+    <button class="tab-btn" data-tab="arch-riscv">RISC-V</button>
+    <button class="tab-btn" data-tab="arch-pipeline">Pipeline</button>
+  </div>
+
+  <div class="tab-pane active" data-pane="arch-cortexm">
+    <div class="card-grid cols-3">
+      <div class="card">
+        <h4><span class="ic">M</span>Cortex-M0/M0+</h4>
+        <ul>
+          <li>Von Neumann, ARMv6-M</li>
+          <li>Thumb-only instruction set</li>
+          <li>No FPU, no DSP</li>
+          <li>12 cycles IRQ latency (M0)</li>
+          <li>3-stage pipeline</li>
+          <li>IoT, ultra-low-power</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">M</span>Cortex-M3</h4>
+        <ul>
+          <li>Harvard architecture, ARMv7-M</li>
+          <li>Thumb-2 (32-bit instructions)</li>
+          <li> NVIC: 240 IRQs, 256 priorities</li>
+          <li>12-cycle IRQ latency</li>
+          <li>MSP + PSP stack pointers</li>
+          <li>SysTick timer standard</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">M</span>Cortex-M4/M7</h4>
+        <ul>
+          <li>ARMv7E-M, DSP instructions</li>
+          <li>Optional single/double FPU</li>
+          <li>M7: 6-stage superscalar, L1 cache</li>
+          <li>TCM (tightly-coupled memory)</li>
+          <li>MPU (M4) / MPU + cache (M7)</li>
+          <li>Audio, motor control, vision</li>
+        </ul>
+      </div>
+    </div>
+
+    <h4 style="margin:24px 0 12px;color:var(--text);font-size:18px">Register Set (Cortex-M)</h4>
+    <div class="compare-table">
+      <thead><tr><th>Register</th><th>Purpose</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>R0–R12</td><td>General purpose</td><td>R0–R7 = low regs (Thumb), R8–R12 = high regs</td></tr>
+        <tr><td>R13 (SP)</td><td>Stack pointer</td><td>Banked: MSP (handler) / PSP (thread)</td></tr>
+        <tr><td>R14 (LR)</td><td>Link register</td><td>Return addr; special values 0xFFFFFFFx for IRQ return</td></tr>
+        <tr><td>R15 (PC)</td><td>Program counter</td><td>Read yields addr+4 (Thumb-2)</td></tr>
+        <tr><td>xPSR</td><td>Program status</td><td>APSR (flags) + IPSR (IRQ num) + EPSR (Thumb state)</td></tr>
+        <tr><td>PRIMASK</td><td>Disable all IRQs</td><td>CPSID i / CPSIE i</td></tr>
+        <tr><td>FAULTMASK</td><td>Disable faults</td><td>Also blocks HardFault</td></tr>
+        <tr><td>BASEPRI</td><td>Priority mask</td><td>Disable IRQs below priority N</td></tr>
+        <tr><td>CONTROL</td><td>Stack/privilege</td><td>SPSEL, nPRIV</td></tr>
+      </tbody>
+    </div>
+
+    <div class="callout">
+      <div class="title">Exception Model</div>
+      <p>Cortex-M has 16 system exceptions (Reset, NMI, HardFault, MemManage, BusFault, UsageFault, SVCall, PendSV, SysTick, etc.) + N external IRQs. Vector table at 0x00000000 (or VTOR). Each entry is 4 bytes (address). HardFault is the catch-all for unrecoverable errors — debug with CFSR/HFSR registers.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">hardfault_handler.c</span><span>Cortex-M3/M4</span></div>
+      <pre><span class="cmt">// Capture fault state for post-mortem analysis</span>
+__attribute__((naked)) <span class="kw">void</span> <span class="fn">HardFault_Handler</span>(<span class="kw">void</span>) {
+    __asm volatile(
+        <span class="str">" tst lr, #4                \n"</span>  <span class="cmt">// MSP or PSP?</span>
+        <span class="str">" ite eq                    \n"</span>
+        <span class="str">" mrseq r0, msp             \n"</span>
+        <span class="str">" mrsne r0, psp             \n"</span>
+        <span class="str">" ldr r1, =hardfault_dump   \n"</span>
+        <span class="str">" bx r1                     \n"</span>
+    );
+}
+
+<span class="kw">void</span> <span class="fn">hardfault_dump</span>(uint32_t *sp) {
+    <span class="var">volatile</span> uint32_t r0,r1,r2,r3,r12,lr,pc,psr;
+    r0=sp[0]; r1=sp[1]; r2=sp[2]; r3=sp[3];
+    r12=sp[4]; lr=sp[5]; pc=sp[6]; psr=sp[7];
+    <span class="fn">printf</span>(<span class="str">"PC=0x%08lx LR=0x%08lx PSR=0x%08lx\n"</span>, pc, lr, psr);
+    <span class="fn">printf</span>(<span class="str">"CFSR=0x%08lx HFSR=0x%08lx\n"</span>, SCB-&gt;CFSR, SCB-&gt;HFSR);
+    <span class="kw">while</span>(1);  <span class="cmt">// halt for debugger</span>
+}</pre>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="arch-cortexa">
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">A</span>Cortex-A Family</h4>
+        <ul>
+          <li><strong>A53/A55:</strong> 64-bit, low-power, big.LITTLE little</li>
+          <li><strong>A72/A76/A78:</strong> high-performance 64-bit</li>
+          <li><strong>A32/A35:</strong> 32-bit entry-level</li>
+          <li>Full MMU → runs Linux, Android</li>
+          <li>VFPv4 + NEON SIMD standard</li>
+          <li>TrustZone security extension</li>
+          <li>L1 + L2 caches, often L3</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">A</span>Privilege &amp; Modes</h4>
+        <ul>
+          <li>EL0: User (applications)</li>
+          <li>EL1: Kernel (OS)</li>
+          <li>EL2: Hypervisor (virtualization)</li>
+          <li>EL3: Secure monitor (TrustZone)</li>
+          <li>AArch32 modes: USR, FIQ, IRQ, SVC, ABT, UND, SYS</li>
+          <li>Banked registers per mode</li>
+          <li>CP15 for system control</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout warn">
+      <div class="title">Debugging Cortex-A</div>
+      <p>Use JTAG with OpenOCD. Boot sequence: BootROM → BL1 (SPL) → BL2 → BL31 → U-Boot → Kernel. Each stage is a debugging boundary. <code>devmem</code> tool lets you peek/poke physical memory from userspace. <code>/proc/iomem</code> shows kernel memory map.</p>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="arch-riscv">
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">V</span>RISC-V ISA Basics</h4>
+        <ul>
+          <li>Open ISA, no licensing fees</li>
+          <li>Base: RV32I (32-bit, 37 instructions)</li>
+          <li>Standard extensions: M (mul/div), A (atomic), C (compressed 16-bit), F/D (float), V (vector)</li>
+          <li>Common configs: <code>RV32IMAC</code>, <code>RV64GC</code></li>
+          <li>31 general-purpose registers (x0 always 0)</li>
+          <li>Load-store architecture</li>
+          <li>No condition codes — uses explicit compare-and-branch</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">V</span>Privilege Levels</h4>
+        <ul>
+          <li><strong>M-mode:</strong> Machine — full access, mandatory</li>
+          <li><strong>S-mode:</strong> Supervisor — runs OS kernel</li>
+          <li><strong>U-mode:</strong> User — applications</li>
+          <li><strong>CSR:</strong> Control &amp; Status Registers</li>
+          <li><strong>PMP:</strong> Physical Memory Protection</li>
+          <li>CLINT (timer) + PLIC (interrupt controller)</li>
+          <li>OpenSBI handles M-mode runtime services</li>
+        </ul>
+      </div>
+    </div>
+    <div class="compare-table">
+      <thead><tr><th>Feature</th><th>ARM Cortex-M</th><th>RISC-V (RV32IMAC)</th></tr></thead>
+      <tbody>
+        <tr><td>ISA Licensing</td><td>Commercial license</td><td>Open, royalty-free</td></tr>
+        <tr><td>Instruction length</td><td>16/32-bit (Thumb-2)</td><td>16/32-bit (C ext)</td></tr>
+        <tr><td>Register count</td><td>16 (R0–R15)</td><td>32 (x0–x31)</td></tr>
+        <tr><td>Condition codes</td><td>APSR flags (NZCV)</td><td>None — explicit compares</td></tr>
+        <tr><td>Interrupt controller</td><td>NVIC (internal)</td><td>PLIC/CLINT (external)</td></tr>
+        <tr><td>Vector table</td><td>Address array</td><td>Function entry (or CLIC)</td></tr>
+        <tr><td>FPU</td><td>Optional (M4F/M7)</td><td>F/D extensions</td></tr>
+      </tbody>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="arch-pipeline">
+    <h4 style="margin-bottom:12px;color:var(--text);font-size:18px">Cortex-M3 Pipeline (3-stage)</h4>
+    <div class="pipeline">
+      <div class="pipeline-stage"><div class="stage-n">F</div><div class="stage-name">Fetch</div><div class="stage-desc">Instr from memory</div></div>
+      <div class="pipeline-stage"><div class="stage-n">D</div><div class="stage-name">Decode</div><div class="stage-desc">Decode + reg read</div></div>
+      <div class="pipeline-stage"><div class="stage-n">E</div><div class="stage-name">Execute</div><div class="stage-desc">ALU + writeback</div></div>
+    </div>
+
+    <h4 style="margin:24px 0 12px;color:var(--text);font-size:18px">Cortex-M7 Pipeline (6-stage, dual-issue)</h4>
+    <div class="pipeline">
+      <div class="pipeline-stage"><div class="stage-n">F1</div><div class="stage-name">Fetch 1</div></div>
+      <div class="pipeline-stage"><div class="stage-n">F2</div><div class="stage-name">Fetch 2</div></div>
+      <div class="pipeline-stage"><div class="stage-n">D1</div><div class="stage-name">Decode</div></div>
+      <div class="pipeline-stage"><div class="stage-n">D2</div><div class="stage-name">Issue</div></div>
+      <div class="pipeline-stage"><div class="stage-n">E1</div><div class="stage-name">Execute</div></div>
+      <div class="pipeline-stage"><div class="stage-n">E2</div><div class="stage-name">Writeback</div></div>
+    </div>
+
+    <div class="callout">
+      <div class="title">Pipeline Hazards</div>
+      <p><strong>Data hazards:</strong> RAW, WAW, WAR — resolved by forwarding/stalls. <strong>Control hazards:</strong> branches flush pipeline — branch prediction (M7) mitigates. <strong>Structural hazards:</strong> resource conflicts. Memory wait states on flash → insert wait cycles or use cache/TCM. For timing-critical code, place in TCM (Tightly Coupled Memory) for zero-wait-state execution.</p>
+    </div>
+  </div>
+
+  <div class="checkpoint reveal">
+    <div class="label">Checkpoint</div>
+    <div class="q">2. On Cortex-M, which register holds the return address when an IRQ fires and the CPU pushes the exception stack frame?</div>
+    <div class="options" data-correct="b">
+      <div class="opt" data-key="a"><span class="key">A</span>R15 (PC)</div>
+      <div class="opt" data-key="b"><span class="key">B</span>R14 (LR), set to EXC_RETURN</div>
+      <div class="opt" data-key="c"><span class="key">C</span>R13 (SP)</div>
+      <div class="opt" data-key="d"><span class="key">D</span>xPSR</div>
+    </div>
+    <div class="feedback">LR (R14) is loaded with a special EXC_RETURN value (e.g., 0xFFFFFFF9) which tells the CPU how to return from the exception. The hardware also pushes R0–R3, R12, LR, PC, xPSR to the stack automatically.</div>
+  </div>
+</section>
+
+<!-- ==================== 03 · COMMS ==================== -->
+<section class="topic" id="comms">
+  <div class="topic-head reveal">
+    <div class="topic-num">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3"/><path d="M9 22h6M12 18v4M8 14l4-4 4 4"/></svg>
+      <span class="n">03</span>
+    </div>
+    <div>
+      <div class="tagline">// UART · I²C · SPI · CAN · GPIO · ADC/DAC</div>
+      <h2>Communication Protocols &amp; I/O</h2>
+      <p>The four classic embedded serial buses plus analog/digital I/O form the physical interface between the MCU and the world. Verifying them means bit-level timing analysis, signal quality checks, protocol compliance, and boundary testing.</p>
+    </div>
+  </div>
+
+  <div class="tabs reveal">
+    <button class="tab-btn active" data-tab="uart">UART</button>
+    <button class="tab-btn" data-tab="i2c">I²C</button>
+    <button class="tab-btn" data-tab="spi">SPI</button>
+    <button class="tab-btn" data-tab="can">CAN</button>
+    <button class="tab-btn" data-tab="aio">Analog/Digital I/O</button>
+  </div>
+
+  <div class="tab-pane active" data-pane="uart">
+    <div class="proto-viz">
+      <h4>UART Frame · 8-N-1 <span class="pill">8 data bits · No parity · 1 stop</span></h4>
+      <div class="frame-viz" id="uartFrame">
+        <div class="frame-bit idle"><div class="label">Idle</div><div class="val">1</div></div>
+        <div class="frame-bit start"><div class="label">Start</div><div class="val">0</div></div>
+        <div class="frame-bit data"><div class="label">D0</div><div class="val">1</div></div>
+        <div class="frame-bit data"><div class="label">D1</div><div class="val">0</div></div>
+        <div class="frame-bit data"><div class="label">D2</div><div class="val">1</div></div>
+        <div class="frame-bit data"><div class="label">D3</div><div class="val">1</div></div>
+        <div class="frame-bit data"><div class="label">D4</div><div class="val">0</div></div>
+        <div class="frame-bit data"><div class="label">D5</div><div class="val">0</div></div>
+        <div class="frame-bit data"><div class="label">D6</div><div class="val">1</div></div>
+        <div class="frame-bit data"><div class="label">D7</div><div class="val">1</div></div>
+        <div class="frame-bit stop"><div class="label">Stop</div><div class="val">1</div></div>
+        <div class="frame-bit idle"><div class="label">Idle</div><div class="val">1</div></div>
+      </div>
+    </div>
+
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">U</span>Key Characteristics</h4>
+        <ul>
+          <li><strong>Async:</strong> no clock line, both ends agree baud</li>
+          <li><strong>Full-duplex:</strong> TX + RX + GND</li>
+          <li><strong>Topology:</strong> point-to-point (or RS-485 multi-drop)</li>
+          <li><strong>Baud rates:</strong> 9600, 19200, 38400, 57600, 115200, 460800, 921600, 3M+</li>
+          <li><strong>Frame:</strong> Start(1) + Data(5–9) + Parity(optional) + Stop(1/1.5/2)</li>
+          <li><strong>Levels:</strong> TTL (0/3.3V or 0/5V), RS-232 (±12V), RS-485 (differential)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">U</span>Testing UART</h4>
+        <ul>
+          <li><strong>Loopback:</strong> tie TX→RX, send &amp; verify</li>
+          <li><strong>Baud mismatch:</strong> frame errors (FE bit in ISR)</li>
+          <li><strong>Noise:</strong> NE bit, overrun (ORE)</li>
+          <li><strong>Stress:</strong> burst tx, fill FIFO, test backpressure</li>
+          <li><strong>Multi-drop (RS-485):</strong> direction control timing</li>
+          <li><strong>Scope check:</strong> bit width = 1/baud seconds</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="title">Baud Rate Tolerance</div>
+      <p>Receiver samples each bit at its midpoint. Cumulative drift across 10 bits must be &lt; ±2.5%. Use high-precision crystal or auto-baud detection. Common pitfall: APB clock divisor rounding causes 1.5% error → works at 9600, fails at 921600.</p>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="i2c">
+    <div class="proto-viz">
+      <h4>I²C Bus Transaction <span class="pill">7-bit addr · 1 byte write+read</span></h4>
+      <div class="frame-viz">
+        <div class="frame-bit start"><div class="label">Start</div><div class="val">S</div></div>
+        <div class="frame-bit data"><div class="label">Addr (7)</div><div class="val">1010101</div></div>
+        <div class="frame-bit parity"><div class="label">R/W</div><div class="val">0</div></div>
+        <div class="frame-bit data"><div class="label">ACK</div><div class="val">A</div></div>
+        <div class="frame-bit data"><div class="label">Data</div><div class="val">0x42</div></div>
+        <div class="frame-bit data"><div class="label">ACK</div><div class="val">A</div></div>
+        <div class="frame-bit start"><div class="label">RStart</div><div class="val">Sr</div></div>
+        <div class="frame-bit data"><div class="label">Addr</div><div class="val">1010101</div></div>
+        <div class="frame-bit parity"><div class="label">R/W</div><div class="val">1</div></div>
+        <div class="frame-bit data"><div class="label">ACK</div><div class="val">A</div></div>
+        <div class="frame-bit data"><div class="label">Data</div><div class="val">0xReply</div></div>
+        <div class="frame-bit stop"><div class="label">NACK</div><div class="val">N</div></div>
+        <div class="frame-bit stop"><div class="label">Stop</div><div class="val">P</div></div>
+      </div>
+    </div>
+
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">I</span>Key Characteristics</h4>
+        <ul>
+          <li><strong>Sync:</strong> SCL clock + SDA data</li>
+          <li><strong>Half-duplex:</strong> single data line</li>
+          <li><strong>Multi-master:</strong> arbitration + clock sync</li>
+          <li><strong>Addressing:</strong> 7-bit (128 devs) or 10-bit</li>
+          <li><strong>Speeds:</strong> Std 100 kHz · Fast 400 kHz · Fast+ 1 MHz · HSM 3.4 MHz</li>
+          <li><strong>Open-drain:</strong> requires pull-up resistors (typ 4.7kΩ)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">I</span>Testing I²C</h4>
+        <ul>
+          <li><strong>Address scan:</strong> sweep 0x03–0x77, log ACKs</li>
+          <li><strong>Rise time:</strong> check with scope (≤ 300ns @ 1MHz)</li>
+          <li><strong>Pull-up sizing:</strong> Rp = tr / (0.8473 × Cb)</li>
+          <li><strong>Bus stuck:</strong> clock 9 cycles to release</li>
+          <li><strong>Arbitration test:</strong> two masters simultaneously</li>
+          <li><strong>Clock stretching:</strong> slave holds SCL low</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <div class="title">Common I²C Bug</div>
+      <p>A device gets stuck holding SDA low (mid-transfer crash). Recovery: manually toggle SCL 9 times, then issue a STOP. Always implement I²C bus recovery in production firmware.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">i2c_scan.py</span><span>Linux user-space</span></div>
+      <pre><span class="kw">import</span> smbus2
+bus = smbus2.<span class="fn">SMBus</span>(<span class="num">1</span>)  <span class="cmt"># /dev/i2c-1</span>
+<span class="kw">for</span> addr <span class="kw">in</span> <span class="fn">range</span>(<span class="num">0x03</span>, <span class="num">0x78</span>):
+    <span class="kw">try</span>:
+        bus.<span class="fn">read_byte</span>(addr)
+        <span class="fn">print</span>(<span class="str">f"0x{addr:02X} — ACK"</span>)
+    <span class="kw">except</span> IOError:
+        <span class="kw">pass</span>
+bus.<span class="fn">close</span>()</pre>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="spi">
+    <div class="proto-viz">
+      <h4>SPI Bus · Master &amp; Slave <span class="pill">4-wire · Full-duplex</span></h4>
+      <div class="pin-diagram">
+        <svg width="100%" height="160" viewBox="0 0 600 160" style="max-width:600px">
+          <!-- Master -->
+          <rect x="20" y="40" width="140" height="80" fill="none" stroke="#00ff9d" stroke-width="1.5" rx="6"/>
+          <text x="90" y="30" text-anchor="middle" fill="#e6edf7" font-family="JetBrains Mono" font-size="11" font-weight="700">MASTER</text>
+          <text x="160" y="60" fill="#00d4ff" font-family="JetBrains Mono" font-size="10">SCK →</text>
+          <text x="160" y="80" fill="#00d4ff" font-family="JetBrains Mono" font-size="10">MOSI →</text>
+          <text x="160" y="100" fill="#00d4ff" font-family="JetBrains Mono" font-size="10">MISO ←</text>
+          <text x="160" y="120" fill="#ffb020" font-family="JetBrains Mono" font-size="10">CS ↓</text>
+          <!-- Slave 1 -->
+          <rect x="240" y="40" width="140" height="80" fill="none" stroke="#00ff9d" stroke-width="1.5" rx="6"/>
+          <text x="310" y="30" text-anchor="middle" fill="#e6edf7" font-family="JetBrains Mono" font-size="11" font-weight="700">SLAVE 1</text>
+          <!-- Slave 2 -->
+          <rect x="440" y="40" width="140" height="80" fill="none" stroke="#5d6b8a" stroke-width="1.5" rx="6" stroke-dasharray="4"/>
+          <text x="510" y="30" text-anchor="middle" fill="#9aa7c2" font-family="JetBrains Mono" font-size="11" font-weight="700">SLAVE 2</text>
+          <!-- Lines -->
+          <line x1="160" y1="60" x2="580" y2="60" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="160" y1="80" x2="580" y2="80" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="160" y1="100" x2="580" y2="100" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="160" y1="120" x2="220" y2="120" stroke="#ffb020" stroke-width="1.5"/>
+          <line x1="220" y1="120" x2="220" y2="135" stroke="#ffb020" stroke-width="1.5"/>
+          <line x1="420" y1="120" x2="480" y2="120" stroke="#ffb020" stroke-width="1.5"/>
+          <line x1="480" y1="120" x2="480" y2="135" stroke="#ffb020" stroke-width="1.5"/>
+          <circle cx="220" cy="120" r="3" fill="#ffb020"/>
+          <circle cx="480" cy="120" r="3" fill="#ffb020"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="spi-modes">
+      <div class="spi-mode" data-mode="0">
+        <div class="mh"><span class="mn">Mode 0</span><span class="cfg">CPOL=0 · CPHA=0</span></div>
+        <svg width="100%" height="60" viewBox="0 0 200 60">
+          <path d="M0,40 L20,40 L20,15 L180,15 L180,40 L200,40" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="10" y="55" fill="#5d6b8a" font-family="JetBrains Mono" font-size="8">SCK idle low</text>
+          <text x="80" y="10" fill="#00ff9d" font-family="JetBrains Mono" font-size="8">sample on rising</text>
+        </svg>
+      </div>
+      <div class="spi-mode" data-mode="1">
+        <div class="mh"><span class="mn">Mode 1</span><span class="cfg">CPOL=0 · CPHA=1</span></div>
+        <svg width="100%" height="60" viewBox="0 0 200 60">
+          <path d="M0,40 L20,40 L20,15 L180,15 L180,40 L200,40" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="10" y="55" fill="#5d6b8a" font-family="JetBrains Mono" font-size="8">SCK idle low</text>
+          <text x="80" y="10" fill="#00ff9d" font-family="JetBrains Mono" font-size="8">sample on falling</text>
+        </svg>
+      </div>
+      <div class="spi-mode" data-mode="2">
+        <div class="mh"><span class="mn">Mode 2</span><span class="cfg">CPOL=1 · CPHA=0</span></div>
+        <svg width="100%" height="60" viewBox="0 0 200 60">
+          <path d="M0,15 L20,15 L20,40 L180,40 L180,15 L200,15" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="10" y="10" fill="#5d6b8a" font-family="JetBrains Mono" font-size="8">SCK idle high</text>
+        </svg>
+      </div>
+      <div class="spi-mode" data-mode="3">
+        <div class="mh"><span class="mn">Mode 3</span><span class="cfg">CPOL=1 · CPHA=1</span></div>
+        <svg width="100%" height="60" viewBox="0 0 200 60">
+          <path d="M0,15 L20,15 L20,40 L180,40 L180,15 L200,15" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="10" y="10" fill="#5d6b8a" font-family="JetBrains Mono" font-size="8">SCK idle high</text>
+        </svg>
+      </div>
+    </div>
+
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">S</span>Key Characteristics</h4>
+        <ul>
+          <li><strong>Sync:</strong> SCK generated by master</li>
+          <li><strong>Full-duplex:</strong> MOSI + MISO simultaneously</li>
+          <li><strong>4 wires:</strong> SCK, MOSI, MISO, CS (per slave)</li>
+          <li><strong>No addressing:</strong> CS selects slave</li>
+          <li><strong>Speed:</strong> up to 50+ MHz (device-limited)</li>
+          <li><strong>Topologies:</strong> single master-multi slave, daisy-chain</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">S</span>Testing SPI</h4>
+        <ul>
+          <li><strong>Loopback:</strong> MOSI→MISO, send pattern, verify</li>
+          <li><strong>Mode match:</strong> CPOL/CPHA must match slave</li>
+          <li><strong>CS timing:</strong> setup/hold vs SCK</li>
+          <li><strong>Signal integrity:</strong> ringing, overshoot at high speeds</li>
+          <li><strong>Clock polarity:</strong> verify idle state on scope</li>
+          <li><strong>Multi-slave CS:</strong> ensure only one active</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="can">
+    <div class="proto-viz">
+      <h4>CAN Standard Frame <span class="pill">11-bit ID · 8-byte data</span></h4>
+      <div class="frame-viz">
+        <div class="frame-bit start"><div class="label">SOF</div><div class="val">1</div></div>
+        <div class="frame-bit data"><div class="label">ID</div><div class="val">11b</div></div>
+        <div class="frame-bit parity"><div class="label">RTR</div><div class="val">0</div></div>
+        <div class="frame-bit data"><div class="label">IDE</div><div class="val">0</div></div>
+        <div class="frame-bit data"><div class="label">r0</div><div class="val">0</div></div>
+        <div class="frame-bit data"><div class="label">DLC</div><div class="val">4b</div></div>
+        <div class="frame-bit data"><div class="label">Data</div><div class="val">0–64b</div></div>
+        <div class="frame-bit parity"><div class="label">CRC</div><div class="val">15b</div></div>
+        <div class="frame-bit data"><div class="label">CRC delim</div><div class="val">1</div></div>
+        <div class="frame-bit data"><div class="label">ACK</div><div class="val">1</div></div>
+        <div class="frame-bit data"><div class="label">ACK delim</div><div class="val">1</div></div>
+        <div class="frame-bit stop"><div class="label">EOF</div><div class="val">7</div></div>
+      </div>
+    </div>
+
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">C</span>Key Characteristics</h4>
+        <ul>
+          <li><strong>Differential:</strong> CAN_H, CAN_L (twisted pair)</li>
+          <li><strong>Multi-master:</strong> any node can transmit</li>
+          <li><strong>CSMA/CD+AMP:</strong> arbitration by ID priority</li>
+          <li><strong>IDs:</strong> 11-bit (Standard) or 29-bit (Extended)</li>
+          <li><strong>Speeds:</strong> 125k, 250k, 500k, 1M bps</li>
+          <li><strong>Termination:</strong> 120Ω at each bus end</li>
+          <li><strong>Bit stuffing:</strong> after 5 same bits, opposite inserted</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">C</span>Testing CAN</h4>
+        <ul>
+          <li><strong>Arbitration:</strong> lower ID wins — verify with collisions</li>
+          <li><strong>Bit timing:</strong> set sample point ~75–87.5%</li>
+          <li><strong>Termination:</strong> measure 60Ω across bus (two 120Ω in parallel)</li>
+          <li><strong>BUS-OFF recovery:</strong> induce errors, verify re-entry</li>
+          <li><strong>Listen-only mode:</strong> passive monitoring</li>
+          <li><strong>Tools:</strong> can-utils, PCAN-View, Vector CANalyzer</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <div class="title">CAN Bus-Off State</div>
+      <p>When a node's Transmit Error Counter (TEC) exceeds 255, it goes BUS-OFF — disconnected from bus. Recovery requires software intervention (or auto-recovery after 128 × 11 consecutive recessive bits). Verify your firmware handles this gracefully without stranding the node.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">can_test.sh</span><span>Linux SocketCAN</span></div>
+      <pre><span class="cmt"># Bring up CAN interface on Linux</span>
+sudo ip link set can0 type can bitrate <span class="num">500000</span> sample-point <span class="num">0.875</span>
+sudo ip link set can0 up
+
+<span class="cmt"># Send a frame: ID=0x123, 8 bytes</span>
+cansend can0 123#DEADBEEF01020304
+
+<span class="cmt"># Monitor all bus traffic with timestamps</span>
+candump -tA can0
+
+<span class="cmt"># Generate periodic frames for stress testing</span>
+cangen can0 -g <span class="num">10</span> -I 123 -L <span class="num">8</span> -D <span class="str">0xAA</span> -n <span class="num">1000</span></pre>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="aio">
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">D</span>Digital I/O Testing</h4>
+        <ul>
+          <li><strong>Input debounce:</strong> RC filter + software, verify with noisy switch</li>
+          <li><strong>Edge detection:</strong> EXTI rising/falling/both</li>
+          <li><strong>Output modes:</strong> push-pull, open-drain</li>
+          <li><strong>Pull resistors:</strong> internal pull-up/down — verify value (typ 40kΩ)</li>
+          <li><strong>Slew rate:</strong> check edges with scope</li>
+          <li><strong>Drive strength:</strong> source/sink current limits</li>
+          <li><strong>Boundary scan:</strong> JTAG boundary scan cells (IEEE 1149.1)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">A</span>Analog I/O Testing</h4>
+        <ul>
+          <li><strong>ADC resolution:</strong> 8/10/12/16/24-bit</li>
+          <li><strong>Sampling rate:</strong> verify effective vs spec</li>
+          <li><strong>Reference voltage:</strong> internal, external, VDD</li>
+          <li><strong>Linearity:</strong> DNL (differential), INL (integral)</li>
+          <li><strong>Offset &amp; gain error:</strong> calibrated out</li>
+          <li><strong>Noise:</strong> short input, measure RMS</li>
+          <li><strong>DAC:</strong> monotonicity, settling time, glitch energy</li>
+          <li><strong>PWM:</strong> duty cycle accuracy, frequency stability</li>
+        </ul>
+      </div>
+    </div>
+    <div class="callout">
+      <div class="title">Practical Tip</div>
+      <p>For ADC testing, use a precision voltage source (or calibrated DAC) and sweep across the full range. Plot INL — large deviations indicate ADC non-linearity or reference noise. Always test with the actual signal source impedance; high source impedance causes sampling errors due to insufficient acquisition time.</p>
+    </div>
+  </div>
+
+  <div class="checkpoint reveal">
+    <div class="label">Checkpoint</div>
+    <div class="q">3. On a CAN bus, two nodes transmit simultaneously: ID 0x100 and ID 0x200. Which wins arbitration?</div>
+    <div class="options" data-correct="a">
+      <div class="opt" data-key="a"><span class="key">A</span>0x100 (lower ID = higher priority)</div>
+      <div class="opt" data-key="b"><span class="key">B</span>0x200 (higher ID = higher priority)</div>
+      <div class="opt" data-key="c"><span class="key">C</span>Both retry after random delay</div>
+      <div class="opt" data-key="d"><span class="key">D</span>Whichever started first</div>
+    </div>
+    <div class="feedback">CAN arbitration is non-destructive: dominant bit (0) wins over recessive (1). Lower ID has a 0 in a higher bit position earlier, so 0x100 wins. The losing node stops transmitting when it sees a dominant bit where it wrote recessive.</div>
+  </div>
+</section>
+
+<!-- ==================== 04 · HMI ==================== -->
+<section class="topic" id="hmi">
+  <div class="topic-head reveal">
+    <div class="topic-num">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      <span class="n">04</span>
+    </div>
+    <div>
+      <div class="tagline">// Qt · GTK · Touch · UX · Shell Scripts</div>
+      <h2>Linux HMI Testing &amp; Scripting</h2>
+      <p>Human-Machine Interface devices on Linux range from small e-ink displays to full touch panels running Qt. Verification covers UI rendering, input response, performance stability, and the shell tooling that automates test execution on the target.</p>
+    </div>
+  </div>
+
+  <div class="card-grid cols-2 reveal">
+    <div class="card">
+      <h4><span class="ic">H</span>HMI Test Areas</h4>
+      <ul>
+        <li><strong>Rendering:</strong> frame rate, tearing, partial refresh (e-paper)</li>
+        <li><strong>Touch:</strong> accuracy, multi-touch, latency &lt; 100ms</li>
+        <li><strong>Visuals:</strong> colors, contrast, brightness under sunlight</li>
+        <li><strong>State transitions:</strong> every screen reachable, returns cleanly</li>
+        <li><strong>Input validation:</strong> special chars, max-length, ranges</li>
+        <li><strong>Internationalization:</strong> RTL, character rendering, fonts</li>
+        <li><strong>Accessibility:</strong> contrast ratios, focus indicators</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="ic">H</span>Performance &amp; Stability</h4>
+      <ul>
+        <li><strong>Boot time:</strong> splash to interactive &lt; spec</li>
+        <li><strong>Memory:</strong> <code>valgrind --tool=massif</code>, watch for leaks over 24h</li>
+        <li><strong>CPU:</strong> <code>top</code>, <code>htop</code>, idle should be &gt; 80%</li>
+        <li><strong>Watchdog:</strong> system kick under load</li>
+        <li><strong>Disk:</strong> write endurance, log rotation</li>
+        <li><strong>Power:</strong> sleep/wake cycles, deep sleep current</li>
+        <li><strong>Thermal:</strong> long-running UI stress, thermal throttling</li>
+      </ul>
+    </div>
+  </div>
+
+  <h4 style="margin:30px 0 14px;font-size:18px;color:var(--text)">Shell Scripting Toolkit</h4>
+  <div class="tool-row reveal">
+    <span class="tool-tag">bash</span>
+    <span class="tool-tag">sh (POSIX)</span>
+    <span class="tool-tag">awk</span>
+    <span class="tool-tag">sed</span>
+    <span class="tool-tag">grep</span>
+    <span class="tool-tag">xargs</span>
+    <span class="tool-tag">find</span>
+    <span class="tool-tag">journalctl</span>
+    <span class="tool-tag">dmesg</span>
+    <span class="tool-tag">udevadm</span>
+    <span class="tool-tag">strace</span>
+    <span class="tool-tag">ltrace</span>
+    <span class="tool-tag">netcat</span>
+    <span class="tool-tag">socat</span>
+    <span class="tool-tag">i2c-tools</span>
+    <span class="tool-tag">gpioget/set</span>
+  </div>
+
+  <div class="code-block reveal">
+    <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">hmi_smoke_test.sh</span><span>Target HMI</span></div>
+    <pre><span class="cmt">#!/bin/bash</span>
+<span class="cmt"># Smoke-test HMI app: launch, probe, screenshot, kill</span>
+<span class="kw">set</span> -euo pipefail
+
+APP=<span class="str">"/opt/hmi/bin/hmi_app"</span>
+LOG=<span class="str">"/var/log/hmi_test_$(date +%s).log"</span>
+TIMEOUT=<span class="num">30</span>
+
+<span class="fn">log</span>() { <span class="kw">echo</span> <span class="str">"[$(date +%H:%M:%S)] $*"</span> | tee -a <span class="str">"$LOG"</span>; }
+
+<span class="cmt"># 1. Verify binary exists and is executable</span>
+[[ -x <span class="str">"$APP"</span> ]] || { <span class="fn">log</span> <span class="str">"FAIL: binary missing"</span>; <span class="kw">exit</span> 1; }
+
+<span class="cmt"># 2. Launch in background, capture PID</span>
+<span class="fn">log</span> <span class="str">"Launching HMI..."</span>
+<span class="str">"$APP"</span> --no-fullscreen &amp;&amp; APP_PID=$! 
+
+<span class="cmt"># 3. Wait for window to appear (X11 property check)</span>
+<span class="kw">for</span> i <span class="kw">in</span> $(seq 1 $TIMEOUT); <span class="kw">do</span>
+    <span class="kw">if</span> xdotool search --name <span class="str">"HMI Main"</span> &gt;/dev/null 2&gt;&amp;1; <span class="kw">then</span>
+        <span class="fn">log</span> <span class="str">"OK: window appeared after ${i}s"</span>
+        <span class="kw">break</span>
+    <span class="kw">fi</span>
+    sleep 1
+<span class="kw">done</span>
+
+<span class="cmt"># 4. Capture screenshot</span>
+DISPLAY=:0 xwd -root -silent | convert xwd:- /tmp/hmi_$(date +%s).png
+<span class="fn">log</span> <span class="str">"Screenshot saved"</span>
+
+<span class="cmt"># 5. Check memory footprint</span>
+RSS=$(awk <span class="str">'/VmRSS/{print $2}'</span> /proc/$APP_PID/status)
+<span class="fn">log</span> <span class="str">"RSS = ${RSS} kB"</span>
+(( RSS &gt; <span class="num">50000</span> )) &amp;&amp; <span class="fn">log</span> <span class="str">"WARN: high memory"</span>
+
+<span class="cmt"># 6. Touch input simulation (tap center)</span>
+xdotool mousemove 400 300 click 1
+sleep 0.5
+
+<span class="cmt"># 7. Cleanup</span>
+kill -TERM $APP_PID 2&gt;/dev/null || true
+<span class="fn">log</span> <span class="str">"Done"</span></pre>
+  </div>
+
+  <div class="card-grid cols-2 reveal">
+    <div class="card">
+      <h4><span class="ic">S</span>Useful One-Liners</h4>
+      <ul>
+        <li>Find recent logs: <code>journalctl --since "10 min ago" -u hmi</code></li>
+        <li>Watch kernel: <code>dmesg -wT</code></li>
+        <li>Process tree: <code>ps auxf</code></li>
+        <li>Find largest files: <code>du -ah . | sort -rh | head</code></li>
+        <li>Network listeners: <code>ss -tlnp</code></li>
+        <li>CPU by core: <code>mpstat -P ALL 1</code></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="ic">S</span>GPIO &amp; Device Access</h4>
+      <ul>
+        <li>Read GPIO: <code>gpioget gpiochip0 23</code></li>
+        <li>Set GPIO: <code>gpioset gpiochip0 23=1</code></li>
+        <li>I2C detect: <code>i2cdetect -y 1</code></li>
+        <li>Read register: <code>i2cget -y 1 0x4a 0x00</code></li>
+        <li>SPI transfer: <code>spidev_test -D /dev/spidev0.0 -s 1000000</code></li>
+        <li>Serial console: <code>stty -F /dev/ttyUSB0 115200 raw -echo</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="checkpoint reveal">
+    <div class="label">Checkpoint</div>
+    <div class="q">4. You need to capture all kernel messages from the last boot. Which command?</div>
+    <div class="options" data-correct="b">
+      <div class="opt" data-key="a"><span class="key">A</span>dmesg | tail -100</div>
+      <div class="opt" data-key="b"><span class="key">B</span>journalctl -k -b</div>
+      <div class="opt" data-key="c"><span class="key">C</span>cat /var/log/syslog</div>
+      <div class="opt" data-key="d"><span class="key">D</span>tail -f /var/log/messages</div>
+    </div>
+    <div class="feedback"><code>journalctl -k</code> filters kernel messages; <code>-b</code> shows current boot. Use <code>-b -1</code> for previous boot. <code>dmesg</code> only shows current buffer; for persistent logs across reboots, journalctl with persistent storage is required.</div>
+  </div>
+</section>
+
+<!-- ==================== 05 · FRAMEWORKS ==================== -->
+<section class="topic" id="frameworks">
+  <div class="topic-head reveal">
+    <div class="topic-num">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+      <span class="n">05</span>
+    </div>
+    <div>
+      <div class="tagline">// Unity · Ceedling · GoogleTest · Pytest · Robot</div>
+      <h2>Test Frameworks &amp; Automation</h2>
+      <p>Test frameworks bring structure: assertions, fixtures, mocks, reporting. For embedded C, Unity + Ceedling dominates. C++ projects use GoogleTest. Host-side scripting often uses Python. The right framework makes the difference between tests that get written and tests that don't.</p>
+    </div>
+  </div>
+
+  <div class="compare-table reveal">
+    <thead><tr><th>Framework</th><th>Language</th><th>Best For</th><th>Mocking</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td>Unity</td><td>C</td><td>MCU unit tests</td><td>CMock</td><td>Tiny, runs on target</td></tr>
+      <tr><td>Ceedling</td><td>C</td><td>Build + test orchestration</td><td>CMock</td><td>Wraps Unity + CMock + rake</td></tr>
+      <tr><td>CppUTest</td><td>C/C++</td><td>MCU + driver tests</td><td>Built-in</td><td>Designed for TDD embedded</td></tr>
+      <tr><td>GoogleTest</td><td>C++</td><td>Higher-level, Linux</td><td>gMock</td><td>Industry standard</td></tr>
+      <tr><td>Catch2</td><td>C++</td><td>Header-only modern</td><td>Built-in</td><td>BDD-style macros</td></tr>
+      <tr><td>PyTest</td><td>Python</td><td>System/HIL tests</td><td>unittest.mock</td><td>Fixtures, parametrize</td></tr>
+      <tr><td>Robot Framework</td><td>Keyword-driven</td><td>Acceptance, HMI</td><td>Libraries</td><td>Tabular, non-dev friendly</td></tr>
+    </tbody>
+  </table>
+
+  <div class="card-grid cols-2 reveal">
+    <div class="card">
+      <h4><span class="ic">T</span>Test Pyramid (Embedded)</h4>
+      <ul>
+        <li><strong>Unit (base, ~70%):</strong> functions, modules, mocked HW</li>
+        <li><strong>Integration (~20%):</strong> driver + peripheral, on target</li>
+        <li><strong>System (~7%):</strong> end-to-end, real hardware</li>
+        <li><strong>Manual (~3%):</strong> exploratory, UX, edge cases</li>
+        <li>Faster &amp; cheaper at the bottom — automate ruthlessly there</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="ic">T</span>Coverage Metrics</h4>
+      <ul>
+        <li><strong>Statement:</strong> each line executed</li>
+        <li><strong>Branch:</strong> each branch direction taken</li>
+        <li><strong>MC/DC:</strong> required for DO-178C Level A</li>
+        <li><strong>Tools:</strong> gcov/lcov (GCC), Bullseye, Coverity</li>
+        <li>Target: 80–90% line, &gt;70% branch typical</li>
+        <li>100% coverage ≠ 100% correctness — tests must assert</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-block reveal">
+    <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">test_motor_driver.c</span><span>Unity + CMock</span></div>
+    <pre><span class="cmt">// test_motor_driver.c — Unity test with CMock mocks</span>
+<span class="kw">#include</span> <span class="str">"unity.h"</span>
+<span class="kw">#include</span> <span class="str">"Mockpwm.h"</span>      <span class="cmt">// auto-generated by CMock</span>
+<span class="kw">#include</span> <span class="str">"Mockgpio.h"</span>
+<span class="kw">#include</span> <span class="str">"motor_driver.h"</span>
+
+<span class="kw">void</span> <span class="fn">setUp</span>(<span class="kw">void</span>) {}
+<span class="kw">void</span> <span class="fn">tearDown</span>(<span class="kw">void</span>) {
+    <span class="fn">Mockpwm_Verify</span>();   <span class="cmt">// assert all expected calls happened</span>
+    <span class="fn">Mockpwm_Destroy</span>();
+}
+
+<span class="kw">void</span> <span class="fn">test_motor_set_speed_sets_pwm_duty</span>(<span class="kw">void</span>) {
+    <span class="cmt">// Expect: PWM_SetDuty called once with arg = 65</span>
+    <span class="fn">PWM_SetDuty_Expect</span>(<span class="num">65</span>);
+    <span class="fn">GPIO_Write_ExpectAndReturn</span>(MOTOR_EN_PIN, <span class="num">1</span>, STATUS_OK);
+
+    status_t s = <span class="fn">motor_set_speed</span>(<span class="num">65</span>);
+
+    <span class="fn">TEST_ASSERT_EQUAL</span>(STATUS_OK, s);
+}
+
+<span class="kw">void</span> <span class="fn">test_motor_negative_speed_rejected</span>(<span class="kw">void</span>) {
+    status_t s = <span class="fn">motor_set_speed</span>(-<span class="num">10</span>);
+    <span class="fn">TEST_ASSERT_EQUAL</span>(STATUS_INVALID_ARG, s);
+    <span class="cmt">// No PWM_SetDuty expected — motor driver shouldn't touch HW</span>
+}</pre>
+  </div>
+
+  <div class="code-block reveal">
+    <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">test_can_bus.py</span><span>PyTest HIL</span></div>
+    <pre><span class="kw">import</span> pytest
+<span class="kw">from</span> can <span class="kw">import</span> CANBus
+
+@pytest.fixture
+<span class="kw">def</span> <span class="fn">bus</span>():
+    b = <span class="fn">CANBus</span>(interface=<span class="str">"socketcan"</span>, channel=<span class="str">"can0"</span>)
+    <span class="kw">yield</span> b
+    b.<span class="fn">shutdown</span>()
+
+@pytest.mark.parametrize(<span class="str">"speed,expected_duty"</span>, [
+    (<span class="num">0</span>,    <span class="num">0</span>),
+    (<span class="num">50</span>,   <span class="num">50</span>),
+    (<span class="num">100</span>,  <span class="num">100</span>),
+])
+<span class="kw">def</span> <span class="fn">test_motor_command_roundtrip</span>(bus, speed, expected_duty):
+    <span class="str">"""Send motor command via CAN, read back telemetry."""</span>
+    bus.<span class="fn">send</span>(arbitration_id=<span class="num">0x120</span>, data=[speed])
+    reply = bus.<span class="fn">receive</span>(timeout=<span class="num">2.0</span>)
+    <span class="kw">assert</span> reply.id == <span class="num">0x520</span>
+    <span class="kw">assert</span> reply.data[<span class="num">0</span>] == expected_duty</pre>
+  </div>
+
+  <div class="checkpoint reveal">
+    <div class="label">Checkpoint</div>
+    <div class="q">5. Which coverage criterion requires that each condition in a boolean expression independently affects the outcome?</div>
+    <div class="options" data-correct="c">
+      <div class="opt" data-key="a"><span class="key">A</span>Statement coverage</div>
+      <div class="opt" data-key="b"><span class="key">B</span>Branch coverage</div>
+      <div class="opt" data-key="c"><span class="key">C</span>MC/DC (Modified Condition / Decision Coverage)</div>
+      <div class="opt" data-key="d"><span class="key">D</span>Path coverage</div>
+    </div>
+    <div class="feedback">MC/DC is required for DO-178C Level A (safety-critical aviation software). For <code>(A &amp;&amp; B) || C</code>, you need test cases showing each of A, B, C independently changing the result. Path coverage is stronger but often impractical.</div>
+  </div>
+</section>
+
+<!-- ==================== 06 · HW SETUP ==================== -->
+<section class="topic" id="hw">
+  <div class="topic-head reveal">
+    <div class="topic-num">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      <span class="n">06</span>
+    </div>
+    <div>
+      <div class="tagline">// DMM · Scope · Logic Analyzer · Test Jig</div>
+      <h2>Hardware Test Setup &amp; Troubleshooting</h2>
+      <p>Bench equipment and test fixtures turn firmware bugs into observable signals. A well-equipped setup with proper probing technique is the difference between finding a 50 ns glitch in an hour versus never finding it at all.</p>
+    </div>
+  </div>
+
+  <div class="card-grid cols-3 reveal">
+    <div class="card">
+      <h4><span class="ic">D</span>Digital Multimeter</h4>
+      <ul>
+        <li><strong>Voltage (DC/AC):</strong> power rails, signal levels</li>
+        <li><strong>Current:</strong> sleep, active, peak (µA range matters)</li>
+        <li><strong>Resistance:</strong> pull-ups, terminations, traces</li>
+        <li><strong>Continuity:</strong> beep mode for shorts/opens</li>
+        <li><strong>Diode test:</strong> forward voltage drop ~0.6V</li>
+        <li><strong>Capacitance:</strong> basic check</li>
+        <li><strong>Beware:</strong> burden voltage on current ranges</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="ic">O</span>Oscilloscope</h4>
+      <ul>
+        <li><strong>Bandwidth:</strong> ≥ 5× signal freq (e.g. 50 MHz for 10 MHz)</li>
+        <li><strong>Sample rate:</strong> ≥ 5× bandwidth (Nyquist is minimum)</li>
+        <li><strong>Probes:</strong> 10× to reduce loading (10 MΩ, ~10 pF)</li>
+        <li><strong>Triggers:</strong> edge, pulse width, runt, glitch, protocol</li>
+        <li><strong>Math:</strong> add, subtract, FFT, decode (I²C/SPI/UART/CAN)</li>
+        <li><strong>Coupling:</strong> AC removes DC component; DC shows truth</li>
+        <li><strong>Memory depth:</strong> captures long bursts at high rate</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="ic">L</span>Logic Analyzer</h4>
+      <ul>
+        <li><strong>Channels:</strong> 8–34 typical, parallel capture</li>
+        <li><strong>Sampling:</strong> 100 MS/s+ for high-speed buses</li>
+        <li><strong>Protocol decode:</strong> I²C, SPI, UART, CAN, 1-Wire, USB</li>
+        <li><strong>Trigger:</strong> complex multi-byte patterns</li>
+        <li><strong>Software:</strong> Saleae Logic, Sigrok/PulseView</li>
+        <li><strong>Limitation:</strong> voltage only, not analog quality</li>
+        <li><strong>Use:</strong> parallel buses, multi-signal timing</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid cols-2 reveal">
+    <div class="card">
+      <h4><span class="ic">P</span>Power Supply</h4>
+      <ul>
+        <li><strong>Voltage + current limits:</strong> never exceed rail spec</li>
+        <li><strong>Current limit:</strong> catch shorts before damage</li>
+        <li><strong>Sequencing:</strong> multi-rail ordering (1.2V core → 3.3V I/O)</li>
+        <li><strong>Measurement:</strong> read-back current for power profiling</li>
+        <li><strong>Battery sim:</strong> variable source + sink for charging tests</li>
+        <li><strong>E-Load:</strong> programmable load for regulator stress</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="ic">J</span>Test Jig / Fixture</h4>
+      <ul>
+        <li><strong>Pogo pins:</strong> spring contacts to test pads</li>
+        <li><strong>Bed of nails:</strong> PCB-level production testing</li>
+        <li><strong>Boundary scan:</strong> JTAG (IEEE 1149.1) for pins</li>
+        <li><strong>Modular:</strong> quick swap of DUT boards</li>
+        <li><strong>Automation:</strong> pneumatic actuation, camera inspection</li>
+        <li><strong>Calibration:</strong> verify fixture itself periodically</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout warn reveal">
+    <div class="title">Probing Pitfalls</div>
+    <p><strong>Ground lead inductance:</strong> the 6-inch alligator clip acts as an inductor; at high frequencies it causes ringing. Use a ground spring tip for &gt;20 MHz signals. <strong>Probe loading:</strong> a 10 pF probe on a 1 MHz SPI clock shifts edge timing — use 10× mode. <strong>Floating measurements:</strong> never connect a grounded scope probe to mains or non-isolated circuits; use a differential probe.</p>
+  </div>
+
+  <div class="callout danger reveal">
+    <div class="title">Troubleshooting Method</div>
+    <p><strong>1. Reproduce reliably</strong> — nothing beats a deterministic repro. <strong>2. Bisect:</strong> what's the smallest config that fails? <strong>3. Divide &amp; conquer:</strong> is it HW or SW? Swap boards, swap firmware. <strong>4. Measure first, theorize second</strong> — assumptions waste hours. <strong>5. Document findings</strong> — future-you will thank present-you.</p>
+  </div>
+
+  <div class="checkpoint reveal">
+    <div class="label">Checkpoint</div>
+    <div class="q">6. You're probing a 20 MHz SPI clock with a scope and see ringing. What's the first thing to change?</div>
+    <div class="options" data-correct="c">
+      <div class="opt" data-key="a"><span class="key">A</span>Switch to 1× probe mode</div>
+      <div class="opt" data-key="b"><span class="key">B</span>Increase the scope bandwidth limit</div>
+      <div class="opt" data-key="c"><span class="key">C</span>Use a shorter ground lead (ground spring)</div>
+      <div class="opt" data-key="d"><span class="key">D</span>Lower the SPI clock to 1 MHz</div>
+    </div>
+    <div class="feedback">The standard alligator ground clip's inductance causes ringing at high frequencies. A ground spring tip removes most of the lead length, dramatically reducing parasitic inductance. 1× probes add capacitance and make it worse.</div>
+  </div>
+</section>
+
+<!-- ==================== 07 · DEBUG ==================== -->
+<section class="topic" id="debug">
+  <div class="topic-head reveal">
+    <div class="topic-num">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 2v4M16 2v4M9 2h6"/><rect x="6" y="6" width="12" height="14" rx="2"/><path d="M9 10h6M9 14h6M9 18h6"/></svg>
+      <span class="n">07</span>
+    </div>
+    <div>
+      <div class="tagline">// JTAG · SWD · GDB · OpenOCD · Logs</div>
+      <h2>Flashing, Debugging &amp; Log Analysis</h2>
+      <p>From initial bring-up to field failure analysis, you live in debuggers and logs. Knowing the toolchain — flashing methods, debug probe protocols, log analysis techniques — turns hours of guesswork into minutes of evidence-based diagnosis.</p>
+    </div>
+  </div>
+
+  <div class="card-grid cols-2 reveal">
+    <div class="card">
+      <h4><span class="ic">F</span>Flashing Methods</h4>
+      <ul>
+        <li><strong>SWD:</strong> 2-wire (SWCLK + SWDIO), Cortex-M standard</li>
+        <li><strong>JTAG:</strong> 4-wire (TCK/TMS/TDI/TDO) + TRST, more boundary-scan</li>
+        <li><strong>UART bootloader:</strong> ROM bootloader, no probe needed</li>
+        <li><strong>USB DFU:</strong> Device Firmware Upgrade class</li>
+        <li><strong>ISP:</strong> In-System Programming, SPI/I²C/SPI-flash</li>
+        <li><strong>OTA:</strong> Over-The-Air, A/B partitioning for safety</li>
+        <li><strong>OTP/eFuse:</strong> one-time programmable, careful!</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="ic">P</span>Debug Probes</h4>
+      <ul>
+        <li><strong>ST-Link:</strong> ST-MCU focused, cheap, ubiquitous</li>
+        <li><strong>J-Link:</strong> Segger, fast, broad vendor support</li>
+        <li><strong>CMSIS-DAP:</strong> open standard, low-cost</li>
+        <li><strong>Probe-rs:</strong> open-source, modern, Rust-based</li>
+        <li><strong>Lauterbach Trace32:</strong> high-end, JTAG + trace</li>
+        <li><strong>Black Magic:</strong> native GDB server, open HW</li>
+        <li><strong>DAPLink:</strong> drag-drop flashing via USB MSD</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid cols-2 reveal">
+    <div class="card">
+      <h4><span class="ic">G</span>GDB + OpenOCD</h4>
+      <ul>
+        <li><strong>OpenOCD:</strong> translates GDB ↔ probe protocol</li>
+        <li><strong>arm-none-eabi-gdb:</strong> cross-debugger</li>
+        <li>Break on hardware address: <code>hbreak</code></li>
+        <li>Watchpoint: <code>watch var</code>, data-dependent break</li>
+        <li>Live variable view: <code>watch</code> in TUI mode</li>
+        <li><strong>SWO/ITM:</strong> printf-style trace over single pin</li>
+        <li><strong>ETM:</strong> full instruction trace (Cortex-M7+)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="ic">L</span>Log Analysis</h4>
+      <ul>
+        <li><strong>Levels:</strong> DEBUG/INFO/WARN/ERROR/FATAL</li>
+        <li><strong>Format:</strong> timestamp + level + module + msg</li>
+        <li><strong>Ring buffer:</strong> in-RAM, dumps on fault</li>
+        <li><strong>journalctl:</strong> structured, filterable</li>
+        <li><strong>syslog:</strong> network-aggregated</li>
+        <li><strong>ELK/Loki:</strong> centralized, searchable</li>
+        <li><strong>Correlation IDs:</strong> trace request across modules</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-block reveal">
+    <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">openocd_debug.sh</span><span>SWD + GDB</span></div>
+    <pre><span class="cmt"># Terminal 1: Start OpenOCD server (ST-Link + Cortex-M4)</span>
+openocd -f interface/stlink.cfg -f target/stm32f4x.cfg \
+        -c <span class="str">"adapter speed 4000; transport select hla_swd"</span>
+
+<span class="cmt"># Terminal 2: Start GDB, connect to target</span>
+arm-none-eabi-gdb build/firmware.elf
+(gdb) target remote localhost:3333
+(gdb) monitor reset halt
+(gdb) load                     <span class="cmt"># flash the binary</span>
+(gdb) monitor arm semihosting enable
+(gdb) break main
+(gdb) continue
+
+<span class="cmt"># Useful commands during debug session:</span>
+(gdb) info registers           <span class="cmt"># show R0-R15, xPSR</span>
+(gdb) x/16xw 0x20000000        <span class="cmt"># inspect RAM</span>
+(gdb) watch g_state            <span class="cmt"># break when variable changes</span>
+(gdb) monitor mww 0x40023830 0x00000001  <span class="cmt"># write peripheral reg</span>
+(gdb) monitor mdb 0x08000000 16 <span class="cmt"># dump flash bytes</span>
+
+<span class="cmt"># Capture ITM/SWO trace via OpenOCD</span>
+(gdb) monitor tpiu config internal itm.log uart off 48000000
+(gdb) monitor itm port 0 on    <span class="cmt"># ITM stimulus port 0</span></pre>
+  </div>
+
+  <div class="callout reveal">
+    <div class="title">Printf vs Step-Debug</div>
+    <p>Step debugging finds logic bugs fast. Printf finds timing-sensitive bugs that disappear when paused. For hard real-time issues (race conditions, ISR latency), ITM trace is the gold standard — non-intrusive, time-stamped, post-processable. Use the right tool for the bug.</p>
+  </div>
+
+  <div class="checkpoint reveal">
+    <div class="label">Checkpoint</div>
+    <div class="q">7. Which is the minimum number of wires needed for SWD (excluding ground and reset)?</div>
+    <div class="options" data-correct="b">
+      <div class="opt" data-key="a"><span class="key">A</span>1 (just SWDIO)</div>
+      <div class="opt" data-key="b"><span class="key">B</span>2 (SWCLK + SWDIO)</div>
+      <div class="opt" data-key="c"><span class="key">C</span>4 (TCK/TMS/TDI/TDO)</div>
+      <div class="opt" data-key="d"><span class="key">D</span>6 (full JTAG + trace)</div>
+    </div>
+    <div class="feedback">SWD uses 2 signal wires: SWCLK (clock) and SWDIO (bidirectional data). JTAG uses 4. SWD was designed by ARM specifically to reduce pin count on Cortex-M while keeping debug capability. SWO is an optional output for trace.</div>
+  </div>
+</section>
+
+<!-- ==================== 08 · TOOLS ==================== -->
+<section class="topic" id="tools">
+  <div class="topic-head reveal">
+    <div class="topic-num">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/></svg>
+      <span class="n">08</span>
+    </div>
+    <div>
+      <div class="tagline">// Requirements · Bug Tracker · Version Control · CI/CD</div>
+      <h2>Software Lifecycle Tools</h2>
+      <p>Beyond writing and testing code, you manage requirements, track defects, version your source, and automate builds. These tools form the connective tissue of professional embedded development — they make work auditable, reproducible, and scalable.</p>
+    </div>
+  </div>
+
+  <div class="tabs reveal">
+    <button class="tab-btn active" data-tab="tools-req">Requirements</button>
+    <button class="tab-btn" data-tab="tools-bug">Bug Tracking</button>
+    <button class="tab-btn" data-tab="tools-vcs">Version Control</button>
+    <button class="tab-btn" data-tab="tools-ci">CI/CD</button>
+  </div>
+
+  <div class="tab-pane active" data-pane="tools-req">
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">R</span>Requirements Management</h4>
+        <ul>
+          <li><strong>IBM DOORS:</strong> aerospace, automotive, safety-critical</li>
+          <li><strong>Polarion:</strong> Siemens, ALM integration</li>
+          <li><strong>Jira + Xray/Confluence:</strong> agile + traceability</li>
+          <li><strong>ReqView:</strong> lightweight, on-prem</li>
+          <li><strong>PTC Integrity:</strong> enterprise, ISO 26262</li>
+          <li><strong>Siemens Teamcenter:</strong> PLM-integrated</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">R</span>Key Concepts</h4>
+        <ul>
+          <li><strong>Traceability:</strong> Requirement → Design → Code → Test → Result</li>
+          <li><strong>Bidirectional:</strong> every test maps to req; every req has tests</li>
+          <li><strong>Baseline:</strong> frozen snapshot for release</li>
+          <li><strong>Change control:</strong> impact analysis before approval</li>
+          <li><strong>Standards:</strong> ISO 26262 (auto), DO-178C (aero), IEC 62304 (med), IEC 61508 (industrial)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="tools-bug">
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">B</span>Bug Trackers</h4>
+        <ul>
+          <li><strong>Jira:</strong> de facto standard, agile workflows</li>
+          <li><strong>Bugzilla:</strong> classic, open-source, Mozilla</li>
+          <li><strong>MantisBT:</strong> lightweight PHP</li>
+          <li><strong>Redmine:</strong> open-source, flexible</li>
+          <li><strong>GitHub/GitLab Issues:</strong> integrated with VCS</li>
+          <li><strong>YouTrack:</strong> JetBrains, keyboard-driven</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">B</span>Anatomy of a Good Bug Report</h4>
+        <ul>
+          <li><strong>Title:</strong> concise, searchable</li>
+          <li><strong>Environment:</strong> HW rev, FW version, tools</li>
+          <li><strong>Steps to reproduce:</strong> numbered, exact</li>
+          <li><strong>Expected vs actual:</strong> side-by-side</li>
+          <li><strong>Logs:</strong> attached, not pasted</li>
+          <li><strong>Frequency:</strong> always / intermittent (rate?)</li>
+          <li><strong>Severity vs priority:</strong> different axes</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="tools-vcs">
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">G</span>Git Commands (Daily)</h4>
+        <ul>
+          <li>Branch: <code>git checkout -b feature/foo</code></li>
+          <li>Stage + commit: <code>git add -p; git commit -m "..."</code></li>
+          <li>Rebase on main: <code>git rebase origin/main</code></li>
+          <li>Interactive rebase: <code>git rebase -i HEAD~5</code></li>
+          <li>Stash: <code>git stash push -m "wip"</code></li>
+          <li>Bisect (find regression): <code>git bisect start</code></li>
+          <li>Cherry-pick: <code>git cherry-pick &lt;sha&gt;</code></li>
+          <li>Submodule: <code>git submodule update --init</code></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">G</span>Embedded Branching Strategies</h4>
+        <ul>
+          <li><strong>Git Flow:</strong> main / develop / feature / release / hotfix</li>
+          <li><strong>Trunk-based:</strong> short-lived branches, fast CI</li>
+          <li><strong>Release branches:</strong> long-lived per supported version</li>
+          <li><strong>Tags:</strong> every release, signed (<code>git tag -s</code>)</li>
+          <li><strong>Hooks:</strong> pre-commit lint, commit-msg format</li>
+          <li><strong>Submodules vs monorepo:</strong> tradeoffs</li>
+          <li><strong>West (Zephyr):</strong> manifest-based, common in embedded</li>
+        </ul>
+      </div>
+    </div>
+    <div class="code-block">
+      <div class="code-head"><div class="dots"><span class="r"></span><span class="y"></span><span class="g"></span></div><span class="file">git_bisect.sh</span><span>Find regression</span></div>
+      <pre><span class="cmt"># Binary-search through commits to find what introduced a bug</span>
+git bisect start
+git bisect bad                 <span class="cmt"># current commit is broken</span>
+git bisect good v1.2.0         <span class="cmt"># last known-good tag</span>
+<span class="cmt"># Git checks out midpoint; you test, then:</span>
+git bisect good                <span class="cmt"># or: git bisect bad</span>
+<span class="cmt"># Repeat until git reports the offending commit</span>
+
+<span class="cmt"># Automate: a script that exits 0=good, 1=bad</span>
+git bisect run ./scripts/test_motor_driver.sh
+
+git bisect reset               <span class="cmt"># return to original branch</span></pre>
+    </div>
+  </div>
+
+  <div class="tab-pane" data-pane="tools-ci">
+    <div class="card-grid cols-2">
+      <div class="card">
+        <h4><span class="ic">C</span>CI/CD Platforms</h4>
+        <ul>
+          <li><strong>Jenkins:</strong> on-prem, plugin-heavy, classic</li>
+          <li><strong>GitLab CI:</strong> integrated, .gitlab-ci.yml</li>
+          <li><strong>GitHub Actions:</strong> cloud, marketplace</li>
+          <li><strong>Buildkite:</strong> hybrid, agent-based</li>
+          <li><strong>TeamCity:</strong> JetBrains, enterprise</li>
+          <li><strong>CircleCI:</strong> cloud, Docker-first</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4><span class="ic">C</span>Embedded CI Pipeline</h4>
+        <ul>
+          <li><strong>Build matrix:</strong> multiple toolchains, boards</li>
+          <li><strong>Static analysis:</strong> cppcheck, clang-tidy, MISRA</li>
+          <li><strong>Unit tests:</strong> on host (mocked) + on target (HIL)</li>
+          <li><strong>Coverage:</strong> gcov → lcov → publish</li>
+          <li><strong>Size check:</strong> fail if binary &gt; threshold</li>
+          <li><strong>Artifacts:</strong> .hex/.bin, debug symbols, maps</li>
+          <li><strong>HIL stage:</strong> flash + run on real HW</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="checkpoint reveal">
+    <div class="label">Checkpoint</div>
+    <div class="q">8. What does "traceability" mean in a safety-critical requirements context?</div>
+    <div class="options" data-correct="b">
+      <div class="opt" data-key="a"><span class="key">A</span>Code can be traced in version control</div>
+      <div class="opt" data-key="b"><span class="key">B</span>Every requirement links to design, code, test, and verification result</div>
+      <div class="opt" data-key="c"><span class="key">C</span>Bugs can be traced to their author</div>
+      <div class="opt" data-key="d"><span class="key">D</span>Program execution can be traced with a debugger</div>
+    </div>
+    <div class="feedback">Traceability is the bidirectional chain: each requirement → design element → code unit → test case → verification result, and back. Standards like DO-178C, ISO 26262, and IEC 62304 mandate this for safety-critical software — auditors verify no requirement is untested and no test is orphaned.</div>
+  </div>
+</section>
+
+<!-- ==================== FINAL QUIZ ==================== -->
+<section class="topic" id="quiz">
+  <div class="topic-head reveal">
+    <div class="topic-num">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      <span class="n">★</span>
+    </div>
+    <div>
+      <div class="tagline">// Final Knowledge Check</div>
+      <h2>Mixed Revision Quiz</h2>
+      <p>Ten questions across all eight modules. Pick an answer to get instant feedback. Track your score — aim for 8/10 or better.</p>
+    </div>
+  </div>
+
+  <div class="final-quiz reveal" id="finalQuiz"></div>
+
+  <div class="score-display reveal" id="scoreDisplay" style="display:none">
+    <div>
+      <div class="score-num" id="scoreNum">0/10</div>
+      <div class="score-label">Final Score</div>
+    </div>
+    <div style="flex:1">
+      <div id="scoreMsg" style="font-size:15px;color:var(--text)"></div>
+      <div style="font-size:13px;color:var(--text-muted);margin-top:4px;font-family:'JetBrains Mono',monospace">Reset to try again — questions stay the same, but your understanding deepens.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="mono">Embedded V&amp;V Mastery Hub · <span class="accent">build 2.4.1</span> · single-file revision atlas</div>
+  <div style="margin-top:8px;font-size:12px">Designed for embedded engineers · Refresh concepts before interviews &amp; audits</div>
+</footer>
+
+<script>
+/* ============================================================
+   1. Circuit Background Animation
+   ============================================================ */
+(function(){
+  const canvas = document.getElementById('circuit-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, DPR;
+  const nodes = [];
+  const pulses = [];
+  const NODE_COUNT = 60;
+  
+  function resize(){
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth;
+    H = canvas.clientHeight;
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+    ctx.scale(DPR, DPR);
+  }
+  
+  function init(){
+    resize();
+    nodes.length = 0;
+    for(let i = 0; i < NODE_COUNT; i++){
+      nodes.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        vx: (Math.random() - 0.5) * 0.15,
+        vy: (Math.random() - 0.5) * 0.15,
+        r: Math.random() * 1.5 + 0.5
+      });
+    }
+  }
+  
+  function findConnections(node, maxDist){
+    const conns = [];
+    for(const n of nodes){
+      if(n === node) continue;
+      const dx = n.x - node.x;
+      const dy = n.y - node.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if(d < maxDist) conns.push({n, d, dx, dy});
+    }
+    return conns;
+  }
+  
+  function spawnPulse(){
+    if(pulses.length > 8) return;
+    const from = nodes[Math.floor(Math.random() * nodes.length)];
+    const conns = findConnections(from, 180);
+    if(conns.length === 0) return;
+    const c = conns[Math.floor(Math.random() * conns.length)];
+    pulses.push({
+      from, to: c.n, t: 0, speed: 0.008 + Math.random() * 0.012,
+      color: Math.random() > 0.5 ? 'rgba(0,255,157,' : 'rgba(0,212,255,'
+    });
+  }
+  
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    
+    // Move nodes
+    for(const n of nodes){
+      n.x += n.vx;
+      n.y += n.vy;
+      if(n.x < 0 || n.x > W) n.vx *= -1;
+      if(n.y < 0 || n.y > H) n.vy *= -1;
+    }
+    
+    // Draw connections
+    ctx.lineWidth = 1;
+    for(let i = 0; i < nodes.length; i++){
+      for(let j = i + 1; j < nodes.length; j++){
+        const dx = nodes[j].x - nodes[i].x;
+        const dy = nodes[j].y - nodes[i].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if(d < 150){
+          const alpha = (1 - d / 150) * 0.15;
+          ctx.strokeStyle = `rgba(0,255,157,${alpha})`;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    
+    // Draw nodes
+    for(const n of nodes){
+      ctx.fillStyle = 'rgba(0,255,157,0.6)';
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, Math.max(0.5, n.r), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    // Draw pulses
+    for(let i = pulses.length - 1; i >= 0; i--){
+      const p = pulses[i];
+      p.t += p.speed;
+      if(p.t >= 1){
+        pulses.splice(i, 1);
+        continue;
+      }
+      const x = p.from.x + (p.to.x - p.from.x) * p.t;
+      const y = p.from.y + (p.to.y - p.from.y) * p.t;
+      // glow
+      const grad = ctx.createRadialGradient(x, y, 0, x, y, 12);
+      grad.addColorStop(0, p.color + '1)');
+      grad.addColorStop(1, p.color + '0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(x, y, 12, 0, Math.PI * 2);
+      ctx.fill();
+      // core
+      ctx.fillStyle = p.color + '1)';
+      ctx.beginPath();
+      ctx.arc(x, y, 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    
+    if(Math.random() < 0.06) spawnPulse();
+    
+    requestAnimationFrame(draw);
+  }
+  
+  window.addEventListener('resize', () => { resize(); init(); });
+  init();
+  draw();
+})();
+
+/* ============================================================
+   2. Tab Switching
+   ============================================================ */
+document.querySelectorAll('.tabs').forEach(tabset => {
+  const btns = tabset.querySelectorAll('.tab-btn');
+  btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      btns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.dataset.tab;
+      // Find sibling panes
+      const section = tabset.closest('section');
+      section.querySelectorAll('.tab-pane').forEach(p => {
+        p.classList.toggle('active', p.dataset.pane === target);
+      });
+    });
+  });
+});
+
+/* ============================================================
+   3. Checkpoint Quiz Logic
+   ============================================================ */
+document.querySelectorAll('.checkpoint').forEach(cp => {
+  const opts = cp.querySelector('.options');
+  const correctKey = opts.dataset.correct;
+  const feedback = cp.querySelector('.feedback');
+  
+  opts.querySelectorAll('.opt').forEach(opt => {
+    opt.addEventListener('click', () => {
+      if(opts.classList.contains('answered')) return;
+      opts.classList.add('answered');
+      const key = opt.dataset.key;
+      if(key === correctKey){
+        opt.classList.add('correct');
+      } else {
+        opt.classList.add('wrong');
+        const correctOpt = opts.querySelector(`.opt[data-key="${correctKey}"]`);
+        if(correctOpt) correctOpt.classList.add('correct');
+      }
+      feedback.classList.add('show');
+      updateProgress();
+    });
+  });
+});
+
+/* ============================================================
+   4. Progress Tracking
+   ============================================================ */
+function updateProgress(){
+  const checkpoints = document.querySelectorAll('.checkpoint');
+  const answered = document.querySelectorAll('.checkpoint .options.answered').length;
+  const pct = Math.round((answered / checkpoints.length) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressTxt').textContent = pct + '%';
+}
+
+/* ============================================================
+   5. SPI Mode Interactive
+   ============================================================ */
+document.querySelectorAll('.spi-mode').forEach(m => {
+  m.addEventListener('click', () => {
+    document.querySelectorAll('.spi-mode').forEach(x => x.classList.remove('active'));
+    m.classList.add('active');
+  });
+});
+
+/* ============================================================
+   6. Reveal on Scroll
+   ============================================================ */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      e.target.classList.add('in');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+/* ============================================================
+   7. Smooth Scroll Active Nav
+   ============================================================ */
+const navLinks = document.querySelectorAll('.nav-links a');
+const sections = document.querySelectorAll('section[id]');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if(rect.top <= 120 && rect.bottom >= 120) current = s.id;
+  });
+  navLinks.forEach(a => {
+    a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+  });
+});
+
+/* ============================================================
+   8. Search Filter
+   ============================================================ */
+const searchInput = document.getElementById('search');
+searchInput.addEventListener('input', e => {
+  const q = e.target.value.toLowerCase().trim();
+  if(!q){
+    document.querySelectorAll('.card, .checkpoint, .proto-viz').forEach(el => {
+      el.style.opacity = '';
+      el.style.filter = '';
+    });
+    return;
+  }
+  document.querySelectorAll('.card, .checkpoint, .proto-viz, .tab-pane').forEach(el => {
+    const text = el.textContent.toLowerCase();
+    if(text.includes(q)){
+      el.style.opacity = '1';
+      el.style.filter = '';
+    } else {
+      el.style.opacity = '0.15';
+      el.style.filter = 'grayscale(0.5)';
+    }
+  });
+  // Jump to first match
+  const firstMatch = [...document.querySelectorAll('.card, .checkpoint, .proto-viz')]
+    .find(el => el.textContent.toLowerCase().includes(q));
+  if(firstMatch && q.length > 2){
+    firstMatch.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+});
+
+/* ============================================================
+   9. Final Quiz
+   ============================================================ */
+const quizQuestions = [
+  {
+    q: "What's the typical acceptable CPU utilization target for a hard real-time system?",
+    opts: ["100%", "70–80%", "50% maximum", "No limit if WCET is bounded"],
+    correct: 1,
+    explain: "70–80% leaves headroom for sporadic peaks and worst-case scenarios. Hard RT systems must meet deadlines even in worst-case phasing, not just average load."
+  },
+  {
+    q: "On Cortex-M, which stack pointer is used by default in Thread mode after reset?",
+    opts: ["PSP (Process Stack Pointer)", "MSP (Main Stack Pointer)", "Either, randomly chosen", "Neither — there's no stack"],
+    correct: 1,
+    explain: "Reset defaults to MSP. The CONTROL.SPSEL bit switches to PSP, typically when an OS runs tasks on PSP while keeping MSP for exceptions."
+  },
+  {
+    q: "I²C bus is stuck low after a slave crash. What's the recovery procedure?",
+    opts: ["Power cycle the master", "Toggle SCL up to 9 times then issue STOP", "Send a hardware reset to all slaves", "Cut power to the bus"],
+    correct: 1,
+    explain: "Toggle SCL 9 times (max byte length + ACK) to clock out any partial byte the slave is holding, then assert STOP condition to release SDA."
+  },
+  {
+    q: "In SPI, what determines whether data is sampled on rising or falling edge of SCK?",
+    opts: ["The slave's address", "CPOL bit only", "CPHA bit only", "Both CPOL and CPHA together (4 modes)"],
+    correct: 3,
+    explain: "CPOL sets clock idle polarity (0=idle low, 1=idle high). CPHA sets the clock phase (0=first edge sample, 1=second edge sample). Together they form 4 modes (0–3) that master and slave must match."
+  },
+  {
+    q: "CAN arbitration: ID 0x100 vs 0x080 transmit simultaneously. Who wins?",
+    opts: ["0x100", "0x080 (lower ID wins)", "Random", "Whichever has more data"],
+    correct: 1,
+    explain: "0x080 has a dominant (0) bit at the bit-4 position where 0x100 has a recessive (1). 0x080 wins. Lower CAN ID = higher priority."
+  },
+  {
+    q: "Which tool finds a regression's offending commit via binary search through history?",
+    opts: ["git blame", "git bisect", "git revert", "git reflog"],
+    correct: 1,
+    explain: "git bisect performs binary search: you mark commits good/bad until it pins the exact commit that introduced the bug. Can be automated with `git bisect run <script>`."
+  },
+  {
+    q: "An oscilloscope shows 50 MHz ringing on a 10 MHz SPI clock. Most likely cause?",
+    opts: ["Insufficient bandwidth", "Long alligator ground lead inductance", "Wrong probe attenuation", "Trigger misconfigured"],
+    correct: 1,
+    explain: "The standard 6-inch ground clip has ~1µH inductance. At high frequencies this resonates with probe capacitance causing ringing. Solution: use a ground spring tip directly on the probe tip."
+  },
+  {
+    q: "Which debugging technique is LEAST intrusive for analyzing real-time scheduling?",
+    opts: ["Software printf over UART", "Hardware ITM/SWO trace", "Setting GDB breakpoints", "Single-stepping in debugger"],
+    correct: 1,
+    explain: "ITM/SWO trace uses a dedicated hardware pin with cycle-accurate timestamps. Printf adds ms of latency per call. Breakpoints halt the CPU, destroying real-time behavior entirely."
+  },
+  {
+    q: "On RT-Linux (PREEMPT_RT), which tool measures scheduling jitter?",
+    opts: ["perf record", "cyclictest", "strace", "valgrind"],
+    correct: 1,
+    explain: "cyclictest from rt-tests suite measures the latency between expected and actual wake-up times over many cycles. Typical max acceptable: <100µs for hard RT, <50µs for tight RT."
+  },
+  {
+    q: "Which coverage metric is required for DO-178C Level A (safety-critical aviation)?",
+    opts: ["Statement coverage", "Branch coverage", "MC/DC", "Path coverage"],
+    correct: 2,
+    explain: "MC/DC (Modified Condition/Decision Coverage) requires that each condition in a boolean expression independently affects the decision's outcome. Required for DO-178C Level A — strongest practical coverage metric."
+  }
+];
+
+function renderQuiz(){
+  const container = document.getElementById('finalQuiz');
+  let answered = 0;
+  let score = 0;
+  
+  quizQuestions.forEach((item, idx) => {
+    const card = document.createElement('div');
+    card.className = 'quiz-card';
+    let optsHTML = item.opts.map((o, i) => 
+      `<div class="opt" data-key="${String.fromCharCode(97+i)}"><span class="key">${String.fromCharCode(65+i)}</span>${o}</div>`
+    ).join('');
+    card.innerHTML = `
+      <div class="qnum">QUESTION ${String(idx+1).padStart(2,'0')} / ${quizQuestions.length}</div>
+      <div class="qtext">${item.q}</div>
+      <div class="options" data-correct="${String.fromCharCode(97 + item.correct)}">${optsHTML}</div>
+      <div class="feedback">${item.explain}</div>
+    `;
+    container.appendChild(card);
+    
+    const opts = card.querySelector('.options');
+    const feedback = card.querySelector('.feedback');
+    opts.querySelectorAll('.opt').forEach(opt => {
+      opt.addEventListener('click', () => {
+        if(opts.classList.contains('answered')) return;
+        opts.classList.add('answered');
+        const key = opt.dataset.key;
+        const correctKey = opts.dataset.correct;
+        if(key === correctKey){
+          opt.classList.add('correct');
+          score++;
+        } else {
+          opt.classList.add('wrong');
+          const correctOpt = opts.querySelector(`.opt[data-key="${correctKey}"]`);
+          if(correctOpt) correctOpt.classList.add('correct');
+        }
+        feedback.classList.add('show');
+        answered++;
+        if(answered === quizQuestions.length){
+          showScore(score);
+        }
+      });
+    });
+  });
+}
+
+function showScore(score){
+  const display = document.getElementById('scoreDisplay');
+  const num = document.getElementById('scoreNum');
+  const msg = document.getElementById('scoreMsg');
+  display.style.display = 'flex';
+  num.textContent = score + '/' + quizQuestions.length;
+  const pct = score / quizQuestions.length;
+  let text = '';
+  if(pct >= 0.9) text = 'Outstanding. You\'re audit-ready.';
+  else if(pct >= 0.7) text = 'Solid grasp — review the missed topics and re-take.';
+  else if(pct >= 0.5) text = 'Foundational knowledge present. Drill into weak areas.';
+  else text = 'Time to revisit the modules above systematically.';
+  msg.textContent = text;
+  display.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+renderQuiz();
+
+</script>
+</body>
+</html>
